@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header" style="height:38px">
+      <div class="container-fluid">
+        <div class="row mb-2" style="margin-top: -7px;">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="javascript:history.back()">返回上级</a></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title"> <i class="fab fa-docker nav-icon"></i>&nbsp;全量Docker容器列表</h3>
+        <div class=" float-sm-right">
+          <!-- SEARCH FORM -->
+          <form class="form-inline ml-3" th:action="@{'/dockerInfo/hostList'}">
+            <button type="button" onclick="backDockerListPage()" class="btn btn-primary btn-sm">Docker监控列表</button>&nbsp;
+            <button type="button" onclick="searchByOnline('')" class="btn btn-primary btn-sm">全部</button>&nbsp;
+            <button type="button" onclick="searchByOnline('1')" class="btn btn-success btn-sm">在线</button>&nbsp;
+            <button type="button" onclick="searchByOnline('2')" class="btn bg-danger btn-sm">已离线</button>&nbsp;
+            <div th:replace="common/groupSelect.html"></div>
+            <div th:replace="common/accountSelect.html"></div>
+            <div class="input-group input-group-sm">
+              <input th:class="'form-control '+${session.themeNameSign}"  id="hostname" name="hostname" autocomplete="off" th:value="${systemInfo.hostname}" type="text" placeholder="输入ip">
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="submit">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+            </div>
+          </form>
+
+        </div>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <table th:class="'table table-bordered '+${session.themeTableHoverSign}">
+          <thead>
+          <tr>
+            <th style="width: 20px"> <input type="checkbox" value="" name="checkall" id="checkall"></th>
+            <th style="width: 60px">序号</th>
+            <th>IP</th>
+            <th>备注</th>
+            <th>Docker容器数量</th>
+            <th>更新时间</th>
+            <th th:if="${application.hostGroup == 'true'}">标签</th>
+            <th th:if="${application.LICENSE_STATE eq '1' && application.userInfoManage == 'true' && session.LOGIN_KEY.role == 'admin'}">账号</th>
+            <th>操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <th:block th:each="item,iterStat : ${page.list}">
+            <tr>
+              <td><input type="checkbox" th:value="${item.id}" name="todo2" th:id="${item.id}+'_check'"/></td>
+              <td th:text="${iterStat.index+1}">1</td>
+              <th:block th:if="${item.state  == '2'}">
+                  <td><span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="${item.hostname}+'已离线'" class="badge bg-danger"><i th:if="${item.active == '2'}" title="已停止监控" style="margin-right:2px;" class="fa-solid fa-stopwatch"></i><i th:if="${item.countBlock == '2'}" title="已停止计算资源" style="margin-right:2px;" class="fa-solid fa-ban"></i><span th:text="${item.hostname}"></span></span></td>
+              </th:block>
+              <th:block th:if="${item.state  != '2'}">
+                  <td><span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="${item.hostname}" class="badge bg-success"><i th:if="${item.active == '2'}" title="已停止监控" style="margin-right:2px;" class="fa-solid fa-stopwatch"></i><i th:if="${item.countBlock == '2'}" title="已停止计算资源" style="margin-right:2px;" class="fa-solid fa-ban"></i><span th:text="${item.hostname}"></span></span></td>
+              </th:block>
+              <td th:text="${item.remark}"></td>
+              <td><span class="badge bg-primary" th:text="${item.procs}"></span></td>
+              <td th:text="${#dates.format(item.createTime,'yyyy-MM-dd HH:mm:ss')}">Update software</td>
+              <td th:if="${application.hostGroup == 'true'}"><span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="${item.groupId}" th:text="${#strings.abbreviate(item.groupId,60)}"></span></td>
+              <td th:text="${item.account}" th:if="${application.LICENSE_STATE eq '1' && application.userInfoManage == 'true' && session.LOGIN_KEY.role == 'admin'}"></td>
+              <td><button type="button"  th:onclick="view([[${item.id}]])"  class="btn btn-primary btn-sm">查看Docker列表</button></td>
+            </tr>
+          </th:block>
+
+          </tbody>
+        </table>
+      </div>
+      <!-- /.card-body -->
+      <div th:replace="common/page.html"></div>
+    </div>
+    <!-- /.card -->
+
+
+  </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+  <div class="modal fade" id="modal-default3">
+    <div class="modal-dialog">
+      <form method="post" id="form4" th:action="@{'/dockerInfo/saveGroupId'}">
+        <div class="modal-content" style="font-size:0.90rem">
+          <div class="modal-header">
+            <h4 class="modal-title">设置标签<span class="text-muted">（可多选，在系统管理中维护标签）</span></h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>
+              <input type="hidden" id="id3" name="ids"/>
+              <select class="select2" multiple="multiple" data-placeholder="请选择" style="width: 100%;" name="groupId">
+                <option  value="">请选择</option>
+                <th:block th:each="item,iterStat : ${hostGroupList}">
+                  <option  th:value="${item.id}"  th:text="${item.groupName}">Alabama</option>
+                </th:block>
+              </select>
+            </p>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default  btn-sm" data-dismiss="modal">关 闭</button>
+            <button type="button" onclick="ajaxSaveGroupId()" class="btn btn-primary btn-sm">保 存</button>
+          </div>
+        </div>
+      </form>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:inline="javascript">
+  $(document).ready(function(){
+    $("#groupId").val([[${systemInfo.groupId}]]);
+    $("#account").val([[${systemInfo.account}]]);
+    $('.select2').select2();
+  });
+  function searchByOnline(state){
+    window.location.href = SERVER_SERVLET_CONTEXT_PATH + "/dockerInfo/hostList?state="+state;
+  }
+  function searchByGroupId() {
+    window.location.href = SERVER_SERVLET_CONTEXT_PATH + "/dockerInfo/hostList?groupId="+$("#groupId").val();
+  }
+
+  function searchByAccount() {
+    window.location.href = SERVER_SERVLET_CONTEXT_PATH + "/dockerInfo/hostList?account="+$("#account").val();
+  }
+
+  function backDockerListPage(){
+    window.location.href = SERVER_SERVLET_CONTEXT_PATH + "/dockerInfo/list";
+  }
+  function view(id) {
+    window.location.href = SERVER_SERVLET_CONTEXT_PATH + "/dockerInfo/viewAllDockerList?id="+id;
+  }
+  var msg = [[${tipInfo}]];
+  if(msg!='' && msg!=null){
+    toastr.info(msg);
+  }
+</script>
+
+</body>
+</html>

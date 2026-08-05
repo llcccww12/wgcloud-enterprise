@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wgcloud.mapper.SystemInfoMapper">
+	<resultMap id="resultMap" type="com.wgcloud.entity.SystemInfo">
+		<id column="ID" property="id" jdbcType="CHAR" />
+		<result column="HOST_NAME" property="hostname" jdbcType="CHAR" />
+		<result column="MEM_PER" property="memPer" jdbcType="DOUBLE" />
+		<result column="CPU_PER" property="cpuPer" jdbcType="DOUBLE" />
+		<result column="CPU_CORE_NUM" property="cpuCoreNum" jdbcType="CHAR" />
+		<result column="STATE" property="state" jdbcType="CHAR" />
+		<result column="GROUP_ID" property="groupId" jdbcType="CHAR" />
+		<result column="PROCS" property="procs" jdbcType="CHAR" />
+		<result column="REMARK" property="remark" jdbcType="CHAR" />
+		<result column="TOTAL_MEM" property="totalMem" jdbcType="CHAR" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="RXBYT" property="rxbyt" jdbcType="CHAR" />
+		<result column="TXBYT" property="txbyt" jdbcType="CHAR" />
+		<result column="FIVE_LOAD" property="fiveLoad" jdbcType="DOUBLE" />
+		<result column="FIFTEEN_LOAD" property="fifteenLoad" jdbcType="DOUBLE" />
+		<result column="WIN_CONSOLE" property="winConsole" jdbcType="CHAR" />
+		<result column="NET_CONNECTIONS" property="netConnections" jdbcType="CHAR" />
+		<result column="ACCOUNT" property="account" jdbcType="CHAR" />
+		<result column="ACTIVE" property="active" jdbcType="CHAR" />
+		<result column="COUNT_BLOCK" property="countBlock" jdbcType="CHAR" />
+		<result column="DISK_PER" property="diskPer" jdbcType="DOUBLE" />
+		<result column="DISK_SUM_SIZE" property="diskSumSize" jdbcType="CHAR" />
+		<result column="ORDER_NUM" property="orderNum" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<sql id="tableColumnList">
+		ID,HOST_NAME,GROUP_ID,PROCS,MEM_PER,CPU_PER,CPU_CORE_NUM,CREATE_TIME,STATE,REMARK,TOTAL_MEM,RXBYT,TXBYT,WIN_CONSOLE,FIVE_LOAD,FIFTEEN_LOAD,NET_CONNECTIONS,ACCOUNT,ACTIVE,COUNT_BLOCK,ORDER_NUM,DISK_PER,DISK_SUM_SIZE
+	</sql>
+	
+	<sql id="queryByParams">
+		<if test="hostname != null">
+			<choose>
+				<when test="_databaseId == 'oracle'">
+					<![CDATA[ AND ( HOST_NAME LIKE   CONCAT(CONCAT('%',#{hostname}),'%') OR REMARK LIKE   CONCAT(CONCAT('%',#{hostname}),'%') OR HOST_NAME IN (SELECT t.HOST_NAME FROM SYSTEM_INFO_EXT t WHERE t.HOST_NAME_EXT LIKE  CONCAT(CONCAT('%',#{hostname}),'%')) )]]>
+				</when>
+				<otherwise>
+					<![CDATA[ AND ( HOST_NAME LIKE  CONCAT('%',#{hostname},'%') OR REMARK LIKE  CONCAT('%',#{hostname},'%') OR HOST_NAME IN (SELECT t.HOST_NAME FROM SYSTEM_INFO_EXT t WHERE t.HOST_NAME_EXT LIKE CONCAT('%',#{hostname},'%')) )]]>
+				</otherwise>
+			</choose>
+		</if>
+		<if test="hostnameForAgent != null">
+			<![CDATA[ AND HOST_NAME = #{hostnameForAgent} ]]>
+		</if>
+		<if test="memPer != null">
+			<![CDATA[ AND MEM_PER >= #{memPer} ]]>
+		</if>
+		<if test="memPerLe != null">
+			<![CDATA[ AND MEM_PER < #{memPerLe} ]]>
+		</if>
+		<if test="cpuPer != null">
+			<![CDATA[ AND CPU_PER >= #{cpuPer} ]]>
+		</if>
+		<if test="cpuPerLe != null">
+			<![CDATA[ AND CPU_PER < #{cpuPerLe} ]]>
+		</if>
+		<if test="state != null">
+			<![CDATA[ AND STATE = #{state} ]]>
+		</if>
+		<if test="active != null">
+			<![CDATA[ AND ACTIVE = #{active} ]]>
+		</if>
+		<if test="activeNe != null">
+			<![CDATA[ AND (ACTIVE != #{activeNe} OR ACTIVE IS NULL) ]]>
+		</if>
+		<if test="groupId != null">
+			<include refid="commonSqlUtil.groupIdQueryParams" />
+		</if>
+		<if test="account != null">
+			<![CDATA[ AND ACCOUNT = #{account} ]]>
+		</if>
+		<if test="countBlockNe != null">
+			<![CDATA[ AND (COUNT_BLOCK != #{countBlockNe} OR COUNT_BLOCK IS NULL) ]]>
+		</if>
+	</sql>
+	
+	<select id="selectById" resultMap="resultMap" parameterType="java.lang.String">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM SYSTEM_INFO WHERE ID=#{id} 
+	</select>
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		DELETE FROM SYSTEM_INFO WHERE ID = #{id}
+	</delete>
+
+
+	<delete id="deleteByAccHname"  parameterType="map">
+		DELETE FROM SYSTEM_INFO WHERE <![CDATA[  HOST_NAME  = #{hostname} ]]>
+	</delete>
+	
+	<delete id="deleteById" parameterType="java.lang.String">
+		DELETE FROM SYSTEM_INFO WHERE ID IN
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<select id="selectByIds" resultMap="resultMap" parameterType="java.lang.String">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM SYSTEM_INFO WHERE ID IN
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<update id="downByHostName" parameterType="java.util.List">
+		UPDATE  SYSTEM_INFO SET STATE = '2'
+		WHERE HOST_NAME IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<update id="updateAccountByHostName"  parameterType="map">
+		UPDATE  SYSTEM_INFO SET ACCOUNT = #{account}
+		WHERE HOST_NAME IN
+		<foreach item="item" index="index" collection="hostnames" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<update id="updateToTargetAccount"  parameterType="map">
+		UPDATE  SYSTEM_INFO SET ACCOUNT = #{accountTarget}
+		<where>
+			<include refid="commonSqlUtil.updateToTargetAccountQueryParams" />
+		</where>
+	</update>
+
+	<insert id="insertList" parameterType="java.util.List" >
+		<choose>
+			<when test="_databaseId == 'oracle'">
+				begin
+				<foreach collection="list" item="item" index="index">
+					INSERT INTO SYSTEM_INFO (ID,HOST_NAME,MEM_PER,CPU_PER,CPU_CORE_NUM,CREATE_TIME,STATE,GROUP_ID,PROCS,REMARK,TOTAL_MEM,RXBYT,TXBYT,WIN_CONSOLE,FIVE_LOAD,FIFTEEN_LOAD,NET_CONNECTIONS,ACCOUNT,DISK_PER,DISK_SUM_SIZE)  VALUES
+					(#{item.id},#{item.hostname},#{item.memPer},#{item.cpuPer},#{item.cpuCoreNum},#{item.createTime},#{item.state},#{item.groupId},#{item.procs},#{item.remark},#{item.totalMem},#{item.rxbyt},#{item.txbyt},#{item.winConsole},#{item.fiveLoad},#{item.fifteenLoad},#{item.netConnections},#{item.account},#{item.diskPer},#{item.diskSumSize});
+				</foreach>
+				end;
+			</when>
+			<otherwise>
+				INSERT INTO SYSTEM_INFO (ID,HOST_NAME,MEM_PER,CPU_PER,CPU_CORE_NUM,CREATE_TIME,STATE,GROUP_ID,PROCS,REMARK,TOTAL_MEM,RXBYT,TXBYT,WIN_CONSOLE,FIVE_LOAD,FIFTEEN_LOAD,NET_CONNECTIONS,ACCOUNT,DISK_PER,DISK_SUM_SIZE)  VALUES
+				<foreach collection="list" item="item" index="index" separator="," >
+					(#{item.id},#{item.hostname},#{item.memPer},#{item.cpuPer},#{item.cpuCoreNum},#{item.createTime},#{item.state},#{item.groupId},#{item.procs},#{item.remark},#{item.totalMem},#{item.rxbyt},#{item.txbyt},#{item.winConsole},#{item.fiveLoad},#{item.fifteenLoad},#{item.netConnections},#{item.account},#{item.diskPer},#{item.diskSumSize})
+				</foreach>
+			</otherwise>
+		</choose>
+	</insert>
+
+
+	<update id="updateList" parameterType="java.util.List" >
+		<if test="_databaseId == 'oracle'">
+			begin
+		</if>
+		<foreach collection="list" item="item" index="index">
+		UPDATE SYSTEM_INFO
+		<set>
+			<if test="item.hostname != null">
+				HOST_NAME = #{item.hostname},
+			</if>
+			<if test="item.memPer != null" >
+				MEM_PER= #{item.memPer},
+			</if>
+			<if test="item.cpuPer != null" >
+				CPU_PER= #{item.cpuPer},
+			</if>
+			<if test="item.cpuCoreNum != null" >
+				CPU_CORE_NUM= #{item.cpuCoreNum},
+			</if>
+			<if test="item.state != null" >
+				STATE= #{item.state},
+			</if>
+			<if test="item.procs != null" >
+				PROCS= #{item.procs},
+			</if>
+			<if test="item.totalMem != null" >
+				TOTAL_MEM= #{item.totalMem},
+			</if>
+			<if test="item.rxbyt != null" >
+				RXBYT= #{item.rxbyt},
+			</if>
+			<if test="item.txbyt != null" >
+				TXBYT= #{item.txbyt},
+			</if>
+			<if test="item.winConsole != null" >
+				WIN_CONSOLE= #{item.winConsole},
+			</if>
+			<if test="item.fiveLoad != null" >
+				FIVE_LOAD= #{item.fiveLoad},
+			</if>
+			<if test="item.fifteenLoad != null" >
+				FIFTEEN_LOAD= #{item.fifteenLoad},
+			</if>
+			<if test="item.netConnections != null" >
+				NET_CONNECTIONS= #{item.netConnections},
+			</if>
+			<if test="item.account != null" >
+				ACCOUNT= #{item.account},
+			</if>
+			<if test="item.diskPer != null" >
+				DISK_PER= #{item.diskPer},
+			</if>
+			<if test="item.diskSumSize != null" >
+				DISK_SUM_SIZE= #{item.diskSumSize},
+			</if>
+			<if test="item.createTime != null" >
+				CREATE_TIME= #{item.createTime}
+			</if>
+		</set>
+		WHERE ID = #{item.id};
+		</foreach>
+		<if test="_databaseId == 'oracle'">
+			end;
+		</if>
+	</update>
+
+	<insert id="save" parameterType="com.wgcloud.entity.SystemInfo">
+		INSERT INTO SYSTEM_INFO
+    	<trim prefix="(" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >ID,</if>
+      		<if test="hostname != null" > HOST_NAME,</if>
+      		<if test="memPer != null" >MEM_PER,</if>
+      		<if test="cpuPer != null" >CPU_PER,</if>
+      		<if test="cpuCoreNum != null" >CPU_CORE_NUM,</if>
+			<if test="state != null" >STATE,</if>
+			<if test="groupId != null" >GROUP_ID,</if>
+			<if test="procs != null" >PROCS,</if>
+			<if test="remark != null" >REMARK,</if>
+			<if test="totalMem != null" >TOTAL_MEM,</if>
+			<if test="rxbyt != null" >RXBYT,</if>
+			<if test="txbyt != null" >TXBYT,</if>
+			<if test="winConsole != null" >WIN_CONSOLE,</if>
+			<if test="fiveLoad != null" >FIVE_LOAD,</if>
+			<if test="fifteenLoad != null" >FIFTEEN_LOAD,</if>
+			<if test="netConnections != null" >NET_CONNECTIONS,</if>
+			<if test="account != null" >ACCOUNT,</if>
+			<if test="diskPer != null" >DISK_PER,</if>
+			<if test="diskSumSize != null" >DISK_SUM_SIZE,</if>
+      		<if test="createTime != null" >CREATE_TIME</if>
+    	</trim>
+    	<trim prefix="values (" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >#{id},</if>
+      		<if test="hostname != null" >#{hostname},</if>
+      		<if test="memPer != null" >#{memPer},</if>
+      		<if test="cpuPer != null" >#{cpuPer},</if>
+      		<if test="cpuCoreNum != null" >#{cpuCoreNum},</if>
+			<if test="state != null" >#{state},</if>
+			<if test="groupId != null" >#{groupId},</if>
+			<if test="procs != null" >#{procs},</if>
+			<if test="remark != null" >#{remark},</if>
+			<if test="totalMem != null" >#{totalMem},</if>
+			<if test="rxbyt != null" >#{rxbyt},</if>
+			<if test="txbyt != null" >#{txbyt},</if>
+			<if test="winConsole != null" >#{winConsole},</if>
+			<if test="fiveLoad != null" >#{fiveLoad},</if>
+			<if test="fifteenLoad != null" >#{fifteenLoad},</if>
+			<if test="netConnections != null" >#{netConnections},</if>
+			<if test="account != null" >#{account},</if>
+			<if test="diskPer != null" >#{diskPer},</if>
+			<if test="diskSumSize != null" >#{diskSumSize},</if>
+      		<if test="createTime != null" >#{createTime}</if>
+    	</trim>
+	</insert>
+
+	<update id="updateById" parameterType="com.wgcloud.entity.SystemInfo">
+		UPDATE SYSTEM_INFO
+		<set>
+			<if test="hostname != null">
+				HOST_NAME = #{hostname},
+			</if>
+			<if test="memPer != null" >
+				MEM_PER= #{memPer},
+			</if>
+			<if test="cpuPer != null" >
+				CPU_PER= #{cpuPer},
+			</if>
+			<if test="cpuCoreNum != null" >
+				CPU_CORE_NUM= #{cpuCoreNum},
+			</if>
+			<if test="state != null" >
+				STATE= #{state},
+			</if>
+			<if test="groupId != null" >
+				GROUP_ID= #{groupId},
+			</if>
+			<if test="procs != null" >
+				PROCS= #{procs},
+			</if>
+			<if test="remark != null" >
+				REMARK= #{remark},
+			</if>
+			<if test="totalMem != null" >
+				TOTAL_MEM= #{totalMem},
+			</if>
+			<if test="rxbyt != null" >
+				RXBYT= #{rxbyt},
+			</if>
+			<if test="txbyt != null" >
+				TXBYT= #{txbyt},
+			</if>
+			<if test="winConsole != null" >
+				WIN_CONSOLE= #{winConsole},
+			</if>
+			<if test="fiveLoad != null" >
+				FIVE_LOAD= #{fiveLoad},
+			</if>
+			<if test="fifteenLoad != null" >
+				FIFTEEN_LOAD= #{fifteenLoad},
+			</if>
+			<if test="netConnections != null" >
+				NET_CONNECTIONS= #{netConnections},
+			</if>
+			<if test="account != null" >
+				ACCOUNT= #{account},
+			</if>
+			<if test="diskPer != null" >
+				DISK_PER= #{diskPer},
+			</if>
+			<if test="diskSumSize != null" >
+				DISK_SUM_SIZE= #{diskSumSize},
+			</if>
+			<if test="createTime != null" >
+				CREATE_TIME= #{createTime}
+			</if>
+		</set>
+		WHERE ID = #{id}
+	</update>
+
+	<update id="updateDiskPerByHostName" parameterType="java.util.List" >
+		<if test="_databaseId == 'oracle'">
+			begin
+		</if>
+		<foreach collection="list" item="item" index="index">
+			UPDATE SYSTEM_INFO
+			<set>
+				<if test="item.diskPer != null" >
+					DISK_PER= #{item.diskPer},
+				</if>
+				<if test="item.diskSumSize != null" >
+					DISK_SUM_SIZE= #{item.diskSumSize},
+				</if>
+				<if test="item.createTime != null" >
+					CREATE_TIME= #{item.createTime}
+				</if>
+			</set>
+			WHERE ID = #{item.id};
+		</foreach>
+		<if test="_databaseId == 'oracle'">
+			end;
+		</if>
+	</update>
+
+	<update id="updateActive"  parameterType="com.wgcloud.entity.SystemInfo">
+		UPDATE  SYSTEM_INFO SET ACTIVE = #{active},CREATE_TIME = #{createTime} WHERE ID = #{id}
+	</update>
+
+	<update id="updateCountBlock"  parameterType="com.wgcloud.entity.SystemInfo">
+		UPDATE  SYSTEM_INFO SET COUNT_BLOCK = #{countBlock} WHERE ID = #{id}
+	</update>
+
+	<update id="updateOrderNum"  parameterType="com.wgcloud.entity.SystemInfo">
+		UPDATE  SYSTEM_INFO SET ORDER_NUM = #{orderNum} WHERE ID = #{id}
+	</update>
+
+	<select id="selectByHostname" resultMap="resultMap" parameterType="java.lang.String">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM SYSTEM_INFO
+		WHERE HOST_NAME = #{hostname}
+	</select>
+
+
+	<select id="countByParams" parameterType="map"  resultType="java.lang.Integer">
+		SELECT count(*)  FROM SYSTEM_INFO t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+	</select>
+
+	<select id="selectAllHostNameByParams" parameterType="map" resultMap="resultMap">
+		SELECT ID,HOST_NAME FROM SYSTEM_INFO
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		ORDER BY ID DESC
+	</select>
+
+	<sql id="mysqlOrderBySql">
+		<choose>
+			<when test="_databaseId == 'mysql' and (orderBy == 'TXBYT' || orderBy == 'RXBYT' || orderBy == 'TOTAL_MEM' || orderBy == 'CPU_CORE_NUM' || orderBy == 'NET_CONNECTIONS'|| orderBy == 'PROCS')">
+				<![CDATA[ ORDER BY ${orderBy} * 1 ${orderType}]]>
+			</when>
+			<when test="_databaseId == 'postgresql' and (orderBy == 'TXBYT' || orderBy == 'RXBYT' || orderBy == 'TOTAL_MEM' || orderBy == 'CPU_CORE_NUM' || orderBy == 'NET_CONNECTIONS'|| orderBy == 'PROCS')">
+				<![CDATA[ ORDER BY CAST(${orderBy} AS float8)  ${orderType}]]>
+			</when>
+			<otherwise>
+				<![CDATA[ ORDER BY ${orderBy} ${orderType}]]>
+			</otherwise>
+		</choose>
+	</sql>
+
+	  <select id="selectAllByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		  <include refid="tableColumnList" />
+		  FROM SYSTEM_INFO
+		  <where>
+			  <include refid="queryByParams" />
+		  </where>
+		  <choose>
+			  <when test="orderBy !=null and orderBy != ''">
+				  <include refid="mysqlOrderBySql" />
+			  </when>
+			  <otherwise>
+				  ORDER BY ORDER_NUM DESC,ID DESC
+			  </otherwise>
+		  </choose>
+	</select>
+
+	<select id="selectByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		 FROM SYSTEM_INFO
+		<where>
+			<include refid="queryByParams" />
+		</where>
+
+		<choose>
+			<when test="orderBy !=null and orderBy != ''">
+				<include refid="mysqlOrderBySql" />
+			</when>
+			<otherwise>
+				ORDER BY ORDER_NUM DESC,ID DESC
+			</otherwise>
+		</choose>
+
+	</select>
+	
+</mapper>

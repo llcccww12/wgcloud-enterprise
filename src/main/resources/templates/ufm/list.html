@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header" style="height:38px">
+      <div class="container-fluid">
+        <div class="row mb-2" style="margin-top: -7px;">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="javascript:history.back()">返回上级</a></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fa-solid fa-layer-group nav-icon"></i>&nbsp;UFM InfiniBand 监控列表</h3>
+        <div class=" float-sm-right">
+          <!-- SEARCH FORM -->
+          <form class="form-inline ml-3" th:action="@{'/ufmMonitor/list'}">
+            <th:block th:if="${session.LOGIN_KEY.role != 'guest'}">
+              <button type="button" onclick="delChecks('/ufmMonitor/del')"  class="btn bg-danger btn-sm" style="margin-right:5px;">删除</button>
+            </th:block>
+            <div class="input-group input-group-sm">
+              <input th:class="'form-control '+${session.themeNameSign}"  id="systemName" name="systemName" autocomplete="off" th:value="${ufmMonitor.systemName}" type="text" placeholder="名称">
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="submit">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+
+            </div>
+          </form>
+
+        </div>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <table th:class="'table table-bordered '+${session.themeTableHoverSign}">
+          <thead>
+          <tr>
+            <th style="width: 20px"> <input type="checkbox" value="" name="checkall" id="checkall"></th>
+            <th style="width: 60px">序号</th>
+            <th>设备名称</th>
+            <th>GUID</th>
+            <th>类型</th>
+            <th>状态</th>
+            <th>健康等级</th>
+            <th>发送流量(MB)</th>
+            <th>接收流量(MB)</th>
+            <th>告警数</th>
+            <th>更新时间</th>
+          </tr>
+          </thead>
+          <tbody>
+          <th:block th:each="item,iterStat : ${page.list}">
+            <tr>
+              <td><input type="checkbox" th:value="${item.id}" name="todo2" th:id="${item.id}+'_check'"/></td>
+              <td th:text="${iterStat.index+1}">1</td>
+              <td><a th:href="@{'/ufmMonitor/view?id='+${item.id}}" th:text="${item.systemName}"></a></td>
+              <td th:text="${item.guid}"></td>
+              <td th:text="${item.deviceType}"></td>
+              <td>
+                <th:block th:if="${item.deviceState == 'active'}">
+                  <span class="badge bg-success">active</span>
+                </th:block>
+                <th:block th:if="${item.deviceState != 'active'}">
+                  <span class="badge bg-danger" th:text="${item.deviceState}"></span>
+                </th:block>
+              </td>
+              <td>
+                <th:block th:if="${item.severity == 'Info'}">
+                  <span class="badge bg-info">Info</span>
+                </th:block>
+                <th:block th:if="${item.severity == 'Warning'}">
+                  <span class="badge bg-warning">Warning</span>
+                </th:block>
+                <th:block th:if="${item.severity == 'Critical'}">
+                  <span class="badge bg-danger">Critical</span>
+                </th:block>
+                <th:block th:if="${item.severity != 'Info' and item.severity != 'Warning' and item.severity != 'Critical'}">
+                  <span class="badge bg-secondary" th:text="${item.severity}"></span>
+                </th:block>
+              </td>
+              <td th:text="${item.mbOut}"></td>
+              <td th:text="${item.mbIn}"></td>
+              <td><span class="badge bg-primary" th:text="${item.alarmCount}"></span></td>
+              <td th:text="${#dates.format(item.createTime,'yyyy-MM-dd HH:mm:ss')}"></td>
+            </tr>
+          </th:block>
+
+          </tbody>
+        </table>
+      </div>
+      <!-- /.card-body -->
+      <div th:replace="common/page.html"></div>
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:src="@{'/static/js/fileSafe.js?v=3.5.1'}"></script>
+
+<script th:inline="javascript">
+  var msg = [[${msg}]];
+  if(msg!='' && msg!=null){
+    toastr.info(msg);
+  }
+</script>
+
+</body>
+</html>

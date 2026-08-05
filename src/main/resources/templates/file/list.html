@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}" style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header" style="height:38px">
+      <div class="container-fluid">
+        <div class="row mb-2" style="margin-top: -7px;">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="正在监控中的资源"><a th:href="@{'/fileWarnInfo/list?active=1'}">监控中</a></li>
+              <li class="breadcrumb-item" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="已停止监控的资源"><a th:href="@{'/fileWarnInfo/list?active=2'}">已停止</a></li>
+              <li class="breadcrumb-item"><a href="javascript:history.back()">返回上级</a></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+          <div class="col-md-12">
+            <div th:class="'card '+${session.themeNameSign}">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fa-solid fa-file-circle-check nav-icon"></i>&nbsp;日志监控列表</h3>
+                <div class=" float-sm-right">
+                  <!-- SEARCH FORM -->
+                  <form class="form-inline ml-3" th:action="@{'/fileWarnInfo/list'}">
+                    <th:block th:if="${session.LOGIN_KEY.role != 'guest'}">
+                      <button type="button" onclick="startMonitor('/fileWarnInfo/updateActive')" class="btn btn-primary btn-sm" style="margin-right:5px;">开始监控</button>
+                      <button type="button" onclick="stopMonitor('/fileWarnInfo/updateActive')" class="btn btn-default btn-sm" style="margin-right:5px;">停止监控</button>
+                      <button type="button" onclick="delChecks('/fileWarnInfo/del')"  class="btn bg-danger btn-sm" style="margin-right:5px;">删除</button>
+                      <button type="button" onclick="add()" class="btn btn-primary btn-sm" style="margin-right:5px;">添加</button>
+                      <button type="button" onclick="addBatch()" class="btn btn-primary btn-sm" style="margin-right:5px;">批量添加</button>
+                    </th:block>
+                    <div th:replace="common/accountSelect.html"></div>
+                    <div class="input-group input-group-sm">
+                      <input th:class="'form-control '+${session.themeNameSign}"  id="hostname" name="hostname" autocomplete="off" th:value="${fileWarnInfo.hostname}" type="text" placeholder="输入ip或文件路径">
+                      <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">
+                          <i class="fas fa-search"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+
+                </div>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <table th:class="'table table-bordered '+${session.themeTableHoverSign}">
+                  <thead>
+                  <tr>
+                    <th style="width: 20px"> <input type="checkbox" value="" name="checkall" id="checkall"></th>
+                    <th style="width: 60px">序号</th>
+                    <th:block th:if="${fileWarnInfo.orderBy  == 'HOST_NAME'}">
+                      <th:block th:if="${fileWarnInfo.orderType  == 'ASC'}">
+                        <th style="cursor:pointer" onclick="searchByOrder('HOST_NAME','DESC')">IP<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-up" style="vertical-align:bottom;"></i>&nbsp;</small></th>
+                      </th:block>
+                      <th:block th:if="${fileWarnInfo.orderType  == 'DESC'}">
+                        <th style="cursor:pointer" onclick="searchByOrder('HOST_NAME','ASC')">IP<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-down" style="color: #dc3545!important;vertical-align:bottom;"></i>&nbsp;</small></th>
+                      </th:block>
+                    </th:block>
+                    <th:block th:if="${fileWarnInfo.orderBy  ne 'HOST_NAME'}">
+                      <th style="cursor:pointer" onclick="searchByOrder('HOST_NAME','ASC')">IP<small  class="text-muted mr-1 float-right"><i class="fa-solid fa-up-down" style="vertical-align:bottom;"></i></small></th>
+                    </th:block>
+
+                    <th>日志文件</th>
+
+                    <th:block th:if="${fileWarnInfo.orderBy  == 'warnDatas'}">
+                      <th:block th:if="${fileWarnInfo.orderType  == 'ASC'}">
+                        <th style="cursor:pointer" onclick="searchByOrder('warnDatas','DESC')">告警记录<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-up" style="vertical-align:bottom;"></i>&nbsp;</small></th>
+                      </th:block>
+                      <th:block th:if="${fileWarnInfo.orderType  == 'DESC'}">
+                        <th style="cursor:pointer" onclick="searchByOrder('warnDatas','ASC')">告警记录<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-down" style="color: #dc3545!important;vertical-align:bottom;"></i>&nbsp;</small></th>
+                      </th:block>
+                    </th:block>
+                    <th:block th:if="${fileWarnInfo.orderBy  ne 'warnDatas'}">
+                      <th style="cursor:pointer" onclick="searchByOrder('warnDatas','ASC')">告警记录<small  class="text-muted mr-1 float-right"><i class="fa-solid fa-up-down" style="vertical-align:bottom;"></i></small></th>
+                    </th:block>
+
+                    <th data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="日志文件的体积大小">体积</th>
+                    <th data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="最后扫描日志文件结束的行数">扫描行数</th>
+                    <th>监控状态</th>
+                    <th>备注</th>
+                    <th>更新时间</th>
+                    <th>告警级别</th>
+                    <th th:if="${application.LICENSE_STATE eq '1' && application.userInfoManage == 'true' && session.LOGIN_KEY.role == 'admin'}">账号</th>
+                    <th>操作</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <th:block th:each="item,iterStat : ${page.list}">
+                    <tr>
+                      <td><input type="checkbox" th:value="${item.id}" name="todo2" th:id="${item.id}+'_check'"/></td>
+                      <td th:text="${iterStat.index+1}">1</td>
+                      <th:block th:if="${item.hostState  == '2'}">
+                        <td><span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="主机已离线">
+                        <i class="fa-solid fa-plug-circle-xmark" style="color:oklch(57.7% .245 27)!important;margin-right:1px;"></i><span th:text="${item.hostname}"></span></span></td>
+                      </th:block>
+                      <th:block th:if="${item.hostState  != '2'}">
+                        <td th:text="${item.hostname}">Update software</td>
+                      </th:block>
+                      <td><span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="${item.filePath}" th:text="${#strings.abbreviate(item.filePath,60)}"></span></td>
+                      <td th:onclick="stateList([[${item.id}]])" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="'点击查看告警记录，告警关键字：'+${item.warnChars}" style="cursor: pointer"><span class="badge bg-danger" th:text="${item.warnDatas}"></span></td>
+                      <td><span class="badge bg-teal" th:text="${item.fileSize}"></span></td>
+                      <td th:text="${item.warnRows}">Update software</td>
+                      <td>
+                        <th:block th:if="${item.active  == '1'}">
+                          <span class="badge bg-primary">监控中<span th:if="${item.customShell != ''}" title="已添加自动恢复指令"><i style="margin-left:2px;" class="fa-solid fa-toolbox"></i></span></span>
+                        </th:block>
+                        <th:block th:if="${item.active  != '1'}">
+                          <span style="background:#6c757d!important;" class="badge bg-danger">已停止</span>
+                        </th:block>
+                      </td>
+                      <td th:text="${item.remark}">Update software</td>
+                      <td th:text="${#dates.format(item.createTime,'yyyy-MM-dd HH:mm:ss')}">Update software</td>
+                      <td>
+                        <th:block th:if="${item.warnLevel  == 'ERROR'}">
+                          <span class="badge bg-primary">重要</span>
+                        </th:block>
+                        <th:block th:if="${item.warnLevel  == 'WARN'}">
+                          <span   style="color:#fff!important" class="badge bg-yellow">一般</span>
+                        </th:block>
+                        <th:block th:if="${item.warnLevel  == 'INFO'}">
+                          <span  class="badge bg-teal">信息</span>
+                        </th:block>
+                      </td>
+                      <td th:text="${item.account}" th:if="${application.LICENSE_STATE eq '1' && application.userInfoManage == 'true' && session.LOGIN_KEY.role == 'admin'}"></td>
+                      <td>
+                        <th:block th:if="${session.LOGIN_KEY.role != 'guest'}">
+                          <button type="button"  th:onclick="edit([[${item.id}]])"  class="btn btn-primary btn-sm">编辑</button>
+                          <button type="button"  th:onclick="del([[${item.id}]])"  class="btn bg-danger btn-sm">删除</button>
+                        </th:block>
+                        <button type="button"  th:onclick="view([[${item.id}]])"  class="btn btn-primary btn-sm">查看</button>
+                        <button type="button"  th:onclick="stateList([[${item.id}]])"  class="btn btn-primary btn-sm">记录</button>
+                      </td>
+                    </tr>
+                  </th:block>
+
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.card-body -->
+              <div th:replace="common/page.html"></div>
+            </div>
+            <!-- /.card -->
+
+
+          </div><!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:src="@{'/static/js/fileWarnInfo.js?v=3.5.6'}"></script>
+
+<script th:inline="javascript">
+  $(document).ready(function(){
+    $("#account").val([[${fileWarnInfo.account}]]);
+  });
+
+  var msg = [[${msg}]];
+  if(msg!='' && msg!=null){
+    toastr.info(msg);
+  }
+</script>
+
+</body>
+</html>

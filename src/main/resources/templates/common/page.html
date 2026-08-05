@@ -1,0 +1,14 @@
+<div class="card-footer clearfix">
+    <div class="float-left">共<span th:text="${page.pages}"></span>页&nbsp;<span th:text="${page.total}"></span>条</div>
+    <div class="dataTables_paginate paging_simple_numbers">
+    <ul class="pagination float-right">
+        <li class="paginate_button page-item"><a th:class="'page-link '+${session.themePageFooterSign}"  th:href="@{${pageUrl}+'&page=1'}">«</a></li>
+        <th:block th:each="pageNumber : ${pageNumbers}">
+            <li class="paginate_button page-item active" th:if="${page.pageNum} eq ${pageNumber}"><a th:class="'page-link '+${session.themePageFooterSign}" th:text="${page.pageNum}" href="javascript:location.reload();">1</a>
+            <li class="paginate_button page-item"  th:unless="${page.pageNum} eq ${pageNumber}"><a th:class="'page-link '+${session.themePageFooterSign}" th:text="${pageNumber}"  th:href="@{${pageUrl}+'&page='+${pageNumber}}">1</a>
+            </li>
+        </th:block>
+        <li class="paginate_button page-item"><a th:class="'page-link '+${session.themePageFooterSign}" th:href="@{${pageUrl}+'&page='+${page.pages}}">»</a></li>
+    </ul>
+    </div>
+</div>

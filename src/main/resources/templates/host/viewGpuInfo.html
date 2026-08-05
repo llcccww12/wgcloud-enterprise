@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item active"></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title" ><span th:utext="${systemInfo.image}"></span><span style="margin-left:5px" th:text="${systemInfo.hostname}"></span>
+            <th:block th:if="${systemInfo.remark ne '' && systemInfo.remark ne null}">
+                (备注：<span th:text="${systemInfo.remark}"></span>)
+            </th:block><span class="btncopy" th:data-clipboard-text="${systemInfo.hostname}" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制" style="cursor:pointer;margin-left: 5px"><i class="fa fa-copy"></i></span>
+            </h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+        <label><span style="margin-left: 10px;margin-top:10px;color:#fff;background:#9267ff;display:inline-block;border-radius:3px;padding:4px 8px 4px;">防火墙状态</span>
+            <small th:if="${fireWallDateTime ne '' && fireWallDateTime ne null}" style="background:#508ff4;margin-left:5px;" class="badge badge-danger" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="采集时间"><i class="far fa-clock"></i> <span th:text="${gpuInfoDateTime}">10 Feb. 2014</span></small>
+            <span style="margin-left: 10px;font-weight:700;color: #62d45e!important;" th:text="${tipInfo}"></span></label>
+        <div class="row">
+            <div class="col-12 table-responsive">
+                <textarea class="form-control" name="shell" id="shell2" th:text="${fireWallInfo}"  rows="5"></textarea>
+            </div>
+        </div>
+
+        <label><span style="margin-left: 10px;margin-top:10px;color:#fff;background:#0dcaf0;display:inline-block;border-radius:3px;padding:4px 8px 4px;">CRONTAB信息</span>
+            <small th:if="${crontabDateTime ne '' && crontabDateTime ne null}" style="background:#508ff4;margin-left:5px;" class="badge badge-danger" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="采集时间"><i class="far fa-clock"></i> <span th:text="${gpuInfoDateTime}">10 Feb. 2014</span></small>
+            </label>
+        <div class="row">
+            <div class="col-12 table-responsive">
+                <textarea class="form-control" name="shell" id="shell3" th:text="${crontabInfo}"  rows="5"></textarea>
+            </div>
+        </div>
+
+        <label><span style="margin-left: 10px;margin-top:10px;color:#fff;background:#FF5370;display:inline-block;border-radius:3px;padding:4px 8px 4px;">个性化采集信息</span>
+            <small th:if="${likeShellDateTime ne '' && likeShellDateTime ne null}" style="background:#508ff4;margin-left:5px;" class="badge badge-danger" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="采集时间"><i class="far fa-clock"></i> <span th:text="${likeShellDateTime}">10 Feb. 2014</span></small>
+        </label>
+        <div class="row">
+            <div class="col-12 table-responsive">
+                <textarea class="form-control" name="shell" id="shell4" th:text="${likeShellInfo}"  rows="5"></textarea>
+            </div>
+        </div>
+
+        <label><span style="margin-left: 10px;margin-top:10px;color:#fff;background:#3ac47d;display:inline-block;border-radius:3px;padding:4px 8px 4px;">GPU信息</span>
+            <small th:if="${gpuInfoDateTime ne '' && gpuInfoDateTime ne null}" style="background:#508ff4;margin-left:5px;" class="badge badge-danger" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="采集时间"><i class="far fa-clock"></i> <span th:text="${gpuInfoDateTime}">10 Feb. 2014</span></small>
+            </label>
+        <div class="row">
+            <div class="col-12 table-responsive">
+                <textarea class="form-control" name="shell" id="shell" th:text="${gpuInfo}"  rows="5"></textarea>
+            </div>
+        </div>
+        <label style="margin-left: 10px;margin-top:10px;" th:if="${not #lists.isEmpty(gpuStateList)}">最近24小时GPU使用率<span class="text-muted">（目前只支持NVIDIA的GPU使用率采集）</span>
+            <span style="margin-left:20px">最高</span><span class="description-percentage text-danger" style="margin-left:10px;margin-right:10px;"><i class="fas fa-caret-down"></i> <span th:text="${subtitleDto.maxValue}">18</span></span>
+            平均<span class="description-percentage text-warning" style="margin-left:5px;margin-right:10px;"><i class="fas fa-caret-left"></i> <span th:text="${subtitleDto.avgValue}">0</span></span>
+            最低<span class="description-percentage text-success" style="margin-left:5px;margin-right:30px;"><i class="fas fa-caret-up"></i> <span th:text="${subtitleDto.minValue}">17</span></span></label>
+        <div id="gpuStateJson" th:if="${not #lists.isEmpty(gpuStateList)}"></div>
+        <div class="card-footer">
+            <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+        </div>
+    </div>
+    <!-- /.card -->
+
+  </div>
+  <!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+<div th:replace="common/codemirror.html"></div>
+<script th:inline="javascript">
+    var editor = CodeMirror.fromTextArea(document.getElementById("shell"), {
+        lineNumbers: true,
+        styleActiveLine: true,
+        matchBrackets: true,
+        readOnly: true,
+        mode: 'shell'
+    });
+    editor.setOption("theme", "dracula");
+    editor.setSize('auto','auto');
+    var editor2 = CodeMirror.fromTextArea(document.getElementById("shell2"), {
+        lineNumbers: true,
+        styleActiveLine: true,
+        matchBrackets: true,
+        readOnly: true,
+        mode: 'shell'
+    });
+    editor2.setOption("theme", "dracula");
+    editor2.setSize('auto','auto');
+    var editor3 = CodeMirror.fromTextArea(document.getElementById("shell3"), {
+        lineNumbers: true,
+        styleActiveLine: true,
+        matchBrackets: true,
+        readOnly: true,
+        mode: 'shell'
+    });
+    editor3.setOption("theme", "dracula");
+    editor3.setSize('auto','auto');
+    var editor4 = CodeMirror.fromTextArea(document.getElementById("shell4"), {
+        lineNumbers: true,
+        styleActiveLine: true,
+        matchBrackets: true,
+        readOnly: true,
+        mode: 'shell'
+    });
+    editor4.setOption("theme", "dracula");
+    editor4.setSize('auto','auto');
+    var clipboard = new ClipboardJS('.btncopy');
+    clipboard.on('success', function (e) {
+        toastr.success("复制成功");
+    });
+
+    var gpuStatJson =[[${gpuStateList}]];
+    $(function() {
+        if(gpuStatJson.length>0){
+            var chart = new G2.Chart({
+                container: 'gpuStateJson',
+                forceFit: true,
+                height: 400,
+                padding: [30, 40, 70, 60]
+            });
+            chart.source(gpuStatJson, {
+                sys: {
+                    alias: 'gpu使用率',
+                    min: 0,
+                    max: [[${subtitleDto.maxValue}]]
+                }
+            });
+            chart.tooltip({
+                crosshairs:false
+            });
+            chart.scale('dateStr',{tickCount: 12,alias: '时间'});
+            chart.line()
+                .position('dateStr*gpuValue')
+                .color('gpuName')
+                .size(2);
+            chart.render();
+        }
+    })
+</script>
+
+</body>
+</html>

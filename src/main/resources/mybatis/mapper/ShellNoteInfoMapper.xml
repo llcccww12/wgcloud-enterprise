@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wgcloud.mapper.ShellNoteInfoMapper">
+	<resultMap id="resultMap" type="com.wgcloud.entity.ShellNoteInfo">
+		<id column="ID" property="id" jdbcType="CHAR" />
+		<result column="SHELL_TITLE" property="shellTitle" jdbcType="CHAR" />
+		<result column="SHELL_CONTENT" property="shellContent" jdbcType="CHAR" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="ACCOUNT" property="account" jdbcType="CHAR" />
+	</resultMap>
+
+	<sql id="tableColumnList">
+		ID,SHELL_TITLE, SHELL_CONTENT,CREATE_TIME,ACCOUNT
+	</sql>
+
+	<sql id="queryByParams">
+		<if test="account != null">
+			<![CDATA[ AND ACCOUNT = #{account} ]]>
+		</if>
+		<if test="shellTitle != null">
+			<choose>
+				<when test="_databaseId == 'oracle'">
+					<![CDATA[ AND SHELL_TITLE LIKE  CONCAT(CONCAT('%',#{shellTitle}),'%') ]]>
+				</when>
+				<otherwise>
+					<![CDATA[ AND SHELL_TITLE LIKE  CONCAT('%',#{shellTitle},'%') ]]>
+				</otherwise>
+			</choose>
+		</if>
+	</sql>
+
+
+	<select id="selectById" resultMap="resultMap" parameterType="java.lang.String">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM SHELL_NOTE_INFO
+		WHERE ID=#{id}
+	</select>
+
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		DELETE FROM SHELL_NOTE_INFO
+		WHERE ID = #{id}
+	</delete>
+
+	<delete id="deleteById" parameterType="java.lang.String">
+		DELETE FROM
+		SHELL_NOTE_INFO
+		WHERE ID IN
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<update id="updateToTargetAccount"  parameterType="map">
+		UPDATE  SHELL_NOTE_INFO SET ACCOUNT = #{accountTarget}
+		<where>
+			<include refid="commonSqlUtil.updateToTargetAccountQueryParams" />
+		</where>
+	</update>
+
+	<insert id="save" parameterType="com.wgcloud.entity.ShellNoteInfo">
+		INSERT INTO SHELL_NOTE_INFO
+    	<trim prefix="(" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >ID,</if>
+      		<if test="shellTitle != null" >SHELL_TITLE,</if>
+      		<if test="shellContent != null">SHELL_CONTENT,</if>
+			<if test="account != null">ACCOUNT,</if>
+      		<if test="createTime != null" >CREATE_TIME</if>
+    	</trim>
+    	<trim prefix="values (" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >#{id},</if>
+      		<if test="shellTitle != null" >#{shellTitle},</if>
+      		<if test="shellContent != null" >#{shellContent},</if>
+			<if test="account != null" >#{account},</if>
+      		<if test="createTime != null" >#{createTime}</if>
+    	</trim>
+	</insert>
+
+
+	<update id="updateById" parameterType="com.wgcloud.entity.ShellNoteInfo">
+		UPDATE SHELL_NOTE_INFO
+		<set>
+			<if test="shellTitle != null">
+				SHELL_TITLE = #{shellTitle},
+			</if>
+			<if test="shellContent != null">
+				SHELL_CONTENT = #{shellContent},
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime}
+			</if>
+		</set>
+		WHERE ID = #{id}
+	</update>
+
+	<select id="countByParams" parameterType="map" resultType="java.lang.Integer">
+		SELECT count(*)  FROM SHELL_NOTE_INFO t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+	</select>
+
+
+	<select id="selectAllByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM SHELL_NOTE_INFO t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		 ORDER BY CREATE_TIME DESC
+	</select>
+	
+	<select id="selectByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM SHELL_NOTE_INFO
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		 ORDER BY CREATE_TIME DESC
+	</select>
+	
+	
+</mapper>

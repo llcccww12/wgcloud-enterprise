@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+      <section class="content-header" style="height:38px">
+          <div class="container-fluid">
+              <div class="row mb-2" style="margin-top: -7px;">
+                  <div class="col-sm-6"></div>
+                  <div class="col-sm-6">
+                      <ol class="breadcrumb float-sm-right">
+                          <li class="breadcrumb-item"><a href="javascript:history.back()">返回上级</a></li>
+                      </ol>
+                  </div>
+              </div>
+          </div><!-- /.container-fluid -->
+      </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-desktop nav-icon"></i>&nbsp;未添加自定义告警设置的主机列表</h3>
+          <span id="timeDiv" style="display: none"><i class="far fa-clock" style="margin-left:5px;margin-top:5px"></i><span id="startTime" style="margin-left:5px;"></span></span>
+          <div class="card-tools">
+              <div class="float-sm-right">
+                  <!-- SEARCH FORM -->
+              </div>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <table th:class="'table table-bordered '+${session.themeTableHoverSign}">
+          <thead>
+          <tr>
+              <th style="width: 20px"> <input type="checkbox" value="" name="checkall" id="checkall"></th>
+              <th style="width: 60px">序号</th>
+              <th data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="操作系统平台">系统</th>
+              <th>IP</th>
+              <th data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="主机名称">主机名称</th>
+              <th data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="CPU核数">CPU核数</th>
+              <th data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="内存">内存</th>
+              <th th:if="${application.hostGroup == 'true'}">标签</th>
+              <th th:if="${application.LICENSE_STATE eq '1' && application.userInfoManage == 'true' && session.LOGIN_KEY.role == 'admin'}">账号</th>
+              <th>备注</th>
+              <th>更新时间</th>
+              <th>操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <th:block th:each="item,iterStat : ${resultList}">
+            <tr>
+                <td><input type="checkbox" th:value="${item.id}" name="todo2" th:id="${item.id}+'_check'"/></td>
+                <td th:text="${iterStat.index+1}"></td>
+                <td>
+                    <image data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="${item.platForm}+'，'+${item.platformVersion}+'，'+${item.hostnameExt}+'，已运行'+${item.uptimeStr}+'，agent版本'+${item.agentVer}" th:src="${item.image}"></image>
+                </td>
+
+              <th:block th:if="${item.state  == '2'}">
+                  <td><span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="${item.hostname}+'已离线'" class="badge bg-danger"><i th:if="${item.active == '2'}" title="已停止监控" style="margin-right:2px;" class="fa-solid fa-stopwatch"></i><i th:if="${item.countBlock == '2'}" title="已停止计算资源" style="margin-right:2px;" class="fa-solid fa-ban"></i><span th:text="${#strings.abbreviate(item.hostname,25)}"></span></span></td>
+              </th:block>
+              <th:block th:if="${item.state  != '2'}">
+                  <td><span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="${item.hostname}" class="badge bg-success"><i th:if="${item.active == '2'}" title="已停止监控" style="margin-right:2px;" class="fa-solid fa-stopwatch"></i><i th:if="${item.countBlock == '2'}" title="已停止计算资源" style="margin-right:2px;" class="fa-solid fa-ban"></i><span th:text="${#strings.abbreviate(item.hostname,25)}"></span></span></td>
+              </th:block>
+
+                <td><span data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="${item.hostnameExt}" th:text="${#strings.abbreviate(item.hostnameExt,25)}"></span></td>
+
+                <td th:text="${item.cpuCoreNum}"></td>
+                <td th:text="${item.totalMem}"></td>
+
+                <td th:if="${application.hostGroup == 'true'}"><span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="${item.groupId}" th:text="${#strings.abbreviate(item.groupId,60)}"></span></td>
+                <td th:text="${item.account}" th:if="${application.LICENSE_STATE eq '1' && application.userInfoManage == 'true' && session.LOGIN_KEY.role == 'admin'}"></td>
+                <td th:text="${item.remark}"></td>
+                <td th:text="${#dates.format(item.createTime,'yyyy-MM-dd HH:mm:ss')}">Update software</td>
+                <td>
+                    <th:block th:if="${session.LOGIN_KEY.role != 'guest'}">
+                        <button type="button"  th:onclick="addForHostname([[${item.hostname}]])"  class="btn btn-primary  btn-sm">添加自定义告警</button>
+                    </th:block>
+                </td>
+            </tr>
+          </th:block>
+
+          </tbody>
+        </table>
+      </div>
+      <!-- /.card-body -->
+        <div class="card-footer clearfix">
+            <div class="float-left">共<span th:text="${resultListSize}"></span>条</div>
+            <div class="float-right"><span style="font-weight:700;color: #62d45e!important;" th:text="${licenseMsg}"></span></div>
+        </div>
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+<script th:src="@{'/static/js/hostWarnDiy.js?v=3.6.2'}"></script>
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $('.select2').select2();
+    });
+
+    var msg = [[${msg}]];
+    if(msg!='' && msg!=null){
+        toastr.info(msg);
+    }
+</script>
+
+</body>
+</html>

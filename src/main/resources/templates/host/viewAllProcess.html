@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item active"></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title" ><span th:utext="${systemInfo.image}"></span><span style="margin-left:5px" th:text="${systemInfo.hostname}"></span>
+            <th:block th:if="${systemInfo.remark ne '' && systemInfo.remark ne null}">
+                (备注：<span th:text="${systemInfo.remark}"></span>)
+            </th:block><span class="btncopy" th:data-clipboard-text="${systemInfo.hostname}" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制" style="cursor:pointer;margin-left: 5px"><i class="fa fa-copy"></i></span>
+            </h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+        <label><span style="margin-left: 10px;margin-top:10px;color:#fff;background:#3ac47d;display:inline-block;border-radius:3px;padding:4px 8px 4px;">全量进程信息<span th:text="${cacheListSize}"></span></span>
+            <small th:if="${caijiDateTime ne '' && caijiDateTime ne null}" style="background:#508ff4;margin-left:5px;" class="badge badge-danger" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="采集时间"><i class="far fa-clock"></i> <span th:text="${caijiDateTime}">10 Feb. 2014</span></small>
+            <span style="margin-left: 10px;font-weight:700;color: #62d45e!important;" th:text="${tipInfo}"></span></label>
+        <div class="row">
+            <div class="col-12 table-responsive">
+                <table th:class="'table '+${session.themeTableHoverSign}">
+                    <thead>
+                    <tr>
+                        <th style="width: 60px">序号</th>
+                        <th:block th:if="${appExceptionInfo.orderBy  == 'appName'}">
+                            <th:block th:if="${appExceptionInfo.orderType  == 'ASC'}">
+                                <th style="cursor:pointer" onclick="searchByOrder('appName','DESC')">进程名称<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-up" style="vertical-align:bottom;"></i>&nbsp;</small></th>
+                            </th:block>
+                            <th:block th:if="${appExceptionInfo.orderType  == 'DESC'}">
+                                <th style="cursor:pointer" onclick="searchByOrder('appName','ASC')">进程名称<small   class="text-success mr-1 float-right"><i class="fas fa-arrow-down" style="color: #dc3545!important;vertical-align:bottom;"></i>&nbsp;</small></th>
+                            </th:block>
+                        </th:block>
+                        <th:block th:if="${appExceptionInfo.orderBy  ne 'appName'}">
+                            <th style="cursor:pointer" onclick="searchByOrder('appName','ASC')">进程名称<small  class="text-muted mr-1 float-right"><i class="fa-solid fa-up-down" style="vertical-align:bottom;"></i></small></th>
+                        </th:block>
+
+                        <th:block th:if="${appExceptionInfo.orderBy  == 'gatherPid'}">
+                            <th:block th:if="${appExceptionInfo.orderType  == 'ASC'}">
+                                <th style="cursor:pointer" onclick="searchByOrder('gatherPid','DESC')">PID<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-up" style="vertical-align:bottom;"></i>&nbsp;</small></th>
+                            </th:block>
+                            <th:block th:if="${appExceptionInfo.orderType  == 'DESC'}">
+                                <th style="cursor:pointer" onclick="searchByOrder('gatherPid','ASC')">PID<small   class="text-success mr-1 float-right"><i class="fas fa-arrow-down" style="color: #dc3545!important;vertical-align:bottom;"></i>&nbsp;</small></th>
+                            </th:block>
+                        </th:block>
+                        <th:block th:if="${appExceptionInfo.orderBy  ne 'gatherPid'}">
+                            <th style="cursor:pointer" onclick="searchByOrder('gatherPid','ASC')">PID<small  class="text-muted mr-1 float-right"><i class="fa-solid fa-up-down" style="vertical-align:bottom;"></i></small></th>
+                        </th:block>
+
+                        <th:block th:if="${appExceptionInfo.orderBy  == 'memPer'}">
+                            <th:block th:if="${appExceptionInfo.orderType  == 'ASC'}">
+                                <th style="cursor:pointer" onclick="searchByOrder('memPer','DESC')">内存<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-up" style="vertical-align:bottom;"></i>&nbsp;</small></th>
+                            </th:block>
+                            <th:block th:if="${appExceptionInfo.orderType  == 'DESC'}">
+                                <th style="cursor:pointer" onclick="searchByOrder('memPer','ASC')">内存<small   class="text-success mr-1 float-right"><i class="fas fa-arrow-down" style="color: #dc3545!important;vertical-align:bottom;"></i>&nbsp;</small></th>
+                            </th:block>
+                        </th:block>
+                        <th:block th:if="${appExceptionInfo.orderBy  ne 'memPer'}">
+                            <th style="cursor:pointer" onclick="searchByOrder('memPer','ASC')">内存<small  class="text-muted mr-1 float-right"><i class="fa-solid fa-up-down" style="vertical-align:bottom;"></i></small></th>
+                        </th:block>
+
+                        <th:block th:if="${appExceptionInfo.orderBy  == 'cpuPer'}">
+                            <th:block th:if="${appExceptionInfo.orderType  == 'ASC'}">
+                                <th style="cursor:pointer" onclick="searchByOrder('cpuPer','DESC')">CPU%<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-up" style="vertical-align:bottom;"></i>&nbsp;</small></th>
+                            </th:block>
+                            <th:block th:if="${appExceptionInfo.orderType  == 'DESC'}">
+                                <th style="cursor:pointer" onclick="searchByOrder('cpuPer','ASC')">CPU%<small   class="text-success mr-1 float-right"><i class="fas fa-arrow-down" style="color: #dc3545!important;vertical-align:bottom;"></i>&nbsp;</small></th>
+                            </th:block>
+                        </th:block>
+                        <th:block th:if="${appExceptionInfo.orderBy  ne 'cpuPer'}">
+                            <th style="cursor:pointer" onclick="searchByOrder('cpuPer','ASC')">CPU%<small  class="text-muted mr-1 float-right"><i class="fa-solid fa-up-down" style="vertical-align:bottom;"></i></small></th>
+                        </th:block>
+
+                        <th:block th:if="${appExceptionInfo.orderBy  == 'appTimes'}">
+                            <th:block th:if="${appExceptionInfo.orderType  == 'ASC'}">
+                                <th style="cursor:pointer" onclick="searchByOrder('appTimes','DESC')">启动时间<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-up" style="vertical-align:bottom;"></i>&nbsp;</small></th>
+                            </th:block>
+                            <th:block th:if="${appExceptionInfo.orderType  == 'DESC'}">
+                                <th style="cursor:pointer" onclick="searchByOrder('appTimes','ASC')">启动时间<small   class="text-success mr-1 float-right"><i class="fas fa-arrow-down" style="color: #dc3545!important;vertical-align:bottom;"></i>&nbsp;</small></th>
+                            </th:block>
+                        </th:block>
+                        <th:block th:if="${appExceptionInfo.orderBy  ne 'appTimes'}">
+                            <th style="cursor:pointer" onclick="searchByOrder('appTimes','ASC')">启动时间<small  class="text-muted mr-1 float-right"><i class="fa-solid fa-up-down" style="vertical-align:bottom;"></i></small></th>
+                        </th:block>
+                        <th data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="从磁盘累计读取数据">读取</th>
+                        <th data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="累计往磁盘写入数据">写入</th>
+                        <th>所有者</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <th:block th:each="item,iterStat : ${cacheList}">
+                        <tr>
+                            <td th:text="${iterStat.index+1}">1</td>
+                            <td th:text="${item.appName}"></td>
+                            <td th:text="${item.gatherPid}"></td>
+                            <td><span class="badge bg-primary"  th:text="${item.memPer}+'MB'"></span></td>
+                            <td><span class="badge bg-primary"  th:text="${item.cpuPer}"></span></td>
+                            <td th:text="${item.appTimes}"></td>
+                            <td th:text="${item.writesBytes}"></td>
+                            <td th:text="${item.readBytes}"></td>
+                            <td th:text="${item.proUsername}"></td>
+                            <td><button type="button" data-toggle="modal" data-target="#modal-default" th:onclick="setHostRemark([[${item.appName}]],[[${item.gatherPid}]],[[${item.memPer}]],[[${item.cpuPer}]],[[${item.appTimes}]],[[${item.proUsername}]],[[${item.appCmdLine}]],[[${item.writesBytes}]],[[${item.readBytes}]])"  class="btn btn-primary btn-sm">查看详情</button></td>
+                        </tr>
+                    </th:block>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-12 card-footer clearfix">
+                <th:block th:if="${#lists.isEmpty(cacheList)}">
+                <div class="float-left">共0条</div>
+                </th:block>
+                <th:block th:if="${not #lists.isEmpty(cacheList)}">
+                    <div class="float-left">共<span th:text="${#lists.size(cacheList)}"></span>条</div>
+                </th:block>
+                <div class="float-right"><button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button></div>
+            </div>
+        </div>
+
+    </div>
+    <!-- /.card -->
+
+  </div>
+  <!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<div class="modal fade" id="modal-default">
+    <div class="modal-dialog modal-lg">
+        <form method="post" id="form2" th:action="@{'/systemInfo/save'}">
+            <div class="modal-content" style="font-size:0.90rem">
+                <div class="modal-header">
+                    <h4 class="modal-title">进程详情</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                    <div class="form-group">
+                        <label>进程名称</label>
+                        <div><span id="appName"></span><span  class="btncopy" data-clipboard-action="copy"  data-clipboard-target="#appName" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制" style="cursor:pointer;margin-left: 10px"><i class="fa fa-copy"></i></span></div>
+                    </div>
+                    <div class="form-group">
+                        <label>PID</label>
+                        <div><span id="gatherPid"></span><span  class="btncopy" data-clipboard-action="copy"  data-clipboard-target="#gatherPid" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制" style="cursor:pointer;margin-left: 10px"><i class="fa fa-copy"></i></span></div>
+                    </div>
+                    <div class="form-group">
+                        <label>内存%</label>
+                        <div  id="memPer"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>CPU%</label>
+                        <div  id="cpuPer"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>从磁盘累计读取数据</label>
+                        <div  id="writesBytes"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>从磁盘累计写入数据</label>
+                        <div  id="readBytes"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>启动时间</label>
+                        <div  id="appTimes"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>所有者</label>
+                        <div  id="proUsername"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>命令行<span  class="btncopy" data-clipboard-action="copy"  data-clipboard-target="#appCmdLine" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制" style="cursor:pointer;margin-left: 10px"><i class="fa fa-copy"></i></span></label>
+                        <div><code class="highlighter-rouge" style="font-size:100%;font-weight:700" id="appCmdLine"></code></div>
+                    </div>
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default  btn-sm" data-dismiss="modal">关 闭</button>
+                </div>
+            </div>
+        </form>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<script th:inline="javascript">
+    function searchByOrder(orderBy,orderType){
+        var systemId = [[${systemInfo.id}]];
+        var hrefUrl = SERVER_SERVLET_CONTEXT_PATH + "/systemInfo/viewAllProcess?id="+systemId+"&orderBy="+orderBy+"&orderType="+orderType;
+        window.location.href = hrefUrl;
+    }
+
+    function setHostRemark(appName,gatherPid,memPer,cpuPer,appTimes,proUsername,appCmdLine,writesBytes,readBytes) {
+        $("#appName").html(appName);
+        $("#gatherPid").html(gatherPid);
+        $("#memPer").html('<span class="badge bg-primary">'+memPer+'MB</span>');
+        $("#cpuPer").html('<span class="badge bg-primary">'+cpuPer+'</span>');
+        $("#appTimes").html(appTimes);
+        $("#proUsername").html(proUsername);
+        $("#appCmdLine").html(appCmdLine);
+        $("#writesBytes").html(writesBytes);
+        $("#readBytes").html(readBytes);
+    }
+
+    var clipboard = new ClipboardJS('.btncopy');
+    clipboard.on('success', function (e) {
+        toastr.success("复制成功");
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wgcloud.mapper.RedisMonitorMapper">
+	<resultMap id="resultMap" type="com.wgcloud.entity.RedisMonitor">
+		<id column="ID" property="id" jdbcType="CHAR" />
+		<result column="REDIS_NAME" property="redisName" jdbcType="CHAR" />
+		<result column="REDIS_VERSION" property="redisVersion" jdbcType="CHAR" />
+		<result column="REDIS_MODE" property="redisMode" jdbcType="CHAR" />
+		<result column="PROCESS_ID" property="processId" jdbcType="CHAR" />
+		<result column="TCP_PORT" property="tcpPort" jdbcType="CHAR" />
+		<result column="UPTIME_IN_DAYS" property="uptimeInDays" jdbcType="CHAR" />
+		<result column="EXECUTABLE" property="executable" jdbcType="CHAR" />
+		<result column="CONFIG_FILE" property="configFile" jdbcType="CHAR" />
+		<result column="CONNECTED_CLIENTS" property="connectedClients" jdbcType="CHAR" />
+		<result column="BLOCKED_CLIENTS" property="blockedClients" jdbcType="CHAR" />
+		<result column="USED_MEMORY_HUMAN" property="usedMemoryHuman" jdbcType="CHAR" />
+		<result column="USED_MEMORY_PEAK_HUMAN" property="usedMemoryPeakHuman" jdbcType="CHAR" />
+		<result column="MAXMEMORY_HUMAN" property="maxMemoryHuman" jdbcType="CHAR" />
+		<result column="AOF_ENABLED" property="aofEnabled" jdbcType="CHAR" />
+		<result column="RDB_LAST_BGSAVE_STATUS" property="rdbLastBgsaveStatus" jdbcType="CHAR" />
+		<result column="RDB_LAST_BGSAVE_TIME_SEC" property="rdbLastBgsaveTimeSec" jdbcType="CHAR" />
+		<result column="INSTANTANEOUS_OPS_PER_SEC" property="instantaneousOpsPerSec" jdbcType="CHAR" />
+		<result column="TOTAL_NET_INPUT_BYTES" property="totalNetInputBytes" jdbcType="CHAR" />
+		<result column="TOTAL_NET_OUTPUT_BYTES" property="totalNetOutputBytes" jdbcType="CHAR" />
+		<result column="REJECTED_CONNECTIONS" property="rejectedConnections" jdbcType="CHAR" />
+		<result column="REDIS_ROLE" property="redisRole" jdbcType="CHAR" />
+		<result column="CONNECTED_SLAVES" property="connectedSlaves" jdbcType="CHAR" />
+		<result column="USED_CPU_SYS" property="usedCpuSys" jdbcType="CHAR" />
+		<result column="EXPIRED_KEYS" property="expiredKeys" jdbcType="CHAR" />
+		<result column="EVICTED_KEYS" property="evictedKeys" jdbcType="CHAR" />
+		<result column="KEYSPACE_HITS" property="keyspaceHits" jdbcType="CHAR" />
+		<result column="KEYSPACE_MISSES" property="keyspaceMisses" jdbcType="CHAR" />
+		<result column="PUBSUB_CHANNELS" property="pubsubChannels" jdbcType="CHAR" />
+		<result column="PUBSUB_PATTERNS" property="pubsubPatterns" jdbcType="CHAR" />
+		<result column="CLUSTER_ENABLED" property="clusterEnabled" jdbcType="CHAR" />
+		<result column="STATE" property="state" jdbcType="CHAR" />
+		<result column="REDIS_NODE_INFO" property="redisNodeInfo" jdbcType="CHAR" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<sql id="tableColumnList">
+		ID,REDIS_NAME,REDIS_VERSION,REDIS_MODE,PROCESS_ID,TCP_PORT,UPTIME_IN_DAYS,EXECUTABLE,CONFIG_FILE,CONNECTED_CLIENTS,BLOCKED_CLIENTS,USED_MEMORY_HUMAN,
+        USED_MEMORY_PEAK_HUMAN,MAXMEMORY_HUMAN,AOF_ENABLED,RDB_LAST_BGSAVE_STATUS,RDB_LAST_BGSAVE_TIME_SEC,INSTANTANEOUS_OPS_PER_SEC,TOTAL_NET_INPUT_BYTES,TOTAL_NET_OUTPUT_BYTES,REJECTED_CONNECTIONS,REDIS_ROLE,
+        CONNECTED_SLAVES,USED_CPU_SYS,EXPIRED_KEYS,EVICTED_KEYS,KEYSPACE_HITS,KEYSPACE_MISSES,PUBSUB_CHANNELS,PUBSUB_PATTERNS,CLUSTER_ENABLED,CREATE_TIME,STATE,REDIS_NODE_INFO
+	</sql>
+
+	<sql id="queryByParams">
+		<if test="state != null">
+			<![CDATA[ AND STATE = #{state} ]]>
+		</if>
+		<if test="redisName != null">
+			<choose>
+				<when test="_databaseId == 'oracle'">
+					<![CDATA[ AND REDIS_NAME LIKE  CONCAT(CONCAT('%',#{redisName}),'%') ]]>
+				</when>
+				<otherwise>
+					<![CDATA[ AND REDIS_NAME LIKE  CONCAT('%',#{redisName},'%') ]]>
+				</otherwise>
+			</choose>
+		</if>
+	</sql>
+	
+	
+	<select id="selectById" resultMap="resultMap" parameterType="java.lang.String">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM REDIS_MONITOR 
+		WHERE ID=#{id} 
+	</select>
+	
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		DELETE FROM REDIS_MONITOR 
+		WHERE ID = #{id}
+	</delete>
+
+	<delete id="deleteByRedisName" parameterType="java.lang.String">
+		DELETE FROM REDIS_MONITOR WHERE REDIS_NAME = #{redisName}
+	</delete>
+
+	<update id="downByRedisName" parameterType="java.lang.String">
+		UPDATE  REDIS_MONITOR SET STATE = '2' WHERE REDIS_NAME = #{redisName}
+	</update>
+	
+	<delete id="deleteById" parameterType="java.lang.String">
+		DELETE FROM
+		REDIS_MONITOR 
+		WHERE ID IN
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<delete id="deleteByDate"  parameterType="map">
+		DELETE FROM REDIS_MONITOR
+		<where>
+			<include refid="commonSqlUtil.createTimeDelParams" />
+		</where>
+	</delete>
+
+	<insert id="save" parameterType="com.wgcloud.entity.K8sMonitor">
+		INSERT INTO REDIS_MONITOR 
+    	<trim prefix="(" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >ID,</if>
+      		<if test="redisName != null" >REDIS_NAME,</if>
+			<if test="redisVersion != null" >REDIS_VERSION,</if>
+			<if test="redisMode != null" >REDIS_MODE,</if>
+			<if test="processId != null" >PROCESS_ID,</if>
+			<if test="tcpPort != null" >TCP_PORT,</if>
+			<if test="uptimeInDays != null" >UPTIME_IN_DAYS,</if>
+			<if test="executable != null" >EXECUTABLE,</if>
+			<if test="configFile != null" >CONFIG_FILE,</if>
+			<if test="connectedClients != null" >CONNECTED_CLIENTS,</if>
+			<if test="blockedClients != null" >BLOCKED_CLIENTS,</if>
+			<if test="usedMemoryHuman != null" >USED_MEMORY_HUMAN,</if>
+			<if test="usedMemoryPeakHuman != null" >USED_MEMORY_PEAK_HUMAN,</if>
+			<if test="maxMemoryHuman != null" >MAXMEMORY_HUMAN,</if>
+			<if test="aofEnabled != null" >AOF_ENABLED,</if>
+			<if test="rdbLastBgsaveStatus != null" >RDB_LAST_BGSAVE_STATUS,</if>
+			<if test="rdbLastBgsaveTimeSec != null" >RDB_LAST_BGSAVE_TIME_SEC,</if>
+			<if test="instantaneousOpsPerSec != null" >INSTANTANEOUS_OPS_PER_SEC,</if>
+			<if test="totalNetInputBytes != null" >TOTAL_NET_INPUT_BYTES,</if>
+			<if test="totalNetOutputBytes != null" >TOTAL_NET_OUTPUT_BYTES,</if>
+			<if test="rejectedConnections != null" >REJECTED_CONNECTIONS,</if>
+      		<if test="redisRole != null">REDIS_ROLE,</if>
+			<if test="connectedSlaves != null">CONNECTED_SLAVES,</if>
+			<if test="usedCpuSys != null">USED_CPU_SYS,</if>
+			<if test="expiredKeys != null">EXPIRED_KEYS,</if>
+			<if test="evictedKeys != null">EVICTED_KEYS,</if>
+			<if test="keyspaceHits != null">KEYSPACE_HITS,</if>
+			<if test="keyspaceMisses != null">KEYSPACE_MISSES,</if>
+			<if test="pubsubChannels != null">PUBSUB_CHANNELS,</if>
+			<if test="pubsubPatterns != null">PUBSUB_PATTERNS,</if>
+			<if test="clusterEnabled != null">CLUSTER_ENABLED,</if>
+			<if test="state != null">STATE,</if>
+			<if test="redisNodeInfo != null">REDIS_NODE_INFO,</if>
+      		<if test="createTime != null" >CREATE_TIME</if>
+    	</trim>
+    	<trim prefix="values (" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >#{id},</if>
+      		<if test="redisName != null" >#{redisName},</if>
+			<if test="redisVersion != null" >#{redisVersion},</if>
+			<if test="redisMode != null" >#{redisMode},</if>
+			<if test="processId != null" >#{processId},</if>
+			<if test="tcpPort != null" >#{tcpPort},</if>
+			<if test="uptimeInDays != null" >#{uptimeInDays},</if>
+			<if test="executable != null" >#{executable},</if>
+			<if test="configFile != null" >#{configFile},</if>
+			<if test="connectedClients != null" >#{connectedClients},</if>
+			<if test="blockedClients != null" >#{blockedClients},</if>
+			<if test="usedMemoryHuman != null" >#{usedMemoryHuman},</if>
+			<if test="usedMemoryPeakHuman != null" >#{usedMemoryPeakHuman},</if>
+			<if test="maxMemoryHuman != null" >#{maxMemoryHuman},</if>
+			<if test="aofEnabled != null" >#{aofEnabled},</if>
+			<if test="rdbLastBgsaveStatus != null" >#{rdbLastBgsaveStatus},</if>
+			<if test="rdbLastBgsaveTimeSec != null" >#{rdbLastBgsaveTimeSec},</if>
+			<if test="instantaneousOpsPerSec != null" >#{instantaneousOpsPerSec},</if>
+			<if test="totalNetInputBytes != null" >#{totalNetInputBytes},</if>
+			<if test="totalNetOutputBytes != null" >#{totalNetOutputBytes},</if>
+			<if test="rejectedConnections != null" >#{rejectedConnections},</if>
+			<if test="redisRole != null" >#{redisRole},</if>
+			<if test="connectedSlaves != null" >#{connectedSlaves},</if>
+			<if test="usedCpuSys != null" >#{usedCpuSys},</if>
+			<if test="expiredKeys != null" >#{expiredKeys},</if>
+			<if test="evictedKeys != null" >#{evictedKeys},</if>
+			<if test="keyspaceHits != null" >#{keyspaceHits},</if>
+			<if test="keyspaceMisses != null" >#{keyspaceMisses},</if>
+      		<if test="pubsubChannels != null" >#{pubsubChannels},</if>
+			<if test="pubsubPatterns != null" >#{pubsubPatterns},</if>
+			<if test="clusterEnabled != null" >#{clusterEnabled},</if>
+			<if test="state != null" >#{state},</if>
+			<if test="redisNodeInfo != null" >#{redisNodeInfo},</if>
+      		<if test="createTime != null" >#{createTime}</if>
+    	</trim>
+	</insert>
+
+
+	<select id="countByParams" parameterType="map" resultType="java.lang.Integer">
+		SELECT count(*)  FROM REDIS_MONITOR t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+	</select>
+
+
+	<select id="selectAllByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM REDIS_MONITOR t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		 ORDER BY ID DESC
+	</select>
+	
+	<select id="selectByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM REDIS_MONITOR
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		<choose>
+			<when test="orderBy !=null and orderBy != ''">
+				<![CDATA[ ORDER BY ${orderBy} ${orderType}]]>
+			</when>
+			<otherwise>
+				ORDER BY ID DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+</mapper>

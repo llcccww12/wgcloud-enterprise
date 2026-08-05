@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}" style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item active"></li>
+                </ol>
+            </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-11">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">查看资产</h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <form role="form" id="form1" th:action="@{'/equipment/save'}">
+            <input type="hidden" name="id" th:value="${equipment.id}"/>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label><font color="red">*</font>资产名称</label>
+                            <div  th:text="${equipment.name}" ></div>
+                        </div>
+                        <div class="form-group">
+                            <label>规格说明</label>
+                            <div><span th:text="${equipment.xinghao}"></span><span th:if="${equipment.xinghao} == null or ${equipment.person} == ''">&nbsp;</span></div>
+                        </div>
+                        <div class="form-group">
+                            <label>使用人员</label>
+                            <div><span th:text="${equipment.person}"></span><span th:if="${equipment.person} == null or ${equipment.person} == ''">&nbsp;</span></div>
+                        </div>
+                        <div class="form-group">
+                            <label>供应商</label>
+                            <div><span th:text="${equipment.gongyingshang}"></span><span th:if="${equipment.gongyingshang} == null or ${equipment.gongyingshang} == ''">&nbsp;</span></div>
+                        </div>
+                        <div class="form-group">
+                            <label>维保到期时间</label>
+                            <div><span th:text="${equipment.weibaoDate}"></span><span th:if="${equipment.weibaoDate} == null or ${equipment.weibaoDate} == ''">&nbsp;</span></div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label><font color="red">*</font>资产编码</label>
+                            <div><span th:text="${equipment.code}"></span><span th:if="${equipment.code} == null or ${equipment.code} == ''">&nbsp;</span></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>使用部门</label>
+                            <div><span th:text="${equipment.dept}"></span><span th:if="${equipment.dept} == null or ${equipment.dept} == ''">&nbsp;</span></div>
+                        </div>
+                        <div class="form-group">
+                            <label>采购日期</label>
+                            <div><span th:text="${equipment.caigouDate}"></span><span th:if="${equipment.caigouDate} == null or ${equipment.caigouDate} == ''">&nbsp;</span></div>
+                        </div>
+                        <div class="form-group">
+                            <label>采购价格(元)</label>
+                            <div><span  style="color: #e64b55!important;font-weight:700" th:text="${equipment.price}"></span><span th:if="${equipment.price} == null or ${equipment.price} == ''">&nbsp;</span></div>
+                        </div>
+                        <div class="form-group">
+                            <label>添加时间</label>
+                            <div  th:text="${#dates.format(equipment.createTime,'yyyy-MM-dd HH:mm:ss')}" ></div>
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <div><span th:text="${equipment.remark}"></span><span th:if="${equipment.remark} == null or ${equipment.remark} == ''">&nbsp;</span></div>
+                </div>
+                <div class="form-group" th:if="${equipment.filePath ne '' && equipment.filePath ne null}">
+                    <div class="card-footer bg-white">
+                        <ul class="mailbox-attachments d-flex align-items-stretch clearfix">
+                            <th:block th:if="${equipment.isImage == '2'}">
+                                <li>
+                                    <span class="mailbox-attachment-icon"><i class="far fa-file"></i></span>
+                                    <div class="mailbox-attachment-info">
+                                        <a target="_blank" th:href="${equipment.filePath}" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> <span th:text="${equipment.fileName}">Sep2014-report.pdf</span></a>
+                                        <span class="mailbox-attachment-size clearfix mt-1">
+                                          <span th:text="${equipment.fileSize}">1,245 KB</span>
+                                          <a target="_blank" th:href="${equipment.filePath}" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></a>
+                                        </span>
+                                    </div>
+                                </li>
+                            </th:block>
+                            <th:block th:unless="${equipment.isImage == '2'}">
+                                <li>
+                                    <span class="mailbox-attachment-icon has-img"><img th:src="${equipment.filePath}" alt="Attachment"></span>
+                                    <div class="mailbox-attachment-info">
+                                        <a target="_blank" th:href="${equipment.filePath}" class="mailbox-attachment-name"><i class="fas fa-camera"></i> <span th:text="${equipment.fileName}">photo1.png</span></a>
+                                        <span class="mailbox-attachment-size clearfix mt-1">
+                                          <span th:text="${equipment.fileSize}">2.67 MB</span>
+                                          <a target="_blank" th:href="${equipment.filePath}" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></a>
+                                        </span>
+                                    </div>
+                                </li>
+                            </th:block>
+                        </ul>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>监控主机<span class="text-muted">（可选，用于和监控主机进行关联）</span></label>
+                    <div><span th:text="${equipment.hostname}"></span><span th:if="${equipment.hostname} == null or ${equipment.hostname} == ''">无</span></div>
+                </div>
+                <div class="form-group"  th:if="${application.hostGroup == 'true'}">
+                    <label>标签</label>
+                    <div><span th:text="${equipment.groupId}"></span><span th:if="${equipment.groupId} == null or ${equipment.groupId} == ''">无</span></div>
+                </div>
+
+
+            </div>
+            <!-- /.card-body -->
+
+        </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+</body>
+</html>

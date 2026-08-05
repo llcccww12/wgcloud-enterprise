@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}" style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item active"></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">下发指令执行详情</h3>
+        <div class=" float-sm-right">
+          <a href="javascript:history.back()">返回上级</a>
+        </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+      <form role="form">
+        <div class="card-body">
+          <div class="form-group">
+            <label>主机IP</label>
+            <div  th:text="${shellState.hostname}"></div>
+          </div>
+          <div class="form-group">
+            <label>指令名称</label>
+            <div  th:text="${shellInfo.shellName}"></div>
+          </div>
+          <div class="form-group">
+            <label>指令下发时间</label>
+            <div>
+              <code class="highlighter-rouge" style="font-size:100%;font-weight:700">
+                <th:block th:if="${shellInfo.shellType  != '2'}">立即下发</th:block>
+                <th:block th:if="${shellInfo.shellType  == '2'}"><span  th:text="${shellInfo.shellTime}" class="badge bg-primary" ></span></th:block>
+              </code>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>下发指令内容</label>
+            <div>
+              <textarea class="form-control" name="shell" id="shell" th:text="${shellInfo.shell}"  rows="5"></textarea>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>更新时间（执行完成时间）</label>
+            <div><code class="highlighter-rouge" th:text="${#dates.format(shellState.createTime,'yyyy-MM-dd HH:mm:ss')}" style="font-size:100%;font-weight:700"></code></div>
+          </div>
+          <div class="form-group">
+            <label>指令执行状态</label>
+            <div>
+              <th:block th:switch="${shellState.state}">
+                <th:block th:case="'1'">
+                  <td><span th:title="${shellState.state}" class="badge bg-primary">下发中</span>
+                </th:block>
+                <th:block th:case="'4'">
+                  <td><span th:title="${shellState.state}"  style="background:#9267FF!important;" class="badge bg-primary">已下发</span>
+                </th:block>
+                <th:block th:case="'2'">
+                  <td><span th:title="${shellState.state}" class="badge bg-warning">已取消</span>
+                </th:block>
+                <th:block th:case="'3'">
+                  <td><span th:title="${shellState.state}" class="badge bg-success">已执行成功</span>
+                </th:block>
+                <th:block th:case="'5'">
+                  <td><span th:title="${shellState.state}" class="badge bg-danger">执行错误</span>
+                </th:block>
+                <th:block th:case="*">
+                  <td><span th:title="${shellState.state}" th:text="${item.state}" class="badge bg-danger">准备</span>
+                </th:block>
+              </th:block>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>指令执行结果</label>
+              <div>
+                <textarea class="form-control" name="warContent" id="warContent" th:utext="${shellState.shellResult}"></textarea>
+              </div>
+          </div>
+        </div>
+        <!-- /.card-body -->
+        <div class="card-footer">
+          <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+        </div>
+      </form>
+      <!-- /.card-body -->
+
+
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<div th:replace="common/codemirror.html"></div>
+
+<script th:inline="javascript">
+  var editor = CodeMirror.fromTextArea(document.getElementById("warContent"), {
+    lineNumbers: true,
+    styleActiveLine: true,
+    matchBrackets: true,
+    readOnly: true,
+    mode: 'shell'
+  });
+  editor.setOption("theme", "dracula");
+  editor.setSize('auto','auto');
+
+  var editor2 = CodeMirror.fromTextArea(document.getElementById("shell"), {
+    lineNumbers: true,
+    styleActiveLine: true,
+    matchBrackets: true,
+    readOnly: true,
+    mode: 'shell'
+  });
+  editor2.setOption("theme", "dracula");
+  editor2.setSize('auto','auto');
+</script>
+
+</body>
+</html>

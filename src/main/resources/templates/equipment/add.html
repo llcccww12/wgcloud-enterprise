@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}" style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item active"></li>
+                </ol>
+            </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-11">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">添加资产</h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <form role="form" id="form1" method="post" th:action="@{'/equipment/save'}" enctype="multipart/form-data">
+            <input type="hidden" name="id" th:value="${equipment.id}"/>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label><font color="red">*</font>资产名称</label>
+                            <input type="text" autocomplete="off"  th:value="${equipment.name}" class="validate[required,maxSize[50]] form-control" name="name" id="name" placeholder="">
+                        </div>
+                        <div class="form-group">
+                            <label>规格说明</label>
+                            <input type="text" autocomplete="off"  th:value="${equipment.xinghao}" class="validate[maxSize[50]] form-control" name="xinghao" id="xinghao" placeholder="">
+                        </div>
+                        <div class="form-group">
+                            <label>使用人员</label>
+                            <input type="text" autocomplete="off"  th:value="${equipment.person}" class="validate[maxSize[50]] form-control" name="person" id="person" placeholder="">
+                        </div>
+                        <div class="form-group">
+                            <label>供应商</label>
+                            <input type="text" autocomplete="off"  th:value="${equipment.gongyingshang}" class="validate[maxSize[50]] form-control" name="gongyingshang" id="gongyingshang" placeholder="">
+                        </div>
+                        <div class="form-group">
+                            <label>维保到期时间</label>
+                            <input type="text" autocomplete="off" th:value="${equipment.weibaoDate}" class="validate[maxSize[50]] form-control" name="weibaoDate" id="weibaoDate" placeholder="">
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>资产编码</label>
+                            <input type="text" autocomplete="off"  th:value="${equipment.code}" class="validate[maxSize[50]] form-control" name="code" id="code" placeholder="">
+                        </div>
+
+                        <div class="form-group">
+                            <label>使用部门</label>
+                            <input type="text" autocomplete="off"  th:value="${equipment.dept}" class="validate[maxSize[50]] form-control" name="dept" id="dept" placeholder="">
+                        </div>
+                        <div class="form-group">
+                            <label>采购日期</label>
+                            <input type="text" autocomplete="off" th:value="${equipment.caigouDate}" class="validate[maxSize[50]] form-control" name="caigouDate" id="caigouDate" placeholder="">
+                        </div>
+                        <div class="form-group">
+                            <label>采购价格(元)</label>
+                            <input type="text" autocomplete="off"  th:value="${equipment.price}" class="validate[custom[number],maxSize[10]] form-control" name="price" id="price" placeholder="">
+                        </div>
+                        <div class="form-group">
+                            <label></label>
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea class="validate[maxSize[255]] form-control"   name="remark" id="remark" th:text="${equipment.remark}"  rows="8" placeholder=''></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputFile">附件<span class="text-muted">（请选择[jpg,jpeg,png,zip,log,tar.gz,doc,docx,ppt,pptx,xls,xlsx,pdf,txt,html]等类型的文件，上传文件体积不能大于100MB）</span></label>
+                    <div class="input-group">
+                        <div class="custom-file">
+                            <input type="file" placeholder="access.log" name="file" class="custom-file-input" id="exampleInputFile">
+                            <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" th:if="${equipment.filePath ne '' && equipment.filePath ne null}">
+                    <div class="card-footer bg-white">
+                        <ul class="mailbox-attachments d-flex align-items-stretch clearfix">
+                            <th:block th:if="${equipment.isImage == '2'}">
+                                <li>
+                                    <span class="mailbox-attachment-icon"><i class="far fa-file"></i></span>
+                                    <div class="mailbox-attachment-info">
+                                        <a target="_blank" th:href="${equipment.filePath}" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> <span th:text="${equipment.fileName}">Sep2014-report.pdf</span></a>
+                                        <span class="mailbox-attachment-size clearfix mt-1">
+                                          <span th:text="${equipment.fileSize}">1,245 KB</span>
+                                          <a target="_blank" th:href="${equipment.filePath}" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></a>
+                                        </span>
+                                    </div>
+                                </li>
+                            </th:block>
+                            <th:block th:unless="${equipment.isImage == '2'}">
+                                <li>
+                                    <span class="mailbox-attachment-icon has-img"><img th:src="${equipment.filePath}" alt="Attachment"></span>
+                                    <div class="mailbox-attachment-info">
+                                        <a target="_blank" th:href="${equipment.filePath}" class="mailbox-attachment-name"><i class="fas fa-camera"></i> <span th:text="${equipment.fileName}">photo1.png</span></a>
+                                        <span class="mailbox-attachment-size clearfix mt-1">
+                                          <span th:text="${equipment.fileSize}">2.67 MB</span>
+                                          <a target="_blank" th:href="${equipment.filePath}" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></a>
+                                        </span>
+                                    </div>
+                                </li>
+                            </th:block>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>监控主机<span class="text-muted">（可选，用于和监控主机进行关联）</span></label>
+                    <select  name="hostname" id="hostname"  class="form-control  col-md-8 select2">
+                        <option value="">请选择</option>
+                        <th:block th:each="item,iterStat : ${systemInfoList}">
+                            <th:block th:if="${item.remark} == null or ${item.remark} == ''">
+                                <option  data-select2-id="" th:value="${item.hostname}" th:attr="data-select2-id=${item.hostname}" th:text="${item.hostname}+' ('+${item.platForm}+')'">Alabama</option>
+                            </th:block>
+                            <th:block th:if="${item.remark} != null and ${item.remark} != ''">
+                                <option  data-select2-id="" th:value="${item.hostname}" th:attr="data-select2-id=${item.hostname}" th:text="${item.hostname}+' ('+${item.remark}+'，'+${item.platForm}+')'">Alabama</option>
+                            </th:block>
+                        </th:block>
+                    </select>
+                </div>
+
+            </div>
+            <!-- /.card-body -->
+
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-right:10px;"><i class="fas fa-save"></i> 保 存</button>
+                <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+            </div>
+
+        </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-10 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+  <!-- bs-custom-file-input -->
+  <script th:src="@{'/static/AdminLTE/plugins/bs-custom-file-input/bs-custom-file-input.min.js'}"></script>
+</div>
+<!-- ./wrapper -->
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $("#form1").validationEngine();
+        //Initialize Select2 Elements
+        $('.select2').select2();
+        //Initialize Select2 Elements
+        $('.select2bs4').select2({
+            theme: 'bootstrap4'
+        });
+        bsCustomFileInput.init();
+
+        $("#hostname").val([[${equipment.hostname}]]).select2();
+        var caigouDateResponse =[[${equipment.caigouDate}]];
+        var caigouDate = $('#caigouDate');
+        if(caigouDate!=null && caigouDate != undefined){
+            caigouDate.daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                // timePicker: true,
+                // timePicker24Hour : true,
+                // autoUpdateInput: false,
+                "opens": "center",
+                "locale": {
+                    format: 'YYYY-MM-DD',
+                    applyLabel: "应用",
+                    cancelLabel: "取消",
+                    daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
+                    monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+                }
+            });
+            if(caigouDateResponse==''  || caigouDateResponse==null){
+                caigouDate.val("");
+            }
+        }
+
+        var weibaoDateResponse =[[${equipment.weibaoDate}]];
+        var weibaoDate = $('#weibaoDate');
+        if(weibaoDate!=null && weibaoDate != undefined){
+            weibaoDate.daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                // timePicker: true,
+                // timePicker24Hour : true,
+                // autoUpdateInput: false,
+                "opens": "center",
+                "locale": {
+                    format: 'YYYY-MM-DD',
+                    applyLabel: "应用",
+                    cancelLabel: "取消",
+                    daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
+                    monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+                }
+            });
+            if(weibaoDateResponse==''  || weibaoDateResponse==null){
+                weibaoDate.val("");
+            }
+        }
+
+    });
+
+</script>
+</body>
+</html>

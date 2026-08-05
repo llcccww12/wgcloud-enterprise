@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<!--
+  二开 Layer 1: AI 智能分析页（独立路由 /ai/chatPage）
+  与原 /AIPage/list 不同：不依赖 mail.aiAnalyzeScript，直接走 /ai/chatStream 流式 LLM。
+-->
+<html>
+<head>
+    <div th:replace="common/header.html"></div>
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+    <div th:replace="common/navbar.html"></div>
+
+    <div th:replace="common/aside.html"></div>
+
+    <div th:class="'content-wrapper '+${session.themeNameSign}" style="font-size:0.90rem">
+        <section class="content-header" style="height:38px">
+            <div class="container-fluid">
+                <div class="row mb-2" style="margin-top: -7px;">
+                    <div class="col-sm-6"></div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="javascript:history.back()">返回上级</a></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div th:class="'card '+${session.themeNameSign}">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="nav-icon fa-solid fa-robot"></i>&nbsp;AI 智能分析
+                                    <span data-trigger="hover" data-container="body" data-toggle="popover" data-placement="top"
+                                          data-content="使用大语言模型对运维问题进行流式问答。模型与 Key 在 application.yml 的 ai 段配置。"
+                                          style="cursor:pointer;margin-left: 10px"><i class="fa fa-comment-dots"></i></span>
+                                </h3>
+                                <div class="card-tools">
+                                    <span id="aiStatusBadge" style="font-size:12px;color:#888">model: <span id="aiModelName">loading...</span></span>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label style="font-weight:bold">提问（Ctrl/Cmd + Enter 发送）</label>
+                                    <textarea class="form-control" name="questionContent" id="questionContent" rows="4"
+                                              placeholder="例如：服务器 CPU 持续 90% 怎么排查？"></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <button type="button" id="btnSend" onclick="aiSend()" class="btn btn-primary" style="margin-right:10px;">
+                                        <i class="fa-solid fa-paper-plane"></i> 开始分析
+                                    </button>
+                                    <button type="button" id="btnStop" onclick="aiStop()" class="btn btn-warning" style="margin-right:10px;display:none;">
+                                        <i class="fa-solid fa-stop"></i> 停止
+                                    </button>
+                                    <button type="button" onclick="aiReset()" class="btn btn-default" style="margin-right:10px;">
+                                        <i class="fa-solid fa-eraser"></i> 清空
+                                    </button>
+                                    <button type="button" onclick="aiCopy()" class="btn btn-default" style="margin-right:10px;">
+                                        <i class="fa-solid fa-copy"></i> 复制结果
+                                    </button>
+                                    <!-- 二开 Layer 3: 工具调用开关 -->
+                                    <label style="font-size:12px;color:#666;margin-left:15px;cursor:pointer;user-select:none;">
+                                        <input type="checkbox" id="cbUseTools" style="vertical-align:middle;margin-right:4px;"/>
+                                        <span style="vertical-align:middle;">启用工具调用（AI 可自行查询主机/告警/进程数据）</span>
+                                    </label>
+                                    <span id="aiHint" style="font-size:12px;color:#888;margin-left:10px;"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label style="font-weight:bold">回答</label>
+                                    <textarea class="form-control" name="answerContent" id="answerContent" rows="22" readonly style="font-family:Consolas,Monaco,monospace;font-size:13px;background:#1e1e2e;color:#e4e4e7;"></textarea>
+                                </div>
+                            </div>
+                            <div class="card-footer clearfix">
+                                <div class="float-left">
+                                    <span style="font-size:12px;color:#888">/ai/chatStream · OpenAI 兼容协议 · 流式输出</span>
+                                </div>
+                                <div class="float-right">
+                                    <button type="button" onclick="window.history.back()" class="btn bg-danger btn-sm">
+                                        <i class="fas fa-backward"></i> 返 回
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div th:replace="common/footer.html"></div>
+
+</div>
+
+<script th:inline="javascript">
+    var msg = [[${msg}]];
+    if(msg && msg.length > 0){
+        toastr.info(msg);
+    }
+
+    // 读取 AI 状态
+    $.get("/ai/ping", function(text){
+        var m = /model=([^,]+)/.exec(text||"");
+        $("#aiModelName").text(m ? m[1] : "?");
+        if(/enabled=false/.test(text)){
+            $("#aiHint").text("⚠ AI 助手未启用 (application.yml: ai.enabled=no)").css("color","#e67e22");
+        }
+    });
+
+    var aiEventSource = null;
+
+    function aiSend(){
+        var q = $("#questionContent").val();
+        if(!q || !q.trim()){
+            toastr.info("请输入内容");
+            return;
+        }
+        aiStop(); // 关上次
+        $("#answerContent").val("");
+        $("#btnSend").hide();
+        $("#btnStop").show();
+        $("#aiHint").text("AI 正在思考...").css("color","#666");
+
+        var useTools = $("#cbUseTools").is(":checked");
+        var endpoint = useTools ? "/ai/chatWithToolsStream" : "/ai/chatStream";
+        var url = endpoint + "?question=" + encodeURIComponent(q);
+        var accumulated = "";
+        var startedAt = Date.now();
+
+        try {
+            aiEventSource = new EventSource(url);
+        } catch(e) {
+            $("#aiHint").text("浏览器不支持 EventSource，已退回同步模式...").css("color","#e67e22");
+            $.post("/ai/chat", { question: q }, function(text){
+                $("#answerContent").val(text);
+                aiFinish();
+            });
+            return;
+        }
+
+        aiEventSource.onmessage = function(ev){
+            accumulated += ev.data;
+            var ta = document.getElementById("answerContent");
+            ta.value = accumulated;
+            ta.scrollTop = ta.scrollHeight;
+        };
+        // 工具调用相关事件 — 仅启用工具调用时会出现
+        aiEventSource.addEventListener("tools", function(ev){
+            $("#aiHint").html("🔧 " + ev.data).css("color","#3498db");
+        });
+        aiEventSource.addEventListener("tool_call", function(ev){
+            // 在回答区上方追加一行可视化标记
+            var prefix = accumulated ? "\n\n" : "";
+            accumulated += prefix + "▸ " + ev.data + "\n";
+            var ta = document.getElementById("answerContent");
+            ta.value = accumulated;
+            ta.scrollTop = ta.scrollHeight;
+            $("#aiHint").html("⚙ " + ev.data).css("color","#3498db");
+        });
+        aiEventSource.addEventListener("tool_result", function(ev){
+            $("#aiHint").html("✓ " + ev.data).css("color","#3498db");
+            accumulated += "✓ " + ev.data + "\n\n";
+            var ta = document.getElementById("answerContent");
+            ta.value = accumulated;
+            ta.scrollTop = ta.scrollHeight;
+        });
+        aiEventSource.addEventListener("done", function(ev){
+            var cost = ((Date.now()-startedAt)/1000).toFixed(1);
+            $("#aiHint").text("完成 · " + ev.data + " · 耗时 " + cost + "s").css("color","#27ae60");
+            aiFinish();
+        });
+        aiEventSource.addEventListener("error", function(ev){
+            if(ev.data){
+                accumulated += "\n\n[AI 异常] " + ev.data;
+                $("#answerContent").val(accumulated);
+                $("#aiHint").text("AI 调用失败").css("color","#e74c3c");
+            }
+            aiFinish();
+        });
+        aiEventSource.onerror = function(){
+            if(!accumulated){
+                $("#aiHint").text("AI 连接异常，请检查 ai.baseUrl 与服务可达性").css("color","#e74c3c");
+            }
+            aiFinish();
+        };
+    }
+
+    function aiStop(){
+        if(aiEventSource){
+            try { aiEventSource.close(); } catch(e){}
+            aiEventSource = null;
+        }
+        $("#btnStop").hide();
+        $("#btnSend").show();
+    }
+    function aiFinish(){
+        aiStop();
+    }
+
+    function aiReset(){
+        aiStop();
+        $("#questionContent").val("");
+        $("#answerContent").val("");
+        $("#aiHint").text("");
+    }
+
+    function aiCopy(){
+        var ta = document.getElementById("answerContent");
+        if(!ta.value){ toastr.info("没有可复制的内容"); return; }
+        ta.removeAttribute("readonly");
+        ta.select();
+        try { document.execCommand("Copy"); toastr.success("复制成功"); }
+        catch(e){ toastr.error("复制失败，请手动选择"); }
+        ta.setAttribute("readonly","readonly");
+    }
+
+    // Ctrl/Cmd + Enter 提交
+    document.getElementById("questionContent").addEventListener("keydown", function(e){
+        if((e.ctrlKey || e.metaKey) && e.keyCode === 13){
+            e.preventDefault();
+            aiSend();
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wgcloud.mapper.K8sMonitorMapper">
+	<resultMap id="resultMap" type="com.wgcloud.entity.K8sMonitor">
+		<id column="ID" property="id" jdbcType="CHAR" />
+		<result column="DATA_TYPE" property="dataType" jdbcType="CHAR" />
+		<result column="K8S_NAME" property="k8sName" jdbcType="CHAR" />
+		<result column="DATA_JSON" property="dataJson" jdbcType="CHAR" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<sql id="tableColumnList">
+		ID,DATA_TYPE,K8S_NAME,DATA_JSON,CREATE_TIME
+	</sql>
+
+	<sql id="queryByParams">
+		<if test="dataJson != null">
+			<choose>
+				<when test="_databaseId == 'oracle'">
+					<![CDATA[ AND DATA_JSON LIKE  CONCAT(CONCAT('%',#{dataJson}),'%') ]]>
+				</when>
+				<otherwise>
+					<![CDATA[ AND DATA_JSON LIKE  CONCAT('%',#{dataJson},'%') ]]>
+				</otherwise>
+			</choose>
+		</if>
+		<if test="dataType != null">
+			<![CDATA[ AND DATA_TYPE = #{dataType} ]]>
+		</if>
+		<if test="k8sName != null">
+			<choose>
+				<when test="_databaseId == 'oracle'">
+					<![CDATA[ AND K8S_NAME LIKE  CONCAT(CONCAT('%',#{k8sName}),'%') ]]>
+				</when>
+				<otherwise>
+					<![CDATA[ AND K8S_NAME LIKE  CONCAT('%',#{k8sName},'%') ]]>
+				</otherwise>
+			</choose>
+		</if>
+	</sql>
+	
+	
+	<select id="selectById" resultMap="resultMap" parameterType="java.lang.String">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM K8S_MONITOR 
+		WHERE ID=#{id} 
+	</select>
+	
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		DELETE FROM K8S_MONITOR 
+		WHERE ID = #{id}
+	</delete>
+
+	<delete id="deleteByK8sName" parameterType="java.lang.String">
+		DELETE FROM K8S_MONITOR WHERE K8S_NAME = #{k8sName}
+	</delete>
+	
+	<delete id="deleteById" parameterType="java.lang.String">
+		DELETE FROM
+		K8S_MONITOR 
+		WHERE ID IN
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<delete id="deleteByDate"  parameterType="map">
+		DELETE FROM K8S_MONITOR
+		<where>
+			<include refid="commonSqlUtil.createTimeDelParams" />
+		</where>
+	</delete>
+
+	<insert id="save" parameterType="com.wgcloud.entity.K8sMonitor">
+		INSERT INTO K8S_MONITOR 
+    	<trim prefix="(" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >ID,</if>
+      		<if test="dataType != null" >DATA_TYPE,</if>
+      		<if test="k8sName != null">K8S_NAME,</if>
+			<if test="dataJson != null">DATA_JSON,</if>
+      		<if test="createTime != null" >CREATE_TIME</if>
+    	</trim>
+    	<trim prefix="values (" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >#{id},</if>
+      		<if test="dataType != null" >#{dataType},</if>
+      		<if test="k8sName != null" >#{k8sName},</if>
+			<if test="dataJson != null" >#{dataJson},</if>
+      		<if test="createTime != null" >#{createTime}</if>
+    	</trim>
+	</insert>
+
+	<insert id="insertList" parameterType="java.util.List" >
+		<choose>
+			<when test="_databaseId == 'oracle'">
+				begin
+				<foreach collection="list" item="item" index="index">
+					INSERT INTO K8S_MONITOR (ID,DATA_TYPE,K8S_NAME,DATA_JSON,CREATE_TIME)  VALUES
+					(#{item.id},#{item.dataType},#{item.k8sName},#{item.dataJson},#{item.createTime});
+				</foreach>
+				end;
+			</when>
+			<otherwise>
+				INSERT INTO K8S_MONITOR (ID,DATA_TYPE,K8S_NAME,DATA_JSON,CREATE_TIME)  VALUES
+				<foreach collection="list" item="item" index="index" separator="," >
+					(#{item.id},#{item.dataType},#{item.k8sName},#{item.dataJson},#{item.createTime})
+				</foreach>
+			</otherwise>
+		</choose>
+	</insert>
+
+	<select id="countByParams" parameterType="map" resultType="java.lang.Integer">
+		SELECT count(*)  FROM K8S_MONITOR t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+	</select>
+
+
+	<select id="selectAllByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM K8S_MONITOR t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		 ORDER BY ID DESC
+	</select>
+	
+	<select id="selectByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM K8S_MONITOR
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		<choose>
+			<when test="orderBy !=null and orderBy != ''">
+				<![CDATA[ ORDER BY ${orderBy} ${orderType}]]>
+			</when>
+			<otherwise>
+				ORDER BY ID DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+</mapper>

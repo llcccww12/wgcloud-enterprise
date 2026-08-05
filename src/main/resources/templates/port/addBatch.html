@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item active"></li>
+                </ol>
+            </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-11">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">添加端口监控
+            <span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="Agent会模拟执行指令[Telnet 目标IP 端口]，测试目标主机的端口是否可以连通"  style="cursor:pointer;margin-left: 10px"><i class="fa fa-comment-dots"></i></span></h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <form role="form" id="form1" method="post" th:action="@{'/portInfo/saveBatch'}">
+            <input type="hidden" name="id" th:value="${portInfo.id}"/>
+            <div class="card-body">
+                <div class="form-group">
+                    <label><font color="red">*</font>监控主机</label>
+                    <div th:replace="common/multiSelectHost.html"></div>
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>监控端口类型</label>
+                    <div class="input-group">
+                        <div class="icheck-turquoise d-inline">
+                            <input type="radio" id="portType1" name="portType" value="TCP" checked>
+                            <label for="portType1"><span style="opacity:.70">TCP</span></label>
+                        </div>
+                        <div class="icheck-wisteria d-inline" style="margin-left:30px;">
+                            <input type="radio" id="portType2" name="portType" value="UDP">
+                            <label for="portType2"><span style="opacity:.70">UDP</span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>Telnet IP<span class="text-muted">（如：192.168.1.2）</span></label>
+                    <input type="text" autocomplete="off"  th:value="${portInfo.telnetIp}" class="validate[required,maxSize[300]] form-control" name="telnetIp" id="telnetIp" placeholder="如localhost">
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>Telnet端口<span class="text-muted">（如：9999）</span></label>
+                    <input type="text" autocomplete="off"  th:value="${portInfo.port}" class="validate[required,custom[number],maxSize[10]] form-control" name="port" id="port" placeholder="请输入端口号，如9999，telnet测试端口是否连通">
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>名称</label>
+                    <input type="text" autocomplete="off"  th:value="${portInfo.portName}" class="validate[required,maxSize[30]] form-control" name="portName" id="portName" placeholder="如LLM平台">
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>告警级别</label>
+                    <div th:replace="common/warnLevel.html"></div>
+                </div>
+                <div class="form-group clearfix">
+                    <label><font color="red">*</font>监控状态</label>
+                    <div th:replace="common/activeRadio.html"></div>
+                </div>
+
+            </div>
+            <!-- /.card-body -->
+
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-right:10px;"><i class="fas fa-save"></i> 保 存</button>
+                <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+            </div>
+
+        </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-10 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:src="@{'/static/js/port.js?v=3.5.0'}"></script>
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $("#form1").validationEngine();
+        $('.duallistbox').bootstrapDualListbox({
+            nonSelectedListLabel: '未选监控主机',
+            selectedListLabel: '已选监控主机',
+            filterPlaceHolder: '过滤条件',
+            moveAllLabel: '添加全部',
+            removeAllLabel: '移除全部',
+            infoText: '当前列表共 {0} 项',
+            infoTextEmpty: '列表为空',
+        });
+    });
+
+</script>
+</body>
+</html>

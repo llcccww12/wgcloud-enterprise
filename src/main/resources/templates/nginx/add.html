@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper"  >
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}" style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+      <section class="content-header" style="height:38px">
+          <div class="container-fluid">
+              <div class="row mb-2" style="margin-top: -7px;">
+                  <div class="col-sm-6"></div>
+                  <div class="col-sm-6">
+                      <ol class="breadcrumb float-sm-right">
+                          <li class="breadcrumb-item"><a href="javascript:history.back()">返回上级</a></li>
+                      </ol>
+                  </div>
+              </div>
+          </div><!-- /.container-fluid -->
+      </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-10">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title"><i class="nav-icon fa-solid fa-layer-group"></i>&nbsp;Nginx日志文件检测</h3>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <form role="form" id="form1" method="post" th:action="@{'/nginxMonitor/uploadLog'}" enctype="multipart/form-data">
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="exampleInputFile">请选择Nginx Access Log文件<span class="text-muted">（上传.log类型文件，文件体积不能大于200MB）</span></label>
+                    <div class="input-group">
+                        <div class="custom-file">
+                            <input type="file" placeholder="access.log" name="file" class="validate[required] custom-file-input" id="exampleInputFile">
+                            <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group"><span style="font-weight:700;color: #62d45e!important;">今天已经检测<span th:text="${NGINX_CHECK_DAY_COUNT}">1</span>次</span></div>
+            </div>
+
+            <div class="card-footer">
+                <th:block th:if="${session.LOGIN_KEY.role != 'guest'}">
+                <button type="button" onclick="upload()" class="btn btn-primary btn-sm" style="margin-right:10px;">上传并检测</button>
+                </th:block>
+                <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+            </div>
+        </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+  <div th:replace="common/footer.html"></div>
+    <!-- bs-custom-file-input -->
+    <script th:src="@{'/static/AdminLTE/plugins/bs-custom-file-input/bs-custom-file-input.min.js'}"></script>
+</div>
+<!-- ./wrapper -->
+<script th:inline="javascript">
+    $(document).ready(function () {
+        $("#form1").validationEngine();
+        bsCustomFileInput.init();
+    });
+    function upload(){
+        var files = $('#exampleInputFile')[0].files
+        if (files.length <= 0) {
+            return alert('请选择文件后再上传！')
+        }
+        toastr.success("正在上传和分析......");
+        $("#form1").submit();
+    }
+    var msg = [[${msg}]];
+    if(msg!='' && msg!=null){
+        toastr.error(msg);
+    }
+</script>
+</body>
+</html>

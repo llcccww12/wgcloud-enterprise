@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<th:block th:if="${session.LOGIN_KEY != null}">
+<body class="sidebar-mini sidebar-collapse">
+</th:block>
+<th:block th:if="${session.LOGIN_KEY == null}">
+<body class="hold-transition sidebar-mini layout-fixed">
+</th:block>
+
+<div class="wrapper">
+
+  <th:block th:if="${session.LOGIN_KEY != null}">
+    <div th:replace="common/navbar.html"></div>
+
+    <div th:replace="common/aside.html"></div>
+  </th:block>
+
+  <!-- Content Wrapper. Contains page content -->
+  <th:block th:if="${session.LOGIN_KEY != null}">
+    <div class="content-wrapper">
+  </th:block>
+  <th:block th:if="${session.LOGIN_KEY == null}">
+    <div th:class="'content-wrapper '+${session.themeNameSign}" style="margin-left: 10px">
+  </th:block>
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>404 找不到页面</h1>
+          </div>
+          <div class="col-sm-6">
+            <!--<ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#"></a></li>
+              <li class="breadcrumb-item active"></li>
+            </ol>-->
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="error-page">
+        <h2 class="headline text-warning"> 404</h2>
+
+        <div class="error-content">
+          <h3><i class="fas fa-exclamation-triangle text-warning"></i> 糟糕！找不到网页</h3>
+
+          <p>
+          <h6>我们找不到您想要的页面。同时，您联系我们提供帮助。</h6>
+          <h6>提示：从v3.4.7版本开始，已支持通过<span class="text-danger">http://[server主机IP]:端口</span>访问server页面，访问地址不用再加<span class="text-danger">/cac</span>了，请将访问URL中的字符串"/cac"删除，然后重新访问再试</h6>
+          </p>
+
+        </div>
+        <!-- /.error-content -->
+      </div>
+      <!-- /.error-page -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+  <th:block th:if="${session.LOGIN_KEY != null}">
+    <div th:replace="common/footer.html"></div>
+  </th:block>
+  <th:block th:if="${session.LOGIN_KEY == null}">
+    <div th:replace="common/footerDashView.html"></div>
+  </th:block>
+
+
+</div>
+<!-- ./wrapper -->
+
+</body>
+</html>

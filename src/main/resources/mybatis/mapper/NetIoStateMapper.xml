@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wgcloud.mapper.NetIoStateMapper">
+	<resultMap id="resultMap" type="com.wgcloud.entity.NetIoState">
+		<id column="ID" property="id" jdbcType="CHAR" />
+		<result column="HOST_NAME" property="hostname" jdbcType="CHAR" />
+		<result column="RXPCK" property="rxpck" jdbcType="CHAR" />
+		<result column="TXPCK" property="txpck" jdbcType="CHAR" />
+		<result column="RXBYT" property="rxbyt" jdbcType="CHAR" />
+		<result column="TXBYT" property="txbyt" jdbcType="CHAR" />
+		<result column="DROPIN" property="dropin" jdbcType="CHAR" />
+		<result column="DROPOUT" property="dropout" jdbcType="CHAR" />
+		<result column="NET_CONNECTIONS" property="netConnections" jdbcType="CHAR" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<sql id="tableColumnList">
+		ID,HOST_NAME, RXPCK,TXPCK,RXBYT, TXBYT, DROPIN, DROPOUT,NET_CONNECTIONS, CREATE_TIME
+	</sql>
+	
+	<sql id="queryByParams">
+		<if test="hostname != null">
+			<![CDATA[ AND HOST_NAME = #{hostname} ]]>
+		</if>
+		<if test="rxbyt != null">
+			<![CDATA[ AND RXBYT = #{rxbyt} ]]>
+		</if>
+		<if test="txbyt != null">
+			<![CDATA[ AND TXBYT = #{txbyt} ]]>
+		</if>
+		<if test="startTime != null and endTime !=null and startTime !='' and endTime != '' ">
+			<include refid="commonSqlUtil.createTimeQueryParams" />
+		</if>
+		<if test="groupId != null">
+			<include refid="commonSqlUtil.groupIdForHostNameQueryParams" />
+		</if>
+	</sql>
+	
+	<select id="selectById" resultMap="resultMap" parameterType="java.lang.String">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM NETIO_STATE
+		WHERE ID=#{id} 
+	</select>
+
+	<select id="selectMaxByHostname" resultType="com.wgcloud.entity.NetIoState" parameterType="map">
+		SELECT
+		<choose>
+			<when test="_databaseId == 'mysql'">
+				MAX(RXBYT + 0) as rxbyt,MAX(TXBYT + 0) as txbyt,MAX(TXPCK + 0) as txpck,MAX(RXPCK + 0) as rxpck
+			</when>
+			<otherwise>
+				MAX(RXBYT) as rxbyt,MAX(TXBYT) as txbyt,MAX(TXPCK) as txpck,MAX(RXPCK) as rxpck
+			</otherwise>
+		</choose>
+		FROM NETIO_STATE
+		<where>
+			<include refid="queryByParams" />
+		</where>
+	</select>
+
+	<select id="selectAvgByHostname" resultType="com.wgcloud.entity.NetIoState" parameterType="map">
+		SELECT
+		<choose>
+			<when test="_databaseId == 'mysql'">
+				AVG(RXBYT + 0) as rxbyt,AVG(TXBYT + 0) as txbyt,AVG(TXPCK + 0) as txpck,AVG(RXPCK + 0) as rxpck
+			</when>
+			<when test="_databaseId == 'SQLServer'">
+				AVG(TRY_CAST(RXBYT AS FLOAT)) as rxbyt,AVG(TRY_CAST(TXBYT AS FLOAT)) as txbyt,AVG(TRY_CAST(TXPCK AS FLOAT)) as txpck,AVG(TRY_CAST(RXPCK AS FLOAT))  as rxpck
+			</when>
+			<otherwise>
+				AVG(to_number(RXBYT,'9999999999999.999')) as rxbyt,AVG(to_number(TXBYT,'9999999999999.999')) as txbyt,AVG(to_number(TXPCK,'9999999999999.999')) as txpck,AVG(to_number(RXPCK,'9999999999999.999')) as rxpck
+			</otherwise>
+		</choose>
+		FROM NETIO_STATE
+		<where>
+			<include refid="queryByParams" />
+		</where>
+	</select>
+
+	<select id="selectMinByHostname" resultType="com.wgcloud.entity.NetIoState" parameterType="map">
+		SELECT
+		<choose>
+			<when test="_databaseId == 'mysql'">
+				MIN(RXBYT + 0) as rxbyt,MIN(TXBYT + 0) as txbyt,MIN(TXPCK + 0) as txpck,MIN(RXPCK + 0) as rxpck
+			</when>
+			<otherwise>
+				MIN(RXBYT) as rxbyt,MIN(TXBYT) as txbyt,MIN(TXPCK) as txpck,MIN(RXPCK) as rxpck
+			</otherwise>
+		</choose>
+		FROM NETIO_STATE
+		<where>
+			<include refid="queryByParams" />
+		</where>
+	</select>
+
+	<select id="selectMaxByDate" resultType="com.wgcloud.entity.NetIoState" parameterType="map">
+		SELECT
+		<choose>
+			<when test="_databaseId == 'mysql'">
+				MAX(RXBYT * 1) as rxbyt,MAX(TXBYT * 1) as txbyt,MAX(NET_CONNECTIONS * 1) as netConnections
+			</when>
+			<otherwise>
+				MAX(RXBYT) as rxbyt,MAX(TXBYT) as txbyt,MAX(NET_CONNECTIONS) as netConnections
+			</otherwise>
+		</choose>
+		FROM NETIO_STATE
+		<where>
+			<if test="startTime != null and endTime !=null and startTime !='' and endTime != '' ">
+				<include refid="commonSqlUtil.createTimeQueryParams" />
+			</if>
+			<if test="account != null">
+				<![CDATA[ AND HOST_NAME IN (SELECT c.HOST_NAME FROM SYSTEM_INFO c WHERE c.ACCOUNT= #{account}) ]]>
+			</if>
+		</where>
+	</select>
+
+
+	
+	<delete id="deleteByDate"  parameterType="map">
+		DELETE FROM NETIO_STATE
+		<where>
+			<include refid="commonSqlUtil.createTimeDelParams" />
+		</where>
+	</delete>
+	
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		DELETE FROM NETIO_STATE
+		WHERE ID = #{id}
+	</delete>
+	
+	<delete id="deleteById" parameterType="java.lang.String">
+		DELETE FROM
+		NETIO_STATE
+		WHERE ID IN
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<insert id="save" parameterType="com.wgcloud.entity.NetIoState">
+		INSERT INTO NETIO_STATE
+    	<trim prefix="(" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >ID,</if>
+      		<if test="hostname != null" > HOST_NAME,</if>
+      		<if test="txpck != null">TXPCK,</if>
+      		<if test="rxpck != null">RXPCK,</if>
+      		<if test="rxbyt != null">RXBYT,</if>
+      		<if test="txbyt != null" >TXBYT,</if>
+      		<if test="dropin != null" >DROPIN,</if>
+      		<if test="dropout != null" >DROPOUT,</if>
+			<if test="netConnections != null" >NET_CONNECTIONS,</if>
+      		<if test="createTime != null" >CREATE_TIME</if>
+    	</trim>
+    	<trim prefix="values (" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >#{id},</if>
+      		<if test="hostname != null" >#{hostname},</if>
+      		<if test="txpck != null" >#{txpck},</if>
+      		<if test="rxpck != null" >#{rxpck},</if>
+      		<if test="rxbyt != null" >#{rxbyt},</if>
+      		<if test="txbyt != null" >#{txbyt},</if>
+      		<if test="dropin != null" >#{dropin},</if>
+      		<if test="dropout != null" >#{dropout},</if>
+			<if test="netConnections != null" >#{netConnections},</if>
+      		<if test="createTime != null" >#{createTime}</if>
+    	</trim>
+	</insert>
+	
+	<insert id="insertList" parameterType="java.util.List" >
+		<choose>
+			<when test="_databaseId == 'oracle'">
+				begin
+				<foreach collection="list" item="item" index="index">
+					INSERT INTO NETIO_STATE (ID,HOST_NAME,TXPCK,RXPCK,RXBYT,TXBYT,DROPIN,DROPOUT,NET_CONNECTIONS,CREATE_TIME)  VALUES
+					(#{item.id},#{item.hostname},#{item.txpck},#{item.rxpck},#{item.rxbyt},#{item.txbyt},
+					#{item.dropin},#{item.dropout},#{item.netConnections},#{item.createTime});
+				</foreach>
+				end;
+			</when>
+			<otherwise>
+				INSERT INTO NETIO_STATE (ID,HOST_NAME,TXPCK,RXPCK,RXBYT,TXBYT,DROPIN,DROPOUT,NET_CONNECTIONS,CREATE_TIME)  VALUES
+				<foreach collection="list" item="item" index="index" separator="," >
+					(#{item.id},#{item.hostname},#{item.txpck},#{item.rxpck},#{item.rxbyt},#{item.txbyt},
+					#{item.dropin},#{item.dropout},#{item.netConnections},#{item.createTime})
+				</foreach>
+			</otherwise>
+		</choose>
+	 </insert>
+
+	<select id="selectTop3" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM NETIO_STATE t ORDER BY TXBYT DESC,RXBYT DESC
+	</select>
+	
+	  <select id="selectAllByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM NETIO_STATE t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		 ORDER BY CREATE_TIME ASC
+	</select>
+
+	<sql id="mysqlOrderBySql">
+		<choose>
+			<when test="_databaseId == 'mysql' and (orderBy == 'TXBYT' || orderBy == 'RXBYT' || orderBy == 'NET_CONNECTIONS')">
+				<![CDATA[ ORDER BY ${orderBy} * 1 ${orderType}]]>
+			</when>
+			<otherwise>
+				<![CDATA[ ORDER BY ${orderBy} ${orderType}]]>
+			</otherwise>
+		</choose>
+	</sql>
+
+	<select id="selectByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM NETIO_STATE
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		<choose>
+			<when test="orderBy !=null and orderBy != ''">
+				<include refid="mysqlOrderBySql" />
+			</when>
+			<otherwise>
+				ORDER BY CREATE_TIME DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+</mapper>

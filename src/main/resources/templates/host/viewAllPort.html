@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item active"></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title" ><span th:utext="${systemInfo.image}"></span><span style="margin-left:5px" th:text="${systemInfo.hostname}"></span>
+            <th:block th:if="${systemInfo.remark ne '' && systemInfo.remark ne null}">
+                (备注：<span th:text="${systemInfo.remark}"></span>)
+            </th:block><span class="btncopy" th:data-clipboard-text="${systemInfo.hostname}" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制" style="cursor:pointer;margin-left: 5px"><i class="fa fa-copy"></i></span>
+            </h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+        <label><span style="margin-left: 10px;margin-top:10px;color:#fff;background:#9267ff;display:inline-block;border-radius:3px;padding:4px 8px 4px;">全量端口信息</span>
+            <span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="主机正在监听的所有端口"  style="cursor:pointer;margin-left:10px"><i class="fa fa-comment-dots"></i></span>
+            <small th:if="${allPortDateTime ne '' && allPortDateTime ne null}" style="background:#508ff4;margin-left:5px;" class="badge badge-danger" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="采集时间"><i class="far fa-clock"></i> <span th:text="${allPortDateTime}">10 Feb. 2014</span></small>
+            <span style="margin-left: 10px;font-weight:700;color: #62d45e!important;" th:text="${tipInfo}"></span></label>
+        <div class="row">
+            <div class="col-12 table-responsive">
+                <textarea class="form-control" name="shell" id="shell" th:text="${allPortInfo}"  rows="5"></textarea>
+            </div>
+            <div class="card-footer">
+                <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+            </div>
+        </div>
+    </div>
+    <!-- /.card -->
+
+  </div>
+  <!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+<div th:replace="common/codemirror.html"></div>
+<script th:inline="javascript">
+    var editor = CodeMirror.fromTextArea(document.getElementById("shell"), {
+        lineNumbers: true,
+        styleActiveLine: true,
+        matchBrackets: true,
+        readOnly: true,
+        mode: 'shell'
+    });
+    editor.setOption("theme", "dracula");
+    editor.setSize('auto','auto');
+    var clipboard = new ClipboardJS('.btncopy');
+    clipboard.on('success', function (e) {
+        toastr.success("复制成功");
+    });
+</script>
+
+</body>
+</html>

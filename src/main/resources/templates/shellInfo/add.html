@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}" style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item active"></li>
+                </ol>
+            </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">添加下发指令</h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <form role="form" id="form1" method="post" th:action="@{'/shellInfo/save'}">
+            <input type="hidden" name="id"/>
+            <input type="hidden" name="displayGroupHref" th:value="${displayGroupHref}"/>
+            <div class="card-body">
+                <div class="form-group">
+                    <label><font color="red">*</font>监控主机<span class="text-muted">（请将需要执行指令的主机移到右侧，保存完成后5分钟内指令会陆续下发执行）</span>
+                        <a th:if="${application.hostGroup == 'true'&& displayGroupHref != '1'}" th:href="@{'/shellInfo/edit?displayGroupHref=1'}">显示主机标签</a>
+                        <a th:if="${application.hostGroup == 'true'&& displayGroupHref == '1'}" th:href="@{'/shellInfo/edit?displayGroupHref=2'}">隐藏主机标签</a>
+                        <a  style="margin-left:10px;" id="dualListboxChangeBtn" href="javascript:dualListboxChange()">当前为单击选择主机模式，点击可切换为双击</a>
+                    </label>
+                    <style>
+                        select option:hover,select option:focus,select option:active,select option:checked {
+                            background: linear-gradient(#FFC894,#FFC894);
+                            background-color: #FFC894 !important; /* for IE */
+                        }
+                    </style>
+                    <select class="duallistbox"  style="height:300px" name="hostnames" multiple="multiple">
+                        <th:block th:each="item,iterStat : ${systemInfoList}">
+                            <th:block th:if="${item.selected} == null or ${item.selected} == ''">
+                                <option  th:value="${item.hostname}" th:text="${item.hostname}+' ('+${item.remark}+')'">Alabama</option>
+                            </th:block>
+                            <th:block th:if="${item.selected} == 'selected'">
+                                <option  th:value="${item.hostname}" selected th:text="${item.hostname}+' ('+${item.remark}+')'">Alabama</option>
+                            </th:block>
+                        </th:block>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>指令名称</label>
+                    <input type="text" autocomplete="off"  th:value="${shellInfo.shellName}" class="validate[required,maxSize[50]] form-control" name="shellName" id="shellName" placeholder="如：重启server程序">
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>下发指令 <span class="text-muted">(多条指令请换行输入)</span><span class="text-muted" th:text="${blockStr}">敏感字符串过滤</span></label>
+                    <label><span style="color: #62d45e!important;">如果指令很多，比如超过10行或带有逻辑判断，建议将指令写入到一个脚本(存在被监控主机)，然后在这里执行脚本</span></label>
+                    <textarea class="validate[required,maxSize[2000]] form-control"   name="shell" id="shell" th:text="${shellInfo.shell}"></textarea>
+                </div>
+                <div class="form-group clearfix">
+                    <label><font color="red">*</font>下发时间</label>
+                    <div class="input-group">
+                    <div class="icheck-turquoise d-inline">
+                        <input type="radio" onclick="hideTimepickerDiv()" id="radioPrimary2" name="shellType" value="1" checked>
+                        <label for="radioPrimary2"><span style="opacity:.70">立即下发</span></label>
+                    </div>
+                    <div class="icheck-wisteria d-inline" style="margin-left:30px;">
+                        <input type="radio" onclick="showTimepickerDiv()" id="radioPrimary4" name="shellType" value="2">
+                        <label for="radioPrimary4"><span style="opacity:.70">定时下发</span></label>
+                    </div>
+                    </div>
+                </div>
+                <div id="timepickerDiv" style="display: none" class="form-group">
+                    <div class="form-group clearfix">
+                        <label><font color="red">*</font>选择执行时间<span class="text-muted">（客户端将在此时间后的5分钟内执行完成）</span></label>
+                        <div class="input-group date" id="timepicker" data-target-input="nearest">
+                            <input type="text" autocomplete="off" value="" class="validate[maxSize[50]] form-control"  name="shellTime" id="shellTime" placeholder="时间">
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <label>连续多少天执行指令<span class="text-muted">（系统将会在每天相同的时间点执行，不能超过30天。若为空，则只会在上面选择的时间执行，不会连续每天执行）</span></label>
+                        <div class="input-group">
+                            <input type="text" autocomplete="off" class="validate[custom[number],maxSize[10]] form-control" name="continueDays" id="continueDays" placeholder="">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.card-body -->
+
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-right:10px;"><i class="fas fa-save"></i> 保存并执行</button>
+                <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+            </div>
+
+        </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-10 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+<div th:replace="common/codemirror.html"></div>
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $("#form1").validationEngine();
+
+        var shellTime = $('#shellTime');
+        if(shellTime!=null && shellTime != undefined){
+            shellTime.daterangepicker({
+                singleDatePicker: true,
+                timePicker: true,
+                timePicker24Hour : true,
+                "opens": "center",
+                drops : "up",
+                "locale": {
+                    format: 'YYYY-MM-DD HH:mm',
+                    applyLabel: "应用",
+                    cancelLabel: "取消",
+                    daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
+                    monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+                }
+            });
+        }
+        var editor = CodeMirror.fromTextArea(document.getElementById("shell"), {
+            lineNumbers: true,
+            styleActiveLine: true,
+            matchBrackets: true,
+            mode: 'shell'
+        });
+        editor.setOption("theme", "dracula");
+        editor.setSize('auto','280px');
+    });
+
+    //Bootstrap Duallistbox
+    var selectDualListBox = $('.duallistbox').bootstrapDualListbox({
+        nonSelectedListLabel: '未选监控主机',
+        selectedListLabel: '已选监控主机',
+        filterPlaceHolder: '过滤条件',
+        moveAllLabel: '添加全部',
+        moveSelectedLabel: '添加所选',
+        removeAllLabel: '移除全部',
+        removeSelectedLabel: '移除所选',
+        infoText: '当前列表共 {0} 项',
+        infoTextEmpty: '列表为空'
+    });
+
+    function showTimepickerDiv() {
+        $("#timepickerDiv").show();
+    }
+
+    function hideTimepickerDiv() {
+        $("#timepickerDiv").hide();
+        $("#shellTime").val("");
+    }
+
+    function dualListboxChange() {
+        var inputValue = $("#dualListboxChangeBtn").html();
+        if("当前为单击选择主机模式，点击可切换为双击"==inputValue){
+            selectDualListBox.bootstrapDualListbox("setMoveOnSelect",false);
+            $("#dualListboxChangeBtn").html("当前为双击选择主机模式，点击可切换为单击");
+            toastr.success("设置成功，请双击选择需要下发指令的主机");
+        }else{
+            selectDualListBox.bootstrapDualListbox("setMoveOnSelect",true);
+            $("#dualListboxChangeBtn").html("当前为单击选择主机模式，点击可切换为双击");
+            toastr.success("设置成功，请单击选择需要下发指令的主机");
+        }
+    }
+
+    var msg = [[${msg}]];
+    if(msg!='' && msg!=null){
+        toastr.error(msg);
+    }
+</script>
+</body>
+</html>

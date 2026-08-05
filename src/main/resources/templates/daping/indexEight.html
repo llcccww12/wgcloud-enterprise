@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title th:text="${application.wgName}">cac监控系统</title>
+  <base href="./" th:href="'/'"/>
+  <meta charset="utf-8">
+  <link rel="shortcut icon" type="image/x-icon" th:href="${application.icoUrl}"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" th:href="@{'/static/dapingEight/common.css'}">
+
+</head>
+<body>
+<header class="header left">
+  <div class="left nav">
+    <ul>
+      <li><i class="nav_1"></i><span id="showTime"></span> </li>
+    </ul>
+  </div>
+  <div class="header_center left" style="position:relative">
+    <h2><strong th:text="${application.wgName}">cac监控系统</strong></h2>
+  </div>
+  <div class="right nav text_right">
+    <ul>
+    </ul>
+  </div>
+
+</header>
+<!--内容部分-->
+<div class="con left">
+  <!--数据总概-->
+  <div class="con_div">
+    <div class="con_div_text left">
+      <div class="con_div_text01 left">
+        <div class="left text01_div">
+          <p>内存总和</p>
+          <p th:text="${memSum}">1235</p>
+        </div>
+      </div>
+      <div class="con_div_text01 right">
+        <div class="left text01_div">
+          <p>CPU核数总和</p>
+          <p th:text="${cpuCoresSum}">235</p>
+        </div>
+      </div>
+    </div>
+    <div class="con_div_text left">
+      <div class="con_div_text01 left">
+        <div class="left text01_div">
+          <p>存储容量总和</p>
+          <p class="sky" th:text="${sumDiskSizeCache}">12356</p>
+        </div>
+      </div>
+      <div class="con_div_text01 right">
+        <div class="left text01_div">
+          <p>终端运行平均时长</p>
+          <p class="sky" th:text="${avgAgentRunDays}">12356</p>
+        </div>
+      </div>
+    </div>
+    <div class="con_div_text left">
+
+      <div class="con_div_text01 left">
+        <div class="left text01_div">
+          <p>主机监控数量</p>
+          <p class="org"  th:text="${totalSystemInfoSize}">92</p>
+        </div>
+      </div>
+      <div class="con_div_text01 right">
+        <div class="left text01_div">
+          <p>网络设备数量</p>
+          <p class="org" th:text="${pingSnmpSumSize}">8</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--统计分析图-->
+  <div class="div_any">
+    <div class="left div_any01">
+      <div class="div_any_child">
+        <div class="div_any_title">主机CPU使用率%最高</div>
+        <p id="histogramChart1" class="p_chart"></p>
+      </div>
+      <div class="div_any_child">
+        <div class="div_any_title">主机内存使用率%最高</div>
+        <p id="histogramChart2" class="p_chart"></p>
+      </div>
+    </div>
+    <div class="left div_any01">
+      <div class="div_any_child">
+        <div class="div_any_title">所有主机最近10分钟状态</div>
+        <p id="lineChart1" class="p_chart"></p>
+      </div>
+      <div class="div_any_child">
+        <div class="div_any_title">上下行速率最新主机(KB/s)</div>
+        <p id="lineChart2" class="p_chart"></p>
+      </div>
+    </div>
+    <div class="left div_any01">
+      <div class="div_any_child">
+        <div class="div_any_title">运行进程数量最多主机</div>
+        <p id="histogramChart3" class="p_chart"></p>
+      </div>
+      <div class="div_any_child">
+        <div class="div_any_title">磁盘总使用率%最高主机</div>
+        <p id="histogramChart4" class="p_chart"></p>
+      </div>
+    </div>
+    <div class="left div_any01">
+      <div class="div_any_child">
+        <div class="div_any_title">主机系统类型占比</div>
+        <p id="pieChart1" class="p_chart"></p>
+      </div>
+      <div class="div_any_child">
+        <div class="div_any_title">监控资源分布</div>
+        <p id="pieChart2" class="p_chart"></p>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+<script  type="text/javascript"  th:src="@{'/static/daping/js/jquery.js'}"></script>
+<script  type="text/javascript"  th:src="@{'/static/dapingEight/echarts.min.js'}"></script>
+<!-- Toastr -->
+<link rel="stylesheet" th:href="@{'/static/AdminLTE/plugins/toastr/toastr.min.css'}">
+<!-- Toastr -->
+<script th:src="@{'/static/AdminLTE/plugins/toastr/toastr.min.js'}"></script>
+<script  th:inline="javascript">
+  const procsTopNameList = [[${procsTopNameList}]];
+  const procsTopValList = [[${procsTopValList}]];
+  const cpuMaxNameList = [[${cpuMaxNameList}]];
+  const cpuMaxValList = [[${cpuMaxValList}]];
+  const memMaxNameList = [[${memMaxNameList}]];
+  const memMaxValList = [[${memMaxValList}]];
+  const systemTypeList = [[${systemTypeList}]];
+  const hostDiskperNameList = [[${hostDiskperNameList}]];
+  const hostDiskperValList = [[${hostDiskperValList}]];
+  const maxCpuInfo = [[${maxCpuInfo}]];
+  const avgCpuInfo = [[${avgCpuInfo}]];
+  const minCpuInfo = [[${minCpuInfo}]];
+  const maxMemInfo = [[${maxMemInfo}]];
+  const avgMemInfo = [[${avgMemInfo}]];
+  const minMemInfo = [[${minMemInfo}]];
+  const maxSwapMemInfo = [[${maxSwapMemInfo}]];
+  const avgSwapMemInfo = [[${avgSwapMemInfo}]];
+  const minSwapMemInfo = [[${minSwapMemInfo}]];
+  const maxFiveLoad = [[${maxFiveLoad}]];
+  const minFiveLoad = [[${minFiveLoad}]];
+  const avgFiveLoad = [[${avgFiveLoad}]];
+  const maxFifteenLoad = [[${maxFifteenLoad}]];
+  const minFifteenLoad = [[${minFifteenLoad}]];
+  const avgFifteenLoad = [[${avgFifteenLoad}]];
+  const maxDiskPer = [[${maxDiskPer}]];
+  const avgDiskPer = [[${avgDiskPer}]];
+  const minDiskPer = [[${minDiskPer}]];
+  const systemTop10NameList = [[${systemTop10NameList}]];
+  const rxbytTop10List = [[${rxbytTop10List}]];
+  const txbytTop10List = [[${txbytTop10List}]];
+  const monitorResourceList = [[${monitorResourceList}]];
+
+  $(function(){
+    init();
+  })
+  function init(){
+    var myColor = ['#1089E7', '#F57474', '#56D0E3', '#F8B448', '#8B78F6'];
+    var histogramChart1 = echarts.init(document.getElementById('histogramChart1'));
+    histogramChart1.setOption({
+      grid: {
+        top: '20%',
+        left: '32%'
+      },
+      xAxis: {
+        show: false
+      },
+      yAxis: [{
+        show: true,
+        data:  cpuMaxNameList,
+        inverse: true,
+        axisLine: {
+          show: false
+        },
+        splitLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        },
+        axisLabel: {
+          color: '#fff',
+          formatter: (value, index) => {
+            return [
+              `{lg|${index+1}}  ` + '{title|' + value + '} '
+            ].join('\n')
+          },
+          rich: {
+            lg: {
+              backgroundColor: '#339911',
+              color: '#fff',
+              borderRadius: 15,
+              // padding: 5,
+              align: 'center',
+              width: 15,
+              height: 15
+            },
+          }
+        },
+      }, {
+        show: true,
+        inverse: true,
+        data: cpuMaxValList,
+        axisLabel: {
+          textStyle: {
+            fontSize: 12,
+            color: '#fff',
+          },
+        },
+        axisLine: {
+          show: false
+        },
+        splitLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        },
+      }],
+      series: [{
+        name: '%',
+        type: 'bar',
+        yAxisIndex: 0,
+        data: cpuMaxValList,
+        barWidth: 10,
+        itemStyle: {
+          normal: {
+            barBorderRadius: 20,
+            color: function(params) {
+              var num = myColor.length;
+              return myColor[params.dataIndex % num]
+            },
+          }
+        },
+        label: {
+          normal: {
+            show: true,
+            position: 'inside',
+            formatter: '{c}%'
+          }
+        },
+      }, {
+        name: '%',
+        type: 'bar',
+        yAxisIndex: 1,
+        barGap: '-100%',
+        data: [100, 100, 100, 100, 100],
+        barWidth: 15,
+        itemStyle: {
+          normal: {
+            color: 'none',
+            borderColor: '#00c1de',
+            borderWidth: 3,
+            barBorderRadius: 15,
+          }
+        }
+      }, ]
+    })
+
+    //内存使用率最高的主机
+    var histogramChart2 = echarts.init(document.getElementById('histogramChart2'));
+    histogramChart2.setOption({
+      grid: {
+        top: '20%',
+        left: '32%'
+      },
+      xAxis: {
+        show: false
+      },
+      yAxis: [{
+        show: true,
+        data:  memMaxNameList,
+        inverse: true,
+        axisLine: {
+          show: false
+        },
+        splitLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        },
+        axisLabel: {
+          color: '#fff',
+          formatter: (value, index) => {
+            return [
+              `{lg|${index+1}}  ` + '{title|' + value + '} '
+            ].join('\n')
+          },
+          rich: {
+            lg: {
+              backgroundColor: '#339911',
+              color: '#fff',
+              borderRadius: 15,
+              // padding: 5,
+              align: 'center',
+              width: 15,
+              height: 15
+            },
+          }
+        },
+      }, {
+        show: true,
+        inverse: true,
+        data: memMaxValList,
+        axisLabel: {
+          textStyle: {
+            fontSize: 12,
+            color: '#fff',
+          },
+        },
+        axisLine: {
+          show: false
+        },
+        splitLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        },
+      }],
+      series: [{
+        name: '%',
+        type: 'bar',
+        yAxisIndex: 0,
+        data:  memMaxValList,
+        barWidth: 10,
+        itemStyle: {
+          normal: {
+            barBorderRadius: 20,
+            color: function(params) {
+              var num = myColor.length;
+              return myColor[params.dataIndex % num]
+            },
+          }
+        },
+        label: {
+          normal: {
+            show: true,
+            position: 'inside',
+            formatter: '{c}%'
+          }
+        },
+      }, {
+        name: '%',
+        type: 'bar',
+        yAxisIndex: 1,
+        barGap: '-100%',
+        data: [100, 100, 100, 100, 100],
+        barWidth: 15,
+        itemStyle: {
+          normal: {
+            color: 'none',
+            borderColor: '#00c1de',
+            borderWidth: 3,
+            barBorderRadius: 15,
+          }
+        }
+      }, ]
+    })
+
+    //主机系统类型占比
+    var pieChart1 = echarts.init(document.getElementById('pieChart1'));
+    pieChart1.setOption({
+      color:["#87cefa","#ff7f50","#32cd32","#da70d6",'#1089E7', '#F57474', '#56D0E3', '#F8B448'],
+      tooltip : {
+        trigger: 'item',
+        formatter: "{a}<br/>{b}<br/>{c}台"
+      },
+      calculable : true,
+      series : [
+        {
+          name:'主机系统类型占比',
+          type:'pie',
+          center : ['50%', '50%'],
+          data: systemTypeList
+        }
+      ]
+    })
+
+    //所有主机最近10分钟状态
+    var lineChart1 = echarts.init(document.getElementById('lineChart1'));
+    lineChart1.setOption( {
+      color:["#87cefa","#ff7f50","#32cd32","#da70d6",],
+      tooltip : {
+        trigger: 'axis'
+      },
+      legend: {
+        data:['最高值','平均值','最低值'],
+        y: 'bottom',
+        x:'center',
+        textStyle:{
+          color:'#fff',
+          fontSize:12
+        }
+      },
+      grid:{
+        left: '5%',
+        right: '5%',
+        bottom: '10%',
+        containLabel: true
+      },
+      calculable : true,
+      xAxis : [
+        {
+          type : 'category',
+          boundaryGap : false,
+          data : ['CPU%','内存%','磁盘%','5分钟负载','15分钟负载','交换区内存%'],
+          axisLine:{
+            lineStyle:{
+              color: '#87cefa'
+            },
+          },
+          axisLabel : {
+            interval:0,
+            rotate:40,
+            textStyle: {
+              color: '#fff',
+              fontSize:13
+            }
+          }
+        }
+      ],
+      yAxis : [
+        {
+          type : 'value',
+          axisLine:{
+            lineStyle:{
+              color: '#87cefa'
+            },
+          },
+          splitLine: {
+            "show": false
+          },
+          axisLabel: {
+            textStyle: {
+              color: '#fff'
+            },
+          },
+        }
+      ],
+      series : [
+        {
+          name:'最高值',
+          type:'line',
+          smooth:true,
+          itemStyle: {normal: {areaStyle: {type: 'default'}}},
+          data:[maxCpuInfo, maxMemInfo, maxDiskPer,  maxFiveLoad, maxFifteenLoad, maxSwapMemInfo]
+        },
+        {
+          name:'平均值',
+          type:'line',
+          smooth:true,
+          itemStyle: {normal: {areaStyle: {type: 'default'}}},
+          data:[avgCpuInfo, avgMemInfo, avgDiskPer, avgFiveLoad, avgFifteenLoad, avgSwapMemInfo]
+        },
+        {
+          name:'最低值',
+          type:'line',
+          smooth:true,
+          itemStyle: {normal: {areaStyle: {type: 'default'}}},
+          data:[minCpuInfo, minMemInfo, minDiskPer, minFiveLoad, minFifteenLoad, minSwapMemInfo]
+        }
+      ]
+
+    })
+
+    //上下行速率最新主机（TOP10）
+    var lineChart2 = echarts.init(document.getElementById('lineChart2'));
+    lineChart2.setOption( {
+      color:["#0184d5","#00d887","#32cd32","#da70d6",],
+      tooltip : {
+        trigger: 'axis'
+      },
+      legend: {
+        data:['上行速率','下行速率'],
+        y: 'bottom',
+        x:'center',
+        textStyle:{
+          color:'#fff',
+          fontSize:12
+        }
+      },
+      grid:{
+        left: '5%',
+        right: '5%',
+        bottom: '10%',
+        containLabel: true
+      },
+      calculable : true,
+      xAxis : [
+        {
+          type : 'category',
+          boundaryGap : false,
+          data : systemTop10NameList,
+          axisLine:{
+            lineStyle:{
+              color: '#87cefa'
+            },
+          },
+          axisLabel : {
+            interval:0,
+            rotate:40,
+            textStyle: {
+              color: '#fff',
+              fontSize:13
+            }
+          }
+        }
+      ],
+      yAxis : [
+        {
+          type : 'value',
+          axisLine:{
+            lineStyle:{
+              color: '#87cefa'
+            },
+          },
+          splitLine: {
+            "show": false
+          },
+          axisLabel: {
+            textStyle: {
+              color: '#fff'
+            },
+          },
+        }
+      ],
+      series : [
+        {
+          name:'上行速率',
+          type:'line',
+          smooth:true,
+          itemStyle: {normal: {areaStyle: {type: 'default'}}},
+          data:txbytTop10List
+        },
+        {
+          name:'下行速率',
+          type:'line',
+          smooth:true,
+          itemStyle: {normal: {areaStyle: {type: 'default'}}},
+          data:rxbytTop10List
+        }
+      ]
+
+    })
+
+    //监控资源数量分布
+    var pieChart2 = echarts.init(document.getElementById('pieChart2'));
+    pieChart2.setOption({
+      color:["#87cefa","#ff7f50","#32cd32","#da70d6","#587bf3","#c8eb39","#575a7c","#ffa854","#fb628b","#FFEFD5","#ff6b98","#d3e3fd","#3fbe95","#0997c1", "#c22167", "#082773", "#604fb9", "#0067c3", "#68cdfb","#5793f3", "#d14a61", "#675bba"],
+      tooltip : {
+        trigger: 'item',
+        formatter: "{a}<br/>{b}<br/>{c}个"
+      },
+      series : [
+        {
+          name:'监控资源数量分布',
+          type:'pie',
+          center : ['45%', '50%'],
+          data: monitorResourceList
+        }
+      ]
+    })
+
+    //运行进程数量最多主机
+    var histogramChart3 = echarts.init(document.getElementById('histogramChart3'));
+    histogramChart3.setOption( {
+      color:['#87cefa'],
+      grid:{
+        left: '5%',
+        right: '5%',
+        bottom: '5%',
+        containLabel: true
+      },
+      tooltip : {
+        trigger: 'item',
+        formatter: "{a}<br/>{b}<br/>{c}"
+      },
+      calculable : true,
+      xAxis : [
+        {
+          type : 'category',
+          data : procsTopNameList,
+          axisLine:{
+            lineStyle:{
+              color: '#87cefa'
+            },
+          },
+          axisLabel : {
+            interval:0,
+            rotate:40,
+            textStyle: {
+              color: '#fff',
+              fontSize:13
+            }
+          }
+        }
+      ],
+      yAxis : [
+        {
+          type : 'value',
+          axisLine:{
+            lineStyle:{
+              color: '#87cefa'
+            },
+          },
+          splitLine: {
+            "show": false
+          },
+          axisLabel: {
+            textStyle: {
+              color: '#fff'
+            },
+          },
+        }
+      ],
+      series : [
+        {
+          name:'运行进程数量',
+          type:'bar',
+          barWidth:30,
+          data:procsTopValList,
+        },
+      ]
+    });
+
+    //磁盘总使用率最高主机
+    var histogramChart4 = echarts.init(document.getElementById('histogramChart4'));
+    histogramChart4.setOption( {
+      color:['#87cefa'],
+      grid:{
+        left: '5%',
+        right: '5%',
+        bottom: '5%',
+        containLabel: true
+      },
+      tooltip : {
+        trigger: 'item',
+        formatter: "{a}<br/>{b}<br/>{c}%"
+      },
+      calculable : true,
+      xAxis : [
+        {
+          type : 'category',
+          data : hostDiskperNameList,
+          axisLine:{
+            lineStyle:{
+              color: '#87cefa'
+            },
+          },
+          axisLabel : {
+            interval:0,
+            rotate:40,
+
+            textStyle: {
+              color: '#fff',
+              fontSize:13
+            }
+          }
+        }
+      ],
+      yAxis : [
+        {
+          type : 'value',
+          axisLine:{
+            lineStyle:{
+              color: '#87cefa'
+            },
+          },
+          splitLine: {
+            "show": false
+          },
+          axisLabel: {
+            textStyle: {
+              color: '#fff'
+            },
+            formatter: function (value) {
+              return value + "%"
+            },
+          },
+        }
+      ],
+      series : [
+        {
+          name:'磁盘总使用率%',
+          type:'bar',
+          barWidth:30,
+          data:hostDiskperValList,
+        },
+      ]
+    });
+  }
+
+  const tipInfoMsg = [[${tipInfoMsg}]];
+  if(tipInfoMsg!=''  && tipInfoMsg!=null){
+    //toastr提示框延时10s后消失
+    toastr.options.timeOut = 10000;
+    toastr.success("<span style='font-size:16px;color:#fff'>"+tipInfoMsg+"</span>");
+  }
+</script>
+
+<script  th:inline="javascript">
+  const dapingRefreshTimes = [[${dapingRefreshTimes}]];
+  var t = null;
+  t = setTimeout(time,1000);//開始运行
+  function time()
+  {
+    clearTimeout(t);//清除定时器
+    dt = new Date();
+    var y=dt.getFullYear();
+    var mt=dt.getMonth()+1;
+    var day=dt.getDate();
+    var h=dt.getHours();//获取时
+    var m=dt.getMinutes();//获取分
+    var s=dt.getSeconds();//获取秒
+    document.getElementById("showTime").innerHTML = y+"年"+mt+"月"+day+"日-"+h+"时"+m+"分"+s+"秒";
+    t = setTimeout(time,1000); //设定定时器，循环运行
+  }
+
+  function reload() {
+    window.location.reload();
+  }
+  setTimeout(reload,dapingRefreshTimes);
+
+</script>
+</body>
+</html>

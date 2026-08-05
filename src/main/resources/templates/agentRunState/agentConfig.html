@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item active"></li>
+                </ol>
+            </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-11">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">修改所有Agent终端配置文件参数serverUrl或者wgToken</h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <form role="form" id="form1" onsubmit="setMd5Pwd()" th:action="@{'/agentRunState/modifyAgentConfig'}">
+            <div class="card-body">
+                <div class="form-group"><span class="text-muted">提示：以下serverUrl和wgToken对应agent配置文件中的参数serverUrl和wgToken，我们只填写需要修改的agent配置参数，不需要全部填写。保存后，系统会通过下发指令批量修改所有监控主机agent的已填写的参数，如果值为空则不会修改对应参数。以下参数的修改，需要在server端的对应配置修改之前进行，因为如果server端先修改，那么所有agent都会离线，就无法批量下发指令修改agent配置了。保存后大概需要5分钟全部修改完成</span></div>
+                <div class="form-group">
+                    <label>serverUrl参数<span class="text-muted">（可选，cac-server端访问地址，不能包含英文逗号）</span></label>
+                    <input type="text" autocomplete="off"   th:value="${serverUrl}" class="form-control" name="serverUrl" id="serverUrl" placeholder="如http://localhost:9999">
+                </div>
+                <div class="form-group">
+                    <label>wgToken参数<span class="text-muted">（可选，通信token，请和server端配置的wgToken保持一致，不能包含英文逗号）</span></label>
+                    <input type="text" autocomplete="off"  th:value="${wgToken}" class="form-control" name="wgToken" id="wgToken" placeholder="如cac">
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>管理员账号<span class="text-muted">（请输入管理员登录账号）</span></label>
+                    <input type="text" autocomplete="off"  class="validate[required,maxSize[50]] form-control" name="account" id="account">
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>管理员密码<span class="text-muted">（请输入管理员登录密码）</span>
+                        <span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="显示密码" onclick="javascript:showPasswd();" style="cursor:pointer;margin-left: 10px"><i id="eyeSwitch" class="fa fa-eye"></i></span></label>
+                    <input type="password" autocomplete="off" class="validate[required,maxSize[50]] form-control" name="passwd" id="passwd">
+                    <input type="hidden" id="md5pwd" name="md5pwd" value=""/>
+                </div>
+            </div>
+            <!-- /.card-body -->
+
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-right:10px;"><i class="fas fa-save"></i> 保 存</button>
+                <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+            </div>
+
+        </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-10 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+
+<script type="text/javascript" th:src="@{'/static/common/md5.js'}"></script>
+<script th:src="@{'/static/js/agentRunState.js?v=3.6.2'}"></script>
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $("#form1").validationEngine();
+    });
+    function setMd5Pwd(){
+        if($("#passwd").val()==""){
+            return true;
+        }
+        $("#md5pwd").val(md5($.trim($("#passwd").val())));
+        $("#passwd").val('********');
+        return true;
+    }
+    function showPasswd(){
+        var type = $("#passwd").attr("type");
+        if(type=='text'){
+            $("#eyeSwitch").attr("class","fa fa-eye");
+            $("#passwd").attr("type","password");
+        }else{
+            $("#eyeSwitch").attr("class","fa fa-eye-slash");
+            $("#passwd").attr("type","text");
+        }
+    }
+    var msg = [[${errorMsg}]];
+    if(msg!='' && msg!=null){
+        toastr.error(msg);
+    }
+</script>
+</body>
+</html>

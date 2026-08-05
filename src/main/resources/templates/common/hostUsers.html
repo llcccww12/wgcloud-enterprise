@@ -1,0 +1,16 @@
+<div style="margin-left:10px;margin-right:10px;">
+    <textarea class="form-control" name="warContent" id="warContent" th:utext="${hostUsersList}"></textarea>
+    <h6></h6>
+</div>
+
+<script>
+var editor = CodeMirror.fromTextArea(document.getElementById("warContent"), {
+lineNumbers: true,
+styleActiveLine: true,
+matchBrackets: true,
+readOnly: true,
+mode: 'shell'
+});
+editor.setOption("theme", "dracula");
+editor.setSize('auto','300px');
+</script>

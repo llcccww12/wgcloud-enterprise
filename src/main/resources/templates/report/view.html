@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item active"></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">巡检报告详细信息</h3>
+        <div class=" float-sm-right">
+          <a href="javascript:history.back()">返回上级</a>
+        </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+      <form role="form">
+        <div class="card-body">
+          <div class="form-group">
+            <label>摘要
+              <th:block th:if="${reportInfo.reportType == '1'}">
+                <span style="margin-left:10px;background:#9267FF!important;" class="badge bg-dark">周报</span>
+              </th:block>
+              <th:block th:if="${reportInfo.reportType == '2'}">
+                <span style="margin-left:10px;background:oklch(65% .2 175)!important;" class="badge bg-dark">月报</span>
+              </th:block>
+              <th:block th:if="${reportInfo.reportType == '3'}">
+                <span style="margin-left:10px;" class="badge bg-primary">日报</span>
+              </th:block>
+              <span style="margin-left:10px;" class="badge bg-primary" th:text="${reportInfo.groupName}">标签</span></label>
+            <div th:text="${reportInfo.timePart}"></div>
+          </div>
+          <div class="form-group">
+            <label>添加时间</label>
+            <div th:text="${#dates.format(reportInfo.createTime,'yyyy-MM-dd HH:mm:ss')}"></div>
+          </div>
+          <div class="form-group row">
+            <div class="col-12">
+              <div class="float-sm-right"><button type="button" th:onclick="showSendMail()"  class="btn btn-primary btn-sm" data-toggle="modal"><i class="fa-regular fa-envelope"></i> 发送邮件</button>&nbsp;
+              <button type="button" style="color:#fff;margin-left:10px;" th:onclick="excelExport([[${reportInfo.id}]])"  class="btn btn-warning btn-sm"><i class="fa-solid fa-file-excel"></i> 导出Excel</button></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>详细信息</label>
+            <div class="card-body table-responsive p-0">
+              <table th:class="'table '+${session.themeTableHoverSign}">
+                <thead>
+                <tr>
+                  <th>序号</th>
+                  <th>巡检项</th>
+                  <th>巡检结果</th>
+                </tr>
+                </thead>
+            <th:block th:each="item,iterStat : ${reportInstanceList}">
+              <tr>
+                <td th:text="${iterStat.index+1}">1</td>
+                <td th:utext="${item.infoKey}"></td>
+                <td th:utext="${item.infoContent}"></td>
+              </tr>
+            </th:block>
+            </table>
+            </div>
+          </div>
+          <div class="card-footer">
+            <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+          </div>
+        </div>
+        <!-- /.card-body -->
+      </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<div class="modal fade" id="modal-default">
+  <div class="modal-dialog">
+    <form method="post" id="form2" th:action="@{'/report/sendMail'}">
+      <div class="modal-content" style="font-size:0.90rem">
+        <div class="modal-header">
+          <h4 class="modal-title">发送巡检报告</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="id" name="id" th:value="${reportInfo.id}"/>
+          <div class="form-group clearfix">
+            <label>输入接收邮件，多个邮件地址请用英文分号隔开</label>
+            <input type="text"  autocomplete="off" class="validate[maxSize[300] form-control" name="toMails" id="toMails" placeholder="输入完成请点击发送">
+          </div>
+            <div class="form-group clearfix">
+              <label>是否将报告通过告警脚本推送</label>
+              <div class="input-group">
+                <div class="icheck-turquoise d-inline">
+                  <input type="radio" id="radioScriptSend1" name="scriptSend" value="1">
+                  <label for="radioScriptSend1"><span style="opacity:.70">是</span></label>
+                </div>
+                <div class="icheck-wisteria d-inline" style="margin-left:30px;">
+                  <input type="radio" id="radioScriptSend2"  name="scriptSend" value="2" checked>
+                  <label for="radioScriptSend2"><span style="opacity:.70">否</span></label>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default  btn-sm" data-dismiss="modal">关 闭</button>
+          <button type="button" onclick="ajaxSendMail()" class="btn btn-primary btn-sm">发 送</button>
+        </div>
+      </div>
+    </form>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+
+<script th:src="@{'/static/js/report.js?v=3.6.7'}"></script>
+</body>
+</html>

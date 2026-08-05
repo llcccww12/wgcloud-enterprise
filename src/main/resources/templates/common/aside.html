@@ -1,0 +1,775 @@
+<!-- Main Sidebar Container -->
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="javascript:location.reload();" class="brand-link">
+        <img th:src="${application.logoUrl}"   class="brand-image img-circle elevation-3"  style="opacity: .8">
+        <span class="brand-text font-weight-light" th:title="${application.wgName}" th:text="${application.wgShortName}">cac</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Sidebar user panel (optional)
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                <img th:src="@{'/static/AdminLTE/dist/img/user2-160x160.jpg'}" class="img-circle elevation-2" alt="User Image">
+            </div>
+            <div class="info">
+                <a href="#" class="d-block">Alexander Pierce</a>
+            </div>
+        </div>
+        -->
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <!-- Add icons to the links using the .nav-icon class
+                     with font-awesome or any other icon font library -->
+
+
+                <li class="nav-item">
+                    <th:block th:if="${session.menuActive eq '01'}">
+                        <a th:href="@{'/dash/main'}" class="nav-link active">
+                    </th:block>
+                    <th:block th:unless="${session.menuActive eq '01'}">
+                        <a th:href="@{'/dash/main'}" class="nav-link">
+                    </th:block>
+                    <i class="nav-icon fas fa-house"></i>
+                    <p th:text="${application.jianKongGaiYao}">监控概要</p>
+                    </a>
+                </li>
+
+                <th:block th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',1,')}">
+                <th:block th:if="${#strings.startsWith(session.menuActive,'1')}">
+                    <li class="nav-item has-treeview menu-open">
+                        <a href="javascript:void(0);" class="nav-link active">
+                </th:block>
+                <th:block th:unless="${#strings.startsWith(session.menuActive,'1')}">
+                    <li class="nav-item has-treeview">
+                        <a  href="javascript:void(0);" class="nav-link">
+                </th:block>
+                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <p>
+                            <span th:text="${application.ziYuanGuanLi}">资源管理</span>
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',12,')}">
+                            <th:block th:if="${session.menuActive eq '12'}">
+                                <a th:href="@{'/systemInfo/systemInfoList'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq '12'}">
+                                <a th:href="@{'/systemInfo/systemInfoList'}" class="nav-link">
+                            </th:block>
+                                <i class="fas fa-desktop nav-icon"></i>
+                                <p th:text="${application.zhuJiGuanLi}">主机管理</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',19,')}">
+                            <th:block th:if="${session.menuActive eq '19'}">
+                                <a th:href="@{'/appExceptionInfo/list'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq '19'}">
+                                <a th:href="@{'/appExceptionInfo/list'}" class="nav-link">
+                            </th:block>
+                            <i class="fa fa-umbrella nav-icon"></i>
+                            <p th:text="${application.yiChangJinCheng}">主机异常进程</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',13,')}">
+                            <th:block th:if="${session.menuActive eq '13'}">
+                                <a th:href="@{'/appInfo/list'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq '13'}">
+                                <a th:href="@{'/appInfo/list'}" class="nav-link">
+                            </th:block>
+                                <i class="fas fa-tasks nav-icon"></i>
+                                <p th:text="${application.jinChengJianCe}">进程监测</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',15,')}">
+                            <th:block th:if="${session.menuActive eq '15'}">
+                                <a th:href="@{'/portInfo/list'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq '15'}">
+                                <a th:href="@{'/portInfo/list'}" class="nav-link">
+                            </th:block>
+                            <i class="fas fa-leaf nav-icon"></i>
+                            <p th:text="${application.duanKouJianCe}">端口监测</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',16,')}">
+                            <th:block th:if="${session.menuActive eq '16'}">
+                                <a th:href="@{'/fileWarnInfo/list'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq '16'}">
+                                <a th:href="@{'/fileWarnInfo/list'}" class="nav-link">
+                            </th:block>
+                            <i class="fa-solid fa-file-circle-check nav-icon"></i>
+                            <p th:text="${application.riZhiJianKong}">日志监控</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',17,')}">
+                            <th:block th:if="${session.menuActive eq '17'}">
+                                <a th:href="@{'/fileSafe/list'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq '17'}">
+                                <a th:href="@{'/fileSafe/list'}" class="nav-link">
+                            </th:block>
+                            <i class="fas fa-shield-alt nav-icon"></i>
+                            <p th:text="${application.wenJianFangCuanGai}">文件防篡改</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',14,')}">
+                            <th:block th:if="${session.menuActive eq '14'}">
+                                <a th:href="@{'/dockerInfo/list'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq '14'}">
+                                <a th:href="@{'/dockerInfo/list'}" class="nav-link">
+                            </th:block>
+                            <i class="fab fa-docker nav-icon"></i>
+                            <p th:text="${application.dockerJianCe}">DOCKER监测</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',18,')}">
+                            <th:block th:if="${session.menuActive eq '18'}">
+                                <a th:href="@{'/customInfo/list'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq '18'}">
+                                <a th:href="@{'/customInfo/list'}" class="nav-link">
+                            </th:block>
+                            <i class="fa-brands fa-pix nav-icon"></i>
+                            <p th:text="${application.ziDingYiJianKongXiang}">自定义监控项</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                </th:block>
+
+                <th:block th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',4,')}">
+                <th:block th:if="${#strings.startsWith(session.menuActive,'4')}">
+                    <li class="nav-item has-treeview menu-open">
+                        <a  href="javascript:void(0);" class="nav-link active">
+                </th:block>
+                <th:block th:unless="${#strings.startsWith(session.menuActive,'4')}">
+                    <li class="nav-item has-treeview">
+                        <a  href="javascript:void(0);" class="nav-link">
+                </th:block>
+                <i class="nav-icon fas fa-table"></i>
+                <p title="检测数据表的数据量变化趋势">
+                    <span th:text="${application.shuJuJianKong}">数据监控</span>
+                    <i class="fas fa-angle-left right"></i>
+                </p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',41,')}">
+                        <th:block th:if="${session.menuActive eq '41'}">
+                            <a th:href="@{'/dbInfo/list'}" class="nav-link active">
+                        </th:block>
+                        <th:block th:unless="${session.menuActive eq '41'}">
+                            <a th:href="@{'/dbInfo/list'}" class="nav-link">
+                        </th:block>
+                        <i class="fas fa-database nav-icon"></i>
+                        <p th:text="${application.shuJuKuGuanLi}">数据库管理</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',42,')}">
+                        <th:block th:if="${session.menuActive eq '42'}">
+                            <a th:href="@{'/dbTable/list'}" class="nav-link active">
+                        </th:block>
+                        <th:block th:unless="${session.menuActive eq '42'}">
+                            <a th:href="@{'/dbTable/list'}" class="nav-link">
+                        </th:block>
+                        <i class="fas fa-table nav-icon"></i>
+                        <p th:text="${application.shuJuBiaoJianCe}">数据表监测</p>
+                        </a>
+                    </li>
+
+                </ul>
+                </li>
+                </th:block>
+
+                <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',51,')}">
+                    <th:block th:if="${session.menuActive eq '51'}">
+                        <a th:href="@{'/heathMonitor/list'}" class="nav-link active">
+                    </th:block>
+                    <th:block th:unless="${session.menuActive eq '51'}">
+                        <a th:href="@{'/heathMonitor/list'}" class="nav-link">
+                    </th:block>
+                    <i class="nav-icon  fas fa-link"></i>
+                    <p th:text="${application.fuWuJieKouJianCe}">服务接口监测</p>
+                    </a>
+                </li>
+
+
+                <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',b1,')}">
+                    <th:block th:if="${session.menuActive eq 'b1'}">
+                        <a th:href="@{'/daping/list'}" class="nav-link active">
+                    </th:block>
+                    <th:block th:unless="${session.menuActive eq 'b1'}">
+                        <a th:href="@{'/daping/list'}" class="nav-link">
+                    </th:block>
+                    <i class="nav-icon  fas fa-chart-area"></i>
+                    <p th:text="${application.zhanShiKanBan}">展示看板</p>
+                    </a>
+                </li>
+
+                <th:block th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',6,')}">
+                <th:block th:if="${#strings.startsWith(session.menuActive,'6')}">
+                    <li class="nav-item has-treeview menu-open">
+                        <a  href="javascript:void(0);" class="nav-link active">
+                </th:block>
+                <th:block th:unless="${#strings.startsWith(session.menuActive,'6')}">
+                    <li class="nav-item has-treeview">
+                        <a  href="javascript:void(0);" class="nav-link">
+                </th:block>
+                <i class="nav-icon fa fa-globe"></i>
+                <p title="网络设备监测">
+                    <span th:text="${application.wangLuoSheBeiJianCe}">网络设备监测</span>
+                    <i class="fas fa-angle-left right"></i>
+                </p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',61,')}">
+                        <th:block th:if="${session.menuActive eq '61'}">
+                            <a th:href="@{'/dceInfo/list'}" class="nav-link active">
+                        </th:block>
+                        <th:block th:unless="${session.menuActive eq '61'}">
+                            <a th:href="@{'/dceInfo/list'}" class="nav-link">
+                        </th:block>
+                        <i class="nav-icon fas fa-route"></i>
+                        <p th:text="${application.pingJianCe}">PING监测</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',62,')}">
+                        <th:block th:if="${session.menuActive eq '62'}">
+                            <a th:href="@{'/snmpInfo/list'}" class="nav-link active">
+                        </th:block>
+                        <th:block th:unless="${session.menuActive eq '62'}">
+                            <a th:href="@{'/snmpInfo/list'}" class="nav-link">
+                        </th:block>
+                        <i class="fas fa-ethernet nav-icon"></i>
+                        <p th:text="${application.snmpJianCe}">SNMP监测</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',63,')}">
+                        <th:block th:if="${session.menuActive eq '63'}">
+                            <a th:href="@{'/snmpDeepInfo/list'}" class="nav-link active">
+                        </th:block>
+                        <th:block th:unless="${session.menuActive eq '63'}">
+                            <a th:href="@{'/snmpDeepInfo/list'}" class="nav-link">
+                        </th:block>
+                        <i class="fas fa-shield nav-icon"></i>
+                        <p th:text="${application.snmpDeepJianCe}">SNMP深度监测</p>
+                        </a>
+                    </li>
+                </ul>
+                </li>
+                </th:block>
+
+                <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',a1,')}">
+                    <th:block th:if="${session.menuActive eq 'a1'}">
+                        <a th:href="@{'/ftpInfo/list'}" class="nav-link active">
+                    </th:block>
+                    <th:block th:unless="${session.menuActive eq 'a1'}">
+                        <a th:href="@{'/ftpInfo/list'}" class="nav-link">
+                    </th:block>
+                    <i class="nav-icon  fas fa-cloud-upload-alt"></i>
+                    <p th:text="${application.ftpJianCe}" title="检测ftp和sftp的健康状态">FTP/SFTP监测</p>
+                    </a>
+                </li>
+
+                <th:block th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',k,')}">
+                    <th:block th:if="${#strings.startsWith(session.menuActive,'k')}">
+                        <li class="nav-item has-treeview menu-open">
+                            <a  href="javascript:void(0);" class="nav-link active">
+                    </th:block>
+                    <th:block th:unless="${#strings.startsWith(session.menuActive,'k')}">
+                        <li class="nav-item has-treeview">
+                            <a  href="javascript:void(0);" class="nav-link">
+                    </th:block>
+                    <i class="nav-icon fa-solid fa-layer-group"></i>
+                    <p title="检测各种中间件的运行信息">
+                        <span th:text="${application.zhongJianJianJianCe}">中间件监测</span>
+                        <i class="fas fa-angle-left right"></i>
+                    </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',k8,')}">
+                            <th:block th:if="${session.menuActive eq 'k8'}">
+                                <a th:href="@{'/redisMonitor/list'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq 'k8'}">
+                                <a th:href="@{'/redisMonitor/list'}" class="nav-link">
+                            </th:block>
+                            <i class="fa-solid fa-seedling nav-icon"></i>
+                            <p th:text="${application.redis}">Redis</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',k14,')}">
+                            <th:block th:if="${session.menuActive eq 'k14'}">
+                                <a th:href="@{'/tomcatMonitor/list'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq 'k14'}">
+                                <a th:href="@{'/tomcatMonitor/list'}" class="nav-link">
+                            </th:block>
+                            <i class="fa-solid fa-cat nav-icon"></i>
+                            <p th:text="${application.tomcat}">Tomcat</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',k10,')}">
+                            <th:block th:if="${session.menuActive eq 'k10'}">
+                                <a th:href="@{'/powerEnvMonitor/list'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq 'k10'}">
+                                <a th:href="@{'/powerEnvMonitor/list'}" class="nav-link">
+                            </th:block>
+                            <i class="fa-solid fa-temperature-arrow-down nav-icon"></i>
+                            <p th:text="${application.dongHuanJianCe}">动环监测</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',k9,')}">
+                            <th:block th:if="${session.menuActive eq 'k9'}">
+                                <a th:href="@{'/nginxMonitor/toAddView'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq 'k9'}">
+                                <a th:href="@{'/nginxMonitor/toAddView'}" class="nav-link">
+                            </th:block>
+                            <i class="far fa-circle nav-icon"></i>
+                            <p th:text="${application.nginxRiZhiJianCe}">Nginx日志检测</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',k7,')}">
+                            <th:block th:if="${session.menuActive eq 'k7'}">
+                                <a th:href="@{'/kafkaMonitor/list'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq 'k7'}">
+                                <a th:href="@{'/kafkaMonitor/list'}" class="nav-link">
+                            </th:block>
+                            <i class="far fa-circle nav-icon"></i>
+                            <p th:text="${application.kafka}">Kafka</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',k11,')}">
+                            <th:block th:if="${session.menuActive eq 'k11'}">
+                                <a th:href="@{'/kafkaMonitor/rabbitmqList'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq 'k11'}">
+                                <a th:href="@{'/kafkaMonitor/rabbitmqList'}" class="nav-link">
+                            </th:block>
+                            <i class="far fa-circle nav-icon"></i>
+                            <p th:text="${application.rabbitmq}">RabbitMQ</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',k12,')}">
+                            <th:block th:if="${session.menuActive eq 'k12'}">
+                                <a th:href="@{'/kafkaMonitor/activemqList'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq 'k12'}">
+                                <a th:href="@{'/kafkaMonitor/activemqList'}" class="nav-link">
+                            </th:block>
+                            <i class="far fa-circle nav-icon"></i>
+                            <p th:text="${application.activemq}">ActiveMQ</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',k1,')}">
+                            <th:block th:if="${session.menuActive eq 'k1'}">
+                                <a th:href="@{'/k8sMonitor/list?dataType=node'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq 'k1'}">
+                                <a th:href="@{'/k8sMonitor/list?dataType=node'}" class="nav-link">
+                            </th:block>
+                            <i class="fa-brands fa-kubernetes nav-icon"></i>
+                            <p th:text="${application.k8sNode}">K8S-Node</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',k6,')}">
+                            <th:block th:if="${session.menuActive eq 'k6'}">
+                                <a th:href="@{'/k8sMonitor/list?dataType=deployment'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq 'k6'}">
+                                <a th:href="@{'/k8sMonitor/list?dataType=deployment'}" class="nav-link">
+                            </th:block>
+                            <i class="fa-brands fa-kubernetes nav-icon"></i>
+                            <p th:text="${application.k8sDeployment}">K8S-Deployment</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',k2,')}">
+                            <th:block th:if="${session.menuActive eq 'k2'}">
+                                <a th:href="@{'/k8sMonitor/list?dataType=namespace'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq 'k2'}">
+                                <a th:href="@{'/k8sMonitor/list?dataType=namespace'}" class="nav-link">
+                            </th:block>
+                            <i class="fa-brands fa-kubernetes nav-icon"></i>
+                            <p th:text="${application.k8sNamespace}">K8S-Namespace</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',k3,')}">
+                            <th:block th:if="${session.menuActive eq 'k3'}">
+                                <a th:href="@{'/k8sMonitor/list?dataType=pod'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq 'k3'}">
+                                <a th:href="@{'/k8sMonitor/list?dataType=pod'}" class="nav-link">
+                            </th:block>
+                            <i class="fa-brands fa-kubernetes nav-icon"></i>
+                            <p th:text="${application.k8sPod}">K8S-Pod</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',k4,')}">
+                            <th:block th:if="${session.menuActive eq 'k4'}">
+                                <a th:href="@{'/k8sMonitor/list?dataType=service'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq 'k4'}">
+                                <a th:href="@{'/k8sMonitor/list?dataType=service'}" class="nav-link">
+                            </th:block>
+                            <i class="fa-brands fa-kubernetes nav-icon"></i>
+                            <p th:text="${application.k8sService}">K8S-Service</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',k5,')}">
+                            <th:block th:if="${session.menuActive eq 'k5'}">
+                                <a th:href="@{'/k8sMonitor/list?dataType=container'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq 'k5'}">
+                                <a th:href="@{'/k8sMonitor/list?dataType=container'}" class="nav-link">
+                            </th:block>
+                            <i class="fa-brands fa-kubernetes nav-icon"></i>
+                            <p th:text="${application.k8sContainer}">K8S-Container</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',k13,')}">
+                            <th:block th:if="${session.menuActive eq 'k13'}">
+                                <a th:href="@{'/serverBackupMonitor/list'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq 'k13'}">
+                                <a th:href="@{'/serverBackupMonitor/list'}" class="nav-link">
+                            </th:block>
+                            <i class="fas fa-fan nav-icon"></i>
+                            <p th:text="${application.serverBackupName}">Server-Backup</p>
+                            </a>
+                        </li>
+                    </ul>
+                    </li>
+                </th:block>
+
+                <th:block th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',7,')}">
+                <th:block th:if="${#strings.startsWith(session.menuActive,'7')}">
+                    <li class="nav-item has-treeview menu-open" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',7,')}">
+                        <a  href="javascript:void(0);" class="nav-link active">
+                </th:block>
+                <th:block th:unless="${#strings.startsWith(session.menuActive,'7')}">
+                    <li class="nav-item has-treeview">
+                        <a  href="javascript:void(0);" class="nav-link" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',7,')}">
+                </th:block>
+                <i class="nav-icon fas fa-network-wired"></i>
+                <p title="自动绘制网络拓扑图">
+                    <span th:text="${application.tuopuTu}">拓扑图</span>
+                    <i class="fas fa-angle-left right"></i>
+                </p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',71,')}">
+                        <th:block th:if="${session.menuActive eq '71'}">
+                            <a th:href="@{'/tuopu/tuopuListHost'}" class="nav-link active">
+                        </th:block>
+                        <th:block th:unless="${session.menuActive eq '71'}">
+                            <a th:href="@{'/tuopu/tuopuListHost'}" class="nav-link">
+                        </th:block>
+                        <i class="nav-icon far fa-circle text-info"></i>
+                        <p th:text="${application.zhuJiTuopuTu}">主机拓扑图</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',72,')}">
+                        <th:block th:if="${session.menuActive eq '72'}">
+                            <a th:href="@{'/tuopu/tuopuListSt'}" class="nav-link active">
+                        </th:block>
+                        <th:block th:unless="${session.menuActive eq '72'}">
+                            <a th:href="@{'/tuopu/tuopuListSt'}" class="nav-link">
+                        </th:block>
+                        <i class="far fa-circle nav-icon"></i>
+                        <p th:text="${application.pingTuopuTu}">PING拓扑图</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',73,')}">
+                        <th:block th:if="${session.menuActive eq '73'}">
+                            <a th:href="@{'/tuopu/tuopuListSnmp'}" class="nav-link active">
+                        </th:block>
+                        <th:block th:unless="${session.menuActive eq '73'}">
+                            <a th:href="@{'/tuopu/tuopuListSnmp'}" class="nav-link">
+                        </th:block>
+                        <i class="far fa-circle nav-icon"></i>
+                        <p th:text="${application.snmpTuopuTu}">SNMP拓扑图</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',74,')}">
+                        <th:block th:if="${session.menuActive eq '74'}">
+                            <a th:href="@{'/tuopu/tuopuListSnmpDeep'}" class="nav-link active">
+                        </th:block>
+                        <th:block th:unless="${session.menuActive eq '74'}">
+                            <a th:href="@{'/tuopu/tuopuListSnmpDeep'}" class="nav-link">
+                        </th:block>
+                        <i class="fas fa-seedling nav-icon"></i>
+                        <p th:text="${application.snmpDeepTuopuTu}">SNMP深度拓扑图</p>
+                        </a>
+                    </li>
+
+                </ul>
+                </li>
+                </th:block>
+
+                <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',91,')}">
+                    <th:block th:if="${session.menuActive eq '91'}">
+                        <a th:href="@{'/report/list'}" class="nav-link active">
+                    </th:block>
+                    <th:block th:unless="${session.menuActive eq '91'}">
+                        <a th:href="@{'/report/list'}" class="nav-link">
+                    </th:block>
+                    <i class="nav-icon  far fa-calendar-alt"></i>
+                    <p th:text="${application.xunJianBaoGao}">巡检报告</p>
+                    </a>
+                </li>
+
+                <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',e1,')}">
+                    <th:block th:if="${session.menuActive eq 'e1'}">
+                        <a th:href="@{'/taskJobInfo/list'}" class="nav-link active">
+                    </th:block>
+                    <th:block th:unless="${session.menuActive eq 'e1'}">
+                        <a th:href="@{'/taskJobInfo/list'}" class="nav-link">
+                    </th:block>
+                    <i class="nav-icon  fa-solid fa-clock"></i>
+                    <p th:text="${application.jiHuaRenWu}">计划任务</p>
+                    </a>
+                </li>
+
+                <th:block th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',2,')}">
+                <th:block th:if="${#strings.startsWith(session.menuActive,'2')}">
+                    <li class="nav-item has-treeview menu-open" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',2,')}">
+                        <a  href="javascript:void(0);" class="nav-link active">
+                </th:block>
+                <th:block th:unless="${#strings.startsWith(session.menuActive,'2')}">
+                    <li class="nav-item has-treeview" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',2,')}">
+                        <a  href="javascript:void(0);" class="nav-link">
+                </th:block>
+                <i class="nav-icon fas fa-laptop-code"></i>
+                <p title="系统管理" >
+                    <span th:text="${application.xiTongGuanLi}">系统管理</span>
+                    <i class="fas fa-angle-left right"></i>
+                </p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',21,')}">
+                        <th:block th:if="${session.menuActive eq '21'}">
+                            <a th:href="@{'/log/list'}" class="nav-link active">
+                        </th:block>
+                        <th:block th:unless="${session.menuActive eq '21'}">
+                            <a th:href="@{'/log/list'}" class="nav-link">
+                        </th:block>
+                        <i class="nav-icon  fas fa-copy"></i>
+                        <p th:text="${application.xiTongRiZhi}">系统日志</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:if="${application.shellToRun  == 'true' && #strings.contains(session.LOGIN_KEY.menuIds,',23,')}">
+                        <th:block th:if="${session.menuActive eq '23'}">
+                            <a th:href="@{'/shellInfo/list'}" class="nav-link active">
+                        </th:block>
+                        <th:block th:unless="${session.menuActive eq '23'}">
+                            <a th:href="@{'/shellInfo/list'}" class="nav-link">
+                        </th:block>
+                        <i class="nav-icon fas fa-terminal"></i>
+                        <p th:text="${application.zhiLingXiaFa}">指令下发</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:if="${application.hostGroup == 'true' && #strings.contains(session.LOGIN_KEY.menuIds,',24,')}">
+                        <th:block th:if="${session.menuActive eq '24'}">
+                            <a th:href="@{'/hostGroup/list'}" class="nav-link active">
+                        </th:block>
+                        <th:block th:unless="${session.menuActive eq '24'}">
+                            <a th:href="@{'/hostGroup/list'}" class="nav-link">
+                        </th:block>
+                        <i class="nav-icon fas fa-tags"></i>
+                        <p th:text="${application.biaoQianGuanLi}">标签管理</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" th:if="${application.userInfoManage == 'true' && session.LOGIN_KEY.role == 'admin'}">
+                        <th:block th:if="${session.menuActive eq '25'}">
+                            <a th:href="@{'/accountInfo/list'}" class="nav-link active">
+                        </th:block>
+                        <th:block th:unless="${session.menuActive eq '25'}">
+                            <a th:href="@{'/accountInfo/list'}" class="nav-link">
+                        </th:block>
+                        <i class="nav-icon fa fa-users"></i>
+                        <p th:text="${application.chengYuanZhangHao}">成员账号</p>
+                        </a>
+                    </li>
+                </ul>
+                </li>
+                </th:block>
+
+                <th:block th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',d,')}">
+                    <th:block th:if="${#strings.startsWith(session.menuActive,'d')}">
+                        <li class="nav-item has-treeview menu-open">
+                            <a  href="javascript:void(0);" class="nav-link active">
+                    </th:block>
+                    <th:block th:unless="${#strings.startsWith(session.menuActive,'d')}">
+                        <li class="nav-item has-treeview">
+                            <a  href="javascript:void(0);" class="nav-link">
+                    </th:block>
+                    <i class="nav-icon fas fa-bell"></i>
+                    <p title="告警设置">
+                        <span th:text="${application.gaoJingSheZhi}">告警设置</span>
+                        <i class="fas fa-angle-left right"></i>
+                    </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item" th:if="${session.LOGIN_KEY.role == 'admin' && #strings.contains(session.LOGIN_KEY.menuIds,',d1,')}">
+                            <th:block th:if="${session.menuActive eq 'd1'}">
+                                <a th:href="@{'/mailset/list'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq 'd1'}">
+                                <a th:href="@{'/mailset/list'}" class="nav-link">
+                            </th:block>
+                            <i class="nav-icon far fa-envelope"></i>
+                            <p th:text="${application.youJianGaoJing}">邮件告警</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${session.LOGIN_KEY.role == 'admin' && #strings.contains(session.LOGIN_KEY.menuIds,',d2,')}">
+                            <th:block th:if="${session.menuActive eq 'd2'}">
+                                <a th:href="@{'/warnScript/list'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq 'd2'}">
+                                <a th:href="@{'/warnScript/list'}" class="nav-link">
+                            </th:block>
+                            <i class="nav-icon fas fa-keyboard"></i>
+                            <p th:text="${application.jiaoBenGaoJing}">脚本告警</p>
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',d3,')}">
+                            <th:block th:if="${session.menuActive eq 'd3'}">
+                                <a th:href="@{'/hostWarnDiy/list'}" class="nav-link active">
+                            </th:block>
+                            <th:block th:unless="${session.menuActive eq 'd3'}">
+                                <a th:href="@{'/hostWarnDiy/list'}" class="nav-link">
+                            </th:block>
+                            <i class="nav-icon far fa-map"></i>
+                            <p th:text="${application.ziDingYiGaoJing}">自定义告警</p>
+                            </a>
+                        </li>
+                    </ul>
+                    </li>
+                </th:block>
+
+                <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',81,')}">
+                    <th:block th:if="${session.menuActive eq '81'}">
+                        <a th:href="@{'/equipment/list'}" class="nav-link active">
+                    </th:block>
+                    <th:block th:unless="${session.menuActive eq '81'}">
+                        <a th:href="@{'/equipment/list'}" class="nav-link">
+                    </th:block>
+                    <i class="nav-icon fas fa-server"></i>
+                    <p th:text="${application.ziChanGuanLi}">资产管理</p>
+                    </a>
+                </li>
+
+                <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',31,')}">
+                    <th:block th:if="${session.menuActive eq '31'}">
+                        <a th:href="@{'/passwdInfo/list'}" class="nav-link active">
+                    </th:block>
+                    <th:block th:unless="${session.menuActive eq '31'}">
+                        <a th:href="@{'/passwdInfo/list'}" class="nav-link">
+                    </th:block>
+                    <i class="nav-icon fa fa-lock"></i>
+                    <p th:text="${application.sheBeiZhangHao}">设备账号管理</p>
+                    </a>
+                </li>
+
+                <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',c1,')}">
+                    <th:block th:if="${session.menuActive eq 'c1'}">
+                        <a th:href="@{'/shellNoteInfo/list'}" class="nav-link active">
+                    </th:block>
+                    <th:block th:unless="${session.menuActive eq 'c1'}">
+                        <a th:href="@{'/shellNoteInfo/list'}" class="nav-link">
+                    </th:block>
+                    <i class="nav-icon fas fa-edit"></i>
+                    <p th:text="${application.gongZuoBiJi}">工作笔记</p>
+                    </a>
+                </li>
+
+                <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',f1,')}">
+                    <th:block th:if="${session.menuActive eq 'f1'}">
+                        <a th:href="@{'/agentRunState/list'}" class="nav-link active">
+                    </th:block>
+                    <th:block th:unless="${session.menuActive eq 'f1'}">
+                        <a th:href="@{'/agentRunState/list'}" class="nav-link">
+                    </th:block>
+                    <i class="nav-icon fas fa-snowflake"></i>
+                    <p th:text="${application.zhongDuanYunXing}">终端运行统计</p>
+                    </a>
+                </li>
+
+                <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',g1,')}">
+                    <th:block th:if="${session.menuActive eq 'g1'}">
+                        <a th:href="@{'/largeModel/list'}" class="nav-link active">
+                    </th:block>
+                    <th:block th:unless="${session.menuActive eq 'g1'}">
+                        <a th:href="@{'/largeModel/list'}" class="nav-link">
+                    </th:block>
+                    <i class="nav-icon fa-solid fa-cubes"></i>
+                    <p th:text="${application.aillm}">AI-LLM</p>
+                    </a>
+                </li>
+
+                <!-- 二开 Layer 1: AI 智能分析（聊天）入口。不挂 menuIds 权限，所有登录用户可见。 -->
+                <li class="nav-item">
+                    <th:block th:if="${session.menuActive eq 'i1'}">
+                        <a th:href="@{'/ai/chatPage'}" class="nav-link active">
+                    </th:block>
+                    <th:block th:unless="${session.menuActive eq 'i1'}">
+                        <a th:href="@{'/ai/chatPage'}" class="nav-link">
+                    </th:block>
+                    <i class="nav-icon fa-solid fa-robot"></i>
+                    <p>AI 智能分析</p>
+                    </a>
+                </li>
+
+                <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',h1,')}">
+                    <th:block th:if="${session.menuActive eq 'h1'}">
+                        <a th:href="@{'/scanIPMonitor/list'}" class="nav-link active">
+                    </th:block>
+                    <th:block th:unless="${session.menuActive eq 'h1'}">
+                        <a th:href="@{'/scanIPMonitor/list'}" class="nav-link">
+                    </th:block>
+                    <i class="nav-icon fa-brands fa-bluesky"></i>
+                    <p th:text="${application.ziDongFaXian}">自动发现</p>
+                    </a>
+                </li>
+
+                <li class="nav-item" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',u1,')}">
+                    <th:block th:if="${session.menuActive eq 'u1'}">
+                        <a th:href="@{'/ufmMonitor/list'}" class="nav-link active">
+                    </th:block>
+                    <th:block th:unless="${session.menuActive eq 'u1'}">
+                        <a th:href="@{'/ufmMonitor/list'}" class="nav-link">
+                    </th:block>
+                    <i class="nav-icon fa-solid fa-network-wired"></i>
+                    <p th:text="${application.ufmJianCe}">UFM监控</p>
+                    </a>
+                </li>
+
+                <!--<li class="nav-item">
+                    <a target="_blank" href="http://www.wgstart.com/elasticsearch-head/index.html"
+                       class="nav-link">
+                        <i class="nav-icon fas fa-search-plus"></i>
+                        <p>ES监控工具</p>
+                    </a>
+                </li>-->
+
+
+
+
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+</aside>

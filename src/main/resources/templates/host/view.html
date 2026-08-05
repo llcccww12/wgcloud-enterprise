@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+<div th:replace="common/codemirror.html"></div>
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item active"></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title"><span th:utext="${systemInfo.image}"></span><span style="margin-left:5px" th:text="${systemInfo.hostname}"></span>
+            <th:block th:if="${systemInfo.remark ne '' && systemInfo.remark ne null}">
+                (备注：<span th:text="${systemInfo.remark}"></span>)
+            </th:block><span class="btncopy" th:data-clipboard-text="${systemInfo.hostname}" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制" style="cursor:pointer;margin-left: 5px"><i class="fa fa-copy"></i></span></h3>
+          <div class=" float-sm-right">
+              <button id="btnAiDiagnose" onclick="aiDiagnoseHost()" class="btn btn-primary btn-sm">AI 诊断</button>
+              <a href="javascript:history.back()" class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+      <form role="form">
+        <div class="card-body">
+          <div class="form-group">
+            <label><span style="color:#fff;background:#0dcaf0;display:inline-block;border-radius:3px;padding:4px 8px;">系统信息</span> <small  style="background:#508ff4;margin-left:5px;" class="badge badge-danger" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="采集时间"><i class="far fa-clock"></i> <span th:text="${#dates.format(systemInfo.createTime,'yyyy-MM-dd HH:mm:ss')}">10 Feb. 2014</span></small></label>
+              <div><strong>主机名称：</strong><span th:text="${systemInfo.hostnameExt}"></span>，<strong>系统描述：</strong><span th:text="${systemInfo.platForm}"></span>，<strong>版本：</strong><span th:text="${systemInfo.platformVersion}"></span>，<strong>KernelArch：</strong><span th:text="${systemInfo.kernelArch}"></span>，<strong>CPU核数：</strong><span th:text="${systemInfo.cpuCoreNum}"></span>
+                  ，<strong>CPU型号：</strong><span th:text="${systemInfo.cpuXh}"></span> ，<strong>运行进程数量：</strong><span th:text="${systemInfo.procs}"></span>，<strong>物理总内存：</strong><span th:text="${systemInfo.totalMem}"></span>
+                  ，<strong>CPU PhysicalId：</strong><span th:text="${systemInfo.cpuPhysicalid}"></span>，<strong>CPU Family：</strong><span th:text="${systemInfo.cpuFamily}"></span>，<strong>CPU Mhz：</strong><span th:text="${systemInfo.cpuMhz}"></span>
+                  ，<strong>交换区总内存：</strong><span th:text="${systemInfo.totalSwapMem}"></span>，<strong>交换区内存已使用：</strong><span th:text="${systemInfo.swapMemPer}"></span>%
+                  ，<strong>启动时间：</strong><span th:text="${systemInfo.bootTimeStr}"></span>，<strong>运行时间：</strong><span th:text="${systemInfo.uptimeStr}"></span>，<strong>备注：</strong><span th:if="${systemInfo.remark eq '' || systemInfo.remark eq null}">无</span><span th:text="${systemInfo.remark}"></span>
+                  ，<strong>总计接收流量：</strong><span th:text="${systemInfo.bytesRecv}+'G'"></span>，<strong>总计发送流量：</strong><span th:text="${systemInfo.bytesSent}+'G'"></span>
+                  ，<strong>BIOS信息：</strong><span th:text="${systemInfo.biosInfo}"></span>，<strong>主板信息：</strong><span th:text="${systemInfo.baseBoard}"></span>
+                  ，<strong>agent版本：</strong><span th:text="${systemInfo.agentVer}"></span>，<strong>agent上报时间(秒)：</strong><span th:text="${systemInfo.submitSeconds}"></span>
+                  ，<strong>成员账号：</strong><span th:if="${systemInfo.account eq '' || systemInfo.account eq null}">管理员</span><span th:text="${systemInfo.account}"></span>
+                  <span th:if="${application.hostGroup == 'true'}">，<strong>标签：</strong><span th:if="${systemInfo.groupId eq '' || systemInfo.groupId eq null}">无</span><span th:text="${systemInfo.groupId}"></span></span></div>
+          </div>
+        </div>
+        <!-- /.card-body -->
+      </form>
+      <!-- /.card-body -->
+
+        <label><span style="margin-left: 10px;color:#fff;background:#3ac47d;display:inline-block;border-radius:3px;padding:4px 8px 4px;">主机监测资源</span></label>
+        <div class="row" style="margin-top: 10px;margin-bottom: 10px;">
+            <div style="margin-left: 10px;" class="col-12 table-responsive">
+                <label style="margin-left: 15px;" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',d3,')}"><a th:href="@{'/hostWarnDiy/list?hostname='+${systemInfo.hostname}}">查看自定义告警设置</a></label>
+                <label style="margin-left: 15px;" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',13,')}"><a th:href="@{'/appInfo/list?hostname='+${systemInfo.hostname}}">查看监控进程</a></label>
+                <label style="margin-left: 15px;" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',15,')}"><a th:href="@{'/portInfo/list?hostname='+${systemInfo.hostname}}">查看监控端口</a></label>
+                <label style="margin-left: 15px;" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',16,')}"><a th:href="@{'/fileWarnInfo/list?hostname='+${systemInfo.hostname}}">查看日志监控</a></label>
+                <label style="margin-left: 15px;" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',14,')}"><a th:href="@{'/dockerInfo/list?hostname='+${systemInfo.hostname}}">查看监控DOCKER</a></label>
+                <label style="margin-left: 15px;" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',17,')}"><a th:href="@{'/fileSafe/list?hostname='+${systemInfo.hostname}}">查看文件防篡改</a></label>
+                <label style="margin-left: 15px;" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',19,')}"><a th:href="@{'/appExceptionInfo/list?hostname='+${systemInfo.hostname}}">查看异常进程</a></label>
+                <label style="margin-left: 15px;" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',18,')}"><a th:href="@{'/customInfo/list?hostname='+${systemInfo.hostname}}">查看自定义监控项</a></label>
+                <label style="margin-left: 15px;" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',e1,')}"><a th:href="@{'/taskJobInfo/list?hostname='+${systemInfo.hostname}}">查看计划任务</a></label>
+                <label style="margin-left: 15px;" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',81,')}"><a th:href="@{'/equipment/list?hostname='+${systemInfo.hostname}}">查看资产详情</a></label>
+                <label style="margin-left: 15px;" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',31,')}"><a th:href="@{'/passwdInfo/list?hostMark='+${systemInfo.hostname}}">查看设备账号</a></label>
+                <label style="margin-left: 15px;" th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',f1,')}"><a th:href="@{'/agentRunState/list?hostname='+${systemInfo.hostname}}">Agent终端运行统计</a></label>
+                <label style="margin-left: 15px;"><a th:href="@{'/systemInfo/viewIfconfigInfo?id='+${systemInfo.id}}"><th:block th:if="${#strings.indexOf(systemInfo.image,'windows') > -1 }">ipconfig</th:block>
+                    <th:block th:unless="${#strings.indexOf(systemInfo.image,'windows') > -1 }">ifconfig</th:block></a></label>
+                <label style="margin-left: 15px;"><a th:href="@{'/systemInfo/viewAllProcess?id='+${systemInfo.id}}">全量进程列表</a></label>
+                <label style="margin-left: 15px;"><a th:href="@{'/systemInfo/viewAllPortInfo?id='+${systemInfo.id}}">全量端口列表</a></label>
+                <label style="margin-left: 15px;"><a th:href="@{'/dockerInfo/viewAllDockerList?id='+${systemInfo.id}}">全量DOCKER列表</a></label>
+                <label style="margin-left: 15px;"><a th:href="@{'/systemInfo/viewImportInfo?id='+${systemInfo.id}}">查看扩展监控信息</a></label>
+                <label style="margin-left: 15px;"><a th:href="@{'/dash/hostDraw?id='+${systemInfo.id}}">查看主机画像</a></label>
+                <label style="margin-left: 15px;"><a  style="color:oklch(57.7% .245 27)!important" th:href="@{'/systemInfo/chart?id='+${systemInfo.id}}">查看数据图表</a></label>
+                <label style="margin-left: 15px;" th:if="${application.shellToRun  == 'true' && session.LOGIN_KEY.role != 'guest' && #strings.contains(session.LOGIN_KEY.menuIds,',23,')}"><a th:href="@{'/shellInfo/sendForHostname?hostname='+${systemInfo.hostname}}">主机下发指令</a></label>
+                <label style="margin-left: 15px;"><a th:href="@{'/systemInfo/viewPCIData?id='+${systemInfo.id}}">查看主机PCI数据</a></label>
+                <label style="margin-left: 15px;"><a th:href="@{'/systemInfo/viewWinServices?id='+${systemInfo.id}}">查看系统服务列表</a></label>
+            </div>
+        </div>
+
+        <div th:replace="common/hostMacAddress.html"></div>
+        <div th:replace="common/cpuTemperatures.html"></div>
+        <div th:replace="common/network.html"></div>
+
+
+        <label><span style="margin-left: 10px;color:#fff;background:#508ff4;display:inline-block;border-radius:3px;padding:4px 8px;">磁盘空间信息</span>
+            <span style="margin-left:30px;"  data-trigger="hover" data-container="body" data-toggle="popover" data-placement="top" data-content="针对每个盘符进行告警通知">告警阈值: </span><span class="description-percentage text-danger" style="margin-left:5px;margin-right:30px;"><span th:text="${diskWarnVal}">17</span></span></label>
+        <div class="row">
+            <div class="col-12 table-responsive">
+                <div th:replace="common/disk.html"></div>
+            </div>
+        </div>
+
+        <div th:if="${hostUsersList ne '' && hostUsersList ne null}">
+            <label><span style="margin-left: 10px;color:#fff;background:#fa71cd;display:inline-block;border-radius:3px;padding:4px 8px;">系统最近登录信息</span> <th:block th:unless="${application.LICENSE_STATE eq '1'}"><span class="text-muted">（提示: 升级到专业版可以查看更多登录信息哦）</span></th:block></label>
+            <div class="row">
+                <div class="col-12 table-responsive">
+                    <div th:replace="common/hostUsers.html"></div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${not #lists.isEmpty(diskIoList)}">
+            <label><span style="margin-left: 10px;margin-top: 10px;color:#fff;background:#9267ff;display:inline-block;border-radius:3px;padding:4px 8px;">磁盘IO信息</span></label>
+            <div class="row">
+                <div class="col-12 table-responsive">
+                    <div th:replace="common/diskio.html"></div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${not #lists.isEmpty(diskSmartList)}">
+            <label><span style="margin-left: 10px;color:#fff;background:#508ff4;display:inline-block;border-radius:3px;padding:4px 8px;">磁盘SMART信息</span><span class="text-muted">（此功能需要在监控主机安装smartmontools，不支持虚拟机）</span></label>
+            <div class="row">
+                <div class="col-12 table-responsive">
+                    <div th:replace="common/disksmart.html"></div>
+                </div>
+            </div>
+        </div>
+
+        <label><span style="margin-left: 10px;color:#fff;background:#ffbf43;display:inline-block;border-radius:3px;padding:4px 8px;">磁盘空间总使用率%</span><span class="text-muted">（统计时间截至到昨天）</span>
+            <span style="margin-left: 10px;">最高</span><span class="description-percentage text-danger" style="margin-left:10px;margin-right:10px;"><i class="fas fa-caret-down"></i> <span th:text="${hostDiskPerSubtitleDto.maxValue}">18</span></span>
+            平均<span class="description-percentage text-warning" style="margin-left:5px;margin-right:10px;"><i class="fas fa-caret-left"></i> <span th:text="${hostDiskPerSubtitleDto.avgValue}">0</span></span>
+            最低<span class="description-percentage text-success" style="margin-left:5px;margin-right:30px;"><i class="fas fa-caret-up"></i> <span th:text="${hostDiskPerSubtitleDto.minValue}">17</span></span></label>
+        <div id="hostDiskPerJson"></div>
+
+        <th:block th:unless="${application.LICENSE_STATE eq '1'}"><label><span style="margin-left: 10px;font-weight:700;color: #62d45e!important;">提示: 升级到专业版可以查看磁盘IO速率图表数据哦</span></label><h6></h6></th:block>
+        <label><span style="margin-left: 10px;color:#fff;background:#9267ff;display:inline-block;border-radius:3px;padding:4px 8px;">磁盘IO读写速率</span><span class="text-muted"></span>
+            <span style="margin-left:20px">读取最高</span><span class="description-percentage text-danger" style="margin-left:10px;margin-right:10px;"><i class="fas fa-caret-down"></i> <span th:text="${diskIoStateReadSubtitleDto.maxValue}">18</span></span>
+            平均<span class="description-percentage text-warning" style="margin-left:5px;margin-right:10px;"><i class="fas fa-caret-left"></i> <span th:text="${diskIoStateReadSubtitleDto.avgValue}">0</span></span>
+            最低<span class="description-percentage text-success" style="margin-left:5px;margin-right:30px;"><i class="fas fa-caret-up"></i> <span th:text="${diskIoStateReadSubtitleDto.minValue}">17</span></span>
+            写入最高<span class="description-percentage text-danger" style="margin-left:10px;margin-right:10px;"><i class="fas fa-caret-down"></i> <span th:text="${diskIoStateWriteSubtitleDto.maxValue}">18</span></span>
+            平均<span class="description-percentage text-warning" style="margin-left:5px;margin-right:10px;"><i class="fas fa-caret-left"></i> <span th:text="${diskIoStateWriteSubtitleDto.avgValue}">0</span></span>
+            最低<span class="description-percentage text-success" style="margin-left:5px;margin-right:30px;"><i class="fas fa-caret-up"></i> <span th:text="${diskIoStateWriteSubtitleDto.minValue}">17</span></span>
+            <span style="margin-left:10px;"  data-trigger="hover" data-container="body" data-toggle="popover" data-placement="top" data-content="告警阈值适用读写IO速率">告警阈值: </span><span class="description-percentage text-danger" style="margin-left:5px;margin-right:30px;"><span th:text="${diskIoSpeedWarnVal}">17</span></span>
+            </label>
+        <div class="row">
+            <div class="col-12 table-responsive">
+                <table class="table table-striped"><tbody><tr>
+                <th:block th:each="item : ${amList}">
+                    <th:block th:if="${item.code eq  am}">
+                        <td width="2%" style="vertical-align:bottom;"><button type="button" style="background:#1652f0;color:#fff;border-color:#1652f0;" title="当前已显示该时间段图表" class="btn btn-block btn-outline-danger btn-sm disabled" th:text="${item.msg}">Primary</button></td>
+                    </th:block>
+                    <th:block th:unless="${item.code eq  am}">
+                        <td width="2%" style="vertical-align:bottom;"><button type="button"  th:onclick="viewDateForDisk([[${systemInfo.id}]],[[${item.code}]])" class="btn btn-block btn-outline-primary btn-sm" th:text="${item.msg}">Primary</button></td>
+                    </th:block>
+                </th:block>
+                </tr></tbody></table>
+            </div>
+            <!-- /.col -->
+        </div><!-- /.row -->
+        <div id="hostDiskIoStateJson"></div>
+
+        <label><span style="margin-left: 10px;color:#fff;background:oklch(70% .18 50);display:inline-block;border-radius:3px;padding:4px 8px;">磁盘IO读写次数</span><span class="text-muted"></span>
+            <span style="margin-left:20px">每秒读取最高</span><span class="description-percentage text-danger" style="margin-left:10px;margin-right:10px;"><i class="fas fa-caret-down"></i> <span th:text="${diskIoCountReadSubtitleDto.maxValue}">18</span></span>
+            平均<span class="description-percentage text-warning" style="margin-left:5px;margin-right:10px;"><i class="fas fa-caret-left"></i> <span th:text="${diskIoCountReadSubtitleDto.avgValue}">0</span></span>
+            最低<span class="description-percentage text-success" style="margin-left:5px;margin-right:30px;"><i class="fas fa-caret-up"></i> <span th:text="${diskIoCountReadSubtitleDto.minValue}">17</span></span>
+            每秒写入最高<span class="description-percentage text-danger" style="margin-left:10px;margin-right:10px;"><i class="fas fa-caret-down"></i> <span th:text="${diskIoCountWriteSubtitleDto.maxValue}">18</span></span>
+            平均<span class="description-percentage text-warning" style="margin-left:5px;margin-right:10px;"><i class="fas fa-caret-left"></i> <span th:text="${diskIoCountWriteSubtitleDto.avgValue}">0</span></span>
+            最低<span class="description-percentage text-success" style="margin-left:5px;margin-right:30px;"><i class="fas fa-caret-up"></i> <span th:text="${diskIoCountWriteSubtitleDto.minValue}">17</span></span>
+        </label>
+        <div id="hostDiskIoCountJson"></div>
+        <div class="card-footer">
+            <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+        </div>
+
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:src="@{'/static/js/host.js?v=3.5.6'}"></script>
+<script th:inline="javascript">
+    var hostDiskPerJson =[[${hostDiskPerList}]];
+    var diskIoStateList =[[${diskIoStateList}]];
+    $(function() {
+        var chart = new G2.Chart({
+            container: 'hostDiskPerJson',
+            forceFit: true,
+            height: 400,
+            padding: [30, 40, 70, 60]
+        });
+        chart.axis('dateStr', {
+            label: {
+                textStyle: {
+                    fill: '#aaaaaa'
+                }
+            }
+        });
+        chart.tooltip({
+            crosshairs: false
+        });
+        chart.legend({
+            position: 'top-center'
+        });
+        chart.source(hostDiskPerJson, {
+            diskSumPer: {
+                alias: '使用率%'
+            }
+        });
+        chart.scale('dateStr', {tickCount: 12, alias: '时间'});
+        chart.area().position('dateStr*diskSumPer').color('#1890ff');
+        // chart.line().position('dateStr*diskSumPer').color('#1890ff');
+        chart.render();
+
+        var chart2 = new G2.Chart({
+            container: 'hostDiskIoStateJson',
+            forceFit: true,
+            height: 400,
+            padding: [30, 40, 70, 48]
+        });
+        chart2.axis('dateStr', {
+            label: {
+                textStyle: {
+                    fill: '#aaaaaa'
+                }
+            }
+        });
+        chart2.axis('writeIoAvgDouble', false);
+        chart2.tooltip({
+            crosshairs: false
+        });
+        chart2.legend({
+            position: 'top-center'
+        });
+        chart2.source(diskIoStateList, {
+            readIoAvgDouble: {
+                alias: '磁盘读取MB/秒',
+                min: 0,
+                max: [[${diskIoStateBytMaxVal}]]
+            },
+            writeIoAvgDouble: {
+                alias: '磁盘写入MB/秒',
+                min: 0,
+                max: [[${diskIoStateBytMaxVal}]]
+            }
+        });
+        chart2.scale('dateStr',{tickCount: 12,alias: '时间'});
+        chart2.line().position('dateStr*readIoAvgDouble').color('#1890ff');
+        chart2.line().position('dateStr*writeIoAvgDouble').color('#2fc25b');
+        chart2.render();
+
+        var chart3 = new G2.Chart({
+            container: 'hostDiskIoCountJson',
+            forceFit: true,
+            height: 400,
+            padding: [30, 40, 70, 48]
+        });
+        chart3.axis('dateStr', {
+            label: {
+                textStyle: {
+                    fill: '#aaaaaa'
+                }
+            }
+        });
+        chart3.axis('writeIoCountAvgDouble', false);
+        chart3.tooltip({
+            crosshairs: false
+        });
+        chart3.legend({
+            position: 'top-center'
+        });
+        chart3.source(diskIoStateList, {
+            readIoCountAvgDouble: {
+                alias: '磁盘每秒读取次数',
+                min: 0,
+                max: [[${diskIoStateCountMaxVal}]]
+            },
+            writeIoCountAvgDouble: {
+                alias: '磁盘每秒写入次数',
+                min: 0,
+                max: [[${diskIoStateCountMaxVal}]]
+            }
+        });
+        chart3.scale('dateStr',{tickCount: 12,alias: '时间'});
+        chart3.line().position('dateStr*readIoCountAvgDouble').color('#1890ff');
+        chart3.line().position('dateStr*writeIoCountAvgDouble').color('#2fc25b');
+        chart3.render();
+
+
+        var clipboard = new ClipboardJS('.btncopy');
+        clipboard.on('success', function (e) {
+            toastr.success("复制成功");
+        });
+    });
+</script>
+
+<!-- 二开 AI 诊断模态框 -->
+<div class="modal fade" id="aiDiagnoseModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">AI 诊断分析 <small id="aiDiagStatus"></small></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="aiDiagnoseStop()"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body" id="aiDiagnoseModalBody" style="max-height:60vh;overflow-y:auto;white-space:pre-wrap;font-size:14px;line-height:1.6;background:#1e1e1e;color:#d4d4d4;border-radius:4px;padding:16px;">
+                <div class="text-center text-muted" id="aiDiagnoseWaiting">
+                    <i class="fa fa-spinner fa-spin"></i> AI 正在分析主机指标数据，请稍候...
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="aiDiagnoseStop()">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+var aiDiagnoseSource = null;
+
+function aiDiagnoseHost() {
+    var hostId = '[[${systemInfo.id}]]';
+    if (!hostId) {
+        toastr.error("无法获取主机 ID");
+        return;
+    }
+    $('#aiDiagnoseModal').modal('show');
+    $('#aiDiagnoseWaiting').show();
+    $('#aiDiagnoseModalBody').html('<div class="text-center text-muted" id="aiDiagnoseWaiting"><i class="fa fa-spinner fa-spin"></i> AI 正在分析主机指标数据，请稍候...</div>');
+    $('#aiDiagStatus').text('');
+
+    if (aiDiagnoseSource) { aiDiagnoseSource.close(); }
+    aiDiagnoseSource = new EventSource('/ai/diagnoseHostStream?hostId=' + hostId);
+
+    aiDiagnoseSource.addEventListener('context', function(e) {
+        $('#aiDiagnoseWaiting').hide();
+        var html = '<div style="margin:8px 0;padding:8px;background:#2d2d2d;border-left:3px solid #0dcaf0;border-radius:3px;"><strong>📊 主机指标数据</strong><pre style="margin:4px 0 0;color:#9cdcfe;font-size:13px;white-space:pre-wrap;">' + escHtml(e.data) + '</pre></div>';
+        $('#aiDiagnoseModalBody').append(html);
+    });
+
+    aiDiagnoseSource.addEventListener('message', function(e) {
+        $('#aiDiagnoseWaiting').hide();
+        var text = escHtml(e.data);
+        $('#aiDiagnoseModalBody').append('<div>' + text + '</div>');
+    });
+
+    aiDiagnoseSource.addEventListener('done', function(e) {
+        if (aiDiagnoseSource) { aiDiagnoseSource.close(); aiDiagnoseSource = null; }
+        $('#aiDiagStatus').text('[完成]');
+    });
+
+    aiDiagnoseSource.addEventListener('error', function(e) {
+        if (aiDiagnoseSource) { aiDiagnoseSource.close(); aiDiagnoseSource = null; }
+        $('#aiDiagnoseWaiting').hide();
+        $('#aiDiagnoseModalBody').append('<div class="text-danger mt-2">⚠ 连接 AI 服务出错，请稍后重试</div>');
+        $('#aiDiagStatus').text('[错误]');
+    });
+}
+
+function aiDiagnoseStop() {
+    if (aiDiagnoseSource) { aiDiagnoseSource.close(); aiDiagnoseSource = null; }
+}
+
+function escHtml(str) {
+    if (!str) return '';
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+}
+</script>
+
+</body>
+</html>

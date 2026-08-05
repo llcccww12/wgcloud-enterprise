@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wgcloud.mapper.SnmpDeepStateMapper">
+	<resultMap id="resultMap" type="com.wgcloud.entity.SnmpDeepState">
+		<id column="ID" property="id" jdbcType="CHAR" />
+		<result column="SNMP_DEEP_INFO_ID" property="snmpDeepInfoId" jdbcType="CHAR" />
+		<result column="OID_VALUE" property="oidValue" jdbcType="CHAR" />
+		<result column="OID_TYPE" property="oidType" jdbcType="CHAR" />
+		<result column="OID_NAME" property="oidName" jdbcType="CHAR" />
+		<result column="OID_ORDER_NUM" property="oidOrderNum" jdbcType="INTEGER" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<sql id="tableColumnList">
+		ID,SNMP_DEEP_INFO_ID,CREATE_TIME,OID_VALUE,OID_TYPE,OID_NAME,OID_ORDER_NUM
+	</sql>
+
+	<sql id="queryByParams">
+		<if test="snmpDeepInfoId != null">
+			<![CDATA[ AND SNMP_DEEP_INFO_ID = #{snmpDeepInfoId} ]]>
+		</if>
+		<if test="snmpDeepInfoIds != null">
+			<![CDATA[ AND SNMP_DEEP_INFO_ID IN ]]>
+			<foreach item="item" index="index" collection="snmpDeepInfoIds" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+	</sql>
+
+
+	<select id="selectById" resultMap="resultMap" parameterType="java.lang.String">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM SNMP_DEEP_STATE
+		WHERE ID=#{id}
+	</select>
+
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		DELETE FROM SNMP_DEEP_STATE
+		WHERE ID = #{id}
+	</delete>
+
+	<delete id="deleteById" parameterType="java.lang.String">
+		DELETE FROM
+		SNMP_DEEP_STATE
+		WHERE ID IN
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<delete id="deleteBySnmpDeepInfoId" parameterType="java.lang.String">
+		DELETE FROM SNMP_DEEP_STATE
+		WHERE SNMP_DEEP_INFO_ID = #{snmpDeepInfoId}
+	</delete>
+
+	<insert id="save" parameterType="com.wgcloud.entity.SnmpDeepState">
+		INSERT INTO SNMP_DEEP_STATE
+    	<trim prefix="(" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >ID,</if>
+      		<if test="snmpDeepInfoId != null" >SNMP_DEEP_INFO_ID,</if>
+			<if test="oidValue != null">OID_VALUE,</if>
+			<if test="oidType != null">OID_TYPE,</if>
+			<if test="oidName != null">OID_NAME,</if>
+			<if test="oidOrderNum != null">OID_ORDER_NUM,</if>
+      		<if test="createTime != null" >CREATE_TIME</if>
+    	</trim>
+    	<trim prefix="values (" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >#{id},</if>
+      		<if test="snmpDeepInfoId != null" >#{snmpDeepInfoId},</if>
+			<if test="oidValue != null" >#{oidValue},</if>
+			<if test="oidType != null" >#{oidType},</if>
+			<if test="oidName != null" >#{oidName},</if>
+			<if test="oidOrderNum != null" >#{oidOrderNum},</if>
+      		<if test="createTime != null" >#{createTime}</if>
+    	</trim>
+	</insert>
+
+	<update id="updateById" parameterType="com.wgcloud.entity.SnmpDeepState">
+		UPDATE SNMP_DEEP_STATE
+		<set>
+			<if test="snmpDeepInfoId != null">
+				SNMP_DEEP_INFO_ID = #{snmpDeepInfoId},
+			</if>
+			<if test="oidValue != null">
+				OID_VALUE = #{oidValue},
+			</if>
+			<if test="oidType != null">
+				OID_TYPE = #{oidType},
+			</if>
+			<if test="oidName != null">
+				OID_NAME = #{oidName},
+			</if>
+			<if test="oidOrderNum != null">
+				OID_ORDER_NUM = #{oidOrderNum},
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime}
+			</if>
+		</set>
+		WHERE ID = #{id}
+	</update>
+
+	<select id="countByParams" parameterType="map" resultType="java.lang.Integer">
+		SELECT count(*)  FROM SNMP_DEEP_STATE t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+	</select>
+
+
+	<select id="selectAllByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM SNMP_DEEP_STATE t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		ORDER BY OID_ORDER_NUM ASC
+	</select>
+
+	<select id="selectByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM SNMP_DEEP_STATE
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		<choose>
+			<when test="orderBy !=null and orderBy != ''">
+				<![CDATA[ ORDER BY ${orderBy} ${orderType}]]>
+			</when>
+			<otherwise>
+				ORDER BY OID_ORDER_NUM ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+	<base href="./" th:href="'/'"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title th:text="${application.wgName}">cac监控系统</title>
+
+	<meta name="viewport" content="width=device-width,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<link type="text/css" rel="stylesheet" th:href="@{'/static/logincss/components.css'}" />
+<link type="text/css" rel="stylesheet" th:href="@{'/static/logincss/fix.css'}" />
+<link type="text/css" rel="stylesheet" th:href="@{'/static/logincss/suri-bootstrap.css'}" />
+<link type="text/css" rel="stylesheet" th:href="@{'/static/logincss/bootstrap.min.css'}" />
+<link type="text/css" rel="stylesheet" th:href="@{'/static/logincss/font-awesome.min.css'}" />
+<link type="text/css" rel="stylesheet" th:href="@{'/static/logincss/ionicons.min.css'}" />
+<link type="text/css" rel="stylesheet" th:href="@{'/static/logincss/atmosfero.css'}" />
+
+<link rel="shortcut icon" type="image/x-icon" th:href="${application.icoUrl}"/>
+		
+</head>
+<body class="login-page">
+
+<div class="login-box" style="margin-bottom: 3%">
+		<div class="login-box-content">
+			<div class="login-logo">
+				<a href="javascript:location.reload();" style="color: #fff;font-size: 16px;font-weight:bold"><img width="60" height="60"  th:src="${application.logoUrl}"><span  style="margin-left:5px;" th:text="${application.wgName}">cac</span></a>
+	  		</div>
+			<div class="login-box-body">
+			<p class="login-box-msg">账号登录</p>
+
+		<form id="form1" th:action="@{'/login/login'}"  method="post" onsubmit="setMd5Pwd()" class="form-horizontal">
+	
+          	<div class="form-group">
+           	<div class="col-sm-12">
+              		<input id="userName" name="userName" placeholder="输入账号" maxlength="50" autocomplete="off" class="validate[required] form-control" type="text">
+            	</div>
+          	</div>
+          	
+          	<div class="form-group">
+           	<div class="col-sm-12">
+              		<input placeholder='输入密码' id="passwd" name="passwd" maxlength="30" class="validate[required] form-control" autocomplete="off" type="password">
+              		<input type="hidden" id="md5pwd" name="md5pwd" value=""/>
+            	</div>
+          	</div>
+
+			<th:block th:if="${application.SESSION_VERCODE eq 'true'}">
+			<div class="form-group">
+				<div class="col-sm-12">
+					<table><tr><td><input id="code" style="width:160px" name="validateCode" placeholder="输入验证码" maxlength="5" class="validate[required,maxSize[4]] form-control" autocomplete="off" type="text"></td>
+						<td><a href="javascript:changeImg()" title="看不清？点击换一张"><img th:src="@{'/vercode/get'}" id="imgObj"  style="margin-top:-8px" width="160" height="40" /></a></td></tr></table>
+				</div>
+				<div class="col-sm-12">
+				</div>
+			</div>
+			</th:block>
+
+        	<div class="form-group"  style="color:red;font-weight:bold;text-align: center;" th:text="${error}"></div>
+             	
+         	<div class="form-group">
+           	<div class="col-sm-12">
+           		<input value="登录" class="btn btn-primary btn-block" type="submit">
+            	</div>
+          	</div>
+             	
+          	<div class="form-group">
+          	</div>
+		</form>
+		</div>
+		</div>
+	</div>
+
+
+<th:block th:if="${application.copyRight eq 'true'}">
+	<center>
+		<div style="color:#2196f3">
+			<th:block th:if="${application.copyRightLoginContent eq ''}">
+				©2017-<span id="copyyear">now</span>  <a target="_blank" href='http://www.wgstart.com'> www.wgstart.com</a> . All Rights Reserved. Version 3.6.8
+			</th:block>
+			<th:block th:if="${application.copyRightLoginContent ne ''}"><th:block th:utext="${application.copyRightLoginContent}"></th:block></th:block>
+		</div>
+	</center>
+</th:block>
+    <link rel="stylesheet" th:href="@{'/static/js/jQuery/validationEngine.jquery.css'}" type="text/css"/>
+    <script th:src="@{'/static/js/jQuery/jquery-3.6.0.min.js'}"></script>
+    <script th:src="@{'/static/js/jQuery/jquery.validationEngine-zh_CN.js'}" type="text/javascript" charset="utf-8"></script>
+    <script th:src="@{'/static/js/jQuery/jquery.validationEngine.js'}" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" th:src="@{'/static/common/md5.js'}"></script>
+    <script type="text/javascript" th:src="@{'/static/js/login.js?v=3.5.3'}"></script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header" style="height:38px">
+    <div class="container-fluid">
+      <div class="row mb-2" style="margin-top: -7px;">
+        <div class="col-sm-6"></div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="javascript:history.back()">返回上级</a></li>
+          </ol>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title"><i class="nav-icon fa-solid fa-cubes"></i>&nbsp;AI-LLM文件列表<span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="您可以将这些Excel文件下载，然后投喂给大模型使用"  style="cursor:pointer;margin-left: 10px"><i class="fa fa-comment-dots"></i></span></h3>
+        <div class="card-tools">
+          <div class="float-sm-right">
+            <!-- SEARCH FORM -->
+            <form class="form-inline ml-3" th:action="@{'/report/list'}">
+              <button type="button" onclick="zipDownLoad()" class="btn bg-primary btn-sm" style="margin-right:5px;">压缩下载</button>
+              <button type="button" onclick="excelExportHostList()" class="btn bg-primary btn-sm" style="margin-right:5px;"><i class="fa-solid fa-file-excel"></i> 所有主机基础信息导出</button>
+              <button type="button" onclick="excelExportHostMacList()" class="btn bg-primary btn-sm" style="margin-right:5px;"><i class="fa-solid fa-laptop"></i> 主机MAC信息导出</button>
+              <button type="button" onclick="excelExportDiskIoStateList()" class="btn bg-primary btn-sm" style="margin-right:5px;" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="导出最近1小时数据"><i class="fa-solid fa-inbox"></i> 主机磁盘IO速率信息导出</button>
+              <button type="button" onclick="excelExportDiskPerList()" class="btn bg-primary btn-sm" style="margin-right:5px;"><i class="fa-solid fa-inbox"></i> 主机磁盘总使用率信息导出</button>
+              <button type="button" onclick="excelExportCpuTemperList()" class="btn bg-primary btn-sm" style="margin-right:5px;"><i class="fas fa-temperature-three-quarters"></i> 主机CPU温度信息导出</button>
+              <button type="button" onclick="excelExportNetworkList()" class="btn bg-primary btn-sm" style="margin-right:5px;"><i class="fas fa-ethernet"></i> 主机网卡信息导出</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <table th:class="'table table-bordered '+${session.themeTableHoverSign}">
+          <thead>
+          <tr>
+            <th style="width: 20px"> <input type="checkbox" value="" name="checkall" id="checkall"></th>
+            <th style="width: 60px">序号</th>
+            <th>日期</th>
+            <th>主机基础监控数据</th>
+            <th>主机磁盘使用率</th>
+            <th>主机全量进程</th>
+            <th>PING监控数据</th>
+          </tr>
+          </thead>
+          <tbody>
+          <th:block th:each="item,iterStat : ${resultList}">
+            <tr>
+              <td><input type="checkbox" th:value="${item.dateStr}" name="todo2" th:id="${item.dateStr}+'_check'"/></td>
+              <td th:text="${iterStat.index+1}">1</td>
+              <td th:text="${item.dateStr}">Update software</td>
+              <td><a th:href="${item.hostListSnapData}"><i class="fa-solid fa-file-excel"></i> 全量主机监控数据快照</a></td>
+              <td><a th:href="${item.diskData}"><i class="fa-solid fa-file-excel"></i> 全量主机磁盘使用率数据</a></td>
+              <td><a th:href="${item.allProcData}"><i class="fa-solid fa-file-excel"></i> 全量主机进程快照数据</a></td>
+              <td><a th:href="${item.pingData}"><i class="fa-solid fa-file-excel"></i> 全量PING监控快照</a></td>
+            </tr>
+          </th:block>
+
+          </tbody>
+        </table>
+      </div>
+      <!-- /.card-body -->
+      <div class="card-footer clearfix">
+        <div class="float-left">共<span th:text="${#lists.size(resultList)}"></span>条</div>
+        <div class="float-right"><button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button></div>
+      </div>
+    </div>
+    <!-- /.card -->
+
+
+  </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:src="@{'/static/js/llm.js?v=3.6.1'}"></script>
+<script th:inline="javascript">
+  var msg = [[${msg}]];
+  if(msg!='' && msg!=null){
+    toastr.info(msg);
+  }
+</script>
+</body>
+</html>

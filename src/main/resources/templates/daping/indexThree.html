@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title th:text="${application.wgName}">cac监控系统</title>
+  <base href="./" th:href="'/'"/>
+  <meta charset="utf-8">
+  <link rel="shortcut icon" type="image/x-icon" th:href="${application.icoUrl}"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" th:href="@{'/static/dapingThree/css/comon0.css?v=3.6.3'}">
+  <style>
+    .device{
+      justify-content: start !important;
+      margin-left: 0.4rem;
+    }
+  </style>
+</head>
+<body style="overflow: hidden;">
+<div class="loading">
+  <div class="loadbox"> <img th:src="@{'/static/dapingThree/images/loading.gif'}"> 页面加载中... </div>
+</div>
+<div class="head">
+  <h1 th:text="${application.wgName}">cac监控系统</h1>
+</div>
+<div class="mainbox">
+  <ul class="clearfix">
+    <li>
+      <div class="boxall"   style="height:calc(100% - .25rem); padding: 0;">
+        <div class="tit04">主机所属监控资源</div>
+        <div class="boxnav nav04">
+
+          <div class="listhead listhead2">
+            <span>资源名称</span>
+            <span>状态</span>
+          </div>
+
+          <div class="listnav listnav2 scrollDiv">
+            <ul class="smjl">
+              <th:block th:each="item,iterStat : ${leftList}">
+                <li>
+                  <span class="device" th:text="${item.name}"></span>
+                  <th:block th:if="${item.state  != '2'}">
+                    <span class="text-green">正常</span>
+                  </th:block>
+                  <th:block th:if="${item.state  == '2'}">
+                    <span class="text-red">离线</span>
+                  </th:block>
+                </li>
+              </th:block>
+            </ul>
+          </div>
+        </div>
+        <div class="boxfoot"></div>
+      </div>
+    </li>
+
+    <li>
+      <div class="boxall" style="height:calc(18% - .25rem)">
+        <div class="tit02" id="showTime">当前时间</div>
+        <div class="boxnav nav02">
+          <div>
+            <p class="p3">
+              <span><i class="dot dot1"></i><a th:href="@{'/dapingThree/index?state=2'}" style="color:#fff">已离线：<span style="text-align:left" th:text="${downLineNum}"></span></a></span>
+              <span><a th:href="@{'/dapingThree/index'}" style="color:#fff">总计：<span style="text-align:left" th:text="${allResourceNum}"></span></a></span>
+              <span><a th:href="@{'/dapingThree/index?state=1'}" style="color:#fff"><i class="dot dot2"></i>正常：<span style="text-align:left" th:text="${onLineNum}"></span></a></span>
+            </p></div>
+        </div>
+        <div class="boxfoot"></div>
+      </div>
+      <div class="boxall"  style="height:calc(82% - .25rem)">
+        <div class="tit03">主机列表</div>
+        <div class="boxnav nav03">
+          <div class="listhead listhead1">
+            <span style="width:200%">主机IP</span>
+            <span>CPU%</span>
+            <span>内存%</span>
+            <span>磁盘%</span>
+            <span>上行速率</span>
+            <span>下行速率</span>
+          </div>
+          <div class="listnav listnav1 scrollDiv">
+            <ul>
+              <th:block th:each="item,iterStat : ${systemInfoList}">
+                <li>
+                  <th:block th:if="${item.state  != '2'}">
+                    <span style="width:200%" class="text-green" th:text="${item.hostname}"></span>
+                  </th:block>
+                  <th:block th:if="${item.state  == '2'}">
+                    <span style="width:200%" class="text-red" th:text="${item.hostname}"></span>
+                  </th:block>
+                  <span th:text="${item.cpuPer}"></span>
+                  <span th:text="${item.memPer}"></span>
+                  <span th:text="${item.diskPer}"></span>
+                  <span th:text="${item.txbyt}"></span>
+                  <span th:text="${item.rxbyt}"></span>
+                </li>
+              </th:block>
+            </ul>
+          </div>
+
+
+        </div>
+        <div class="boxfoot"></div>
+      </div>
+    </li>
+    <li>
+      <div class="boxall"   style="height:calc(100% - .25rem); padding: 0;">
+        <div class="tit04">数据监测</div>
+        <div class="boxnav nav04">
+          <div class="listhead listhead2">
+            <span>资源名称</span>
+            <span>状态</span>
+          </div>
+
+          <div class="listnav listnav2 scrollDiv">
+            <ul class="smjl">
+              <th:block th:each="item,iterStat : ${rightList}">
+                <li>
+                  <span class="device" th:text="${item.name}"></span>
+                  <th:block th:if="${item.state  != '2'}">
+                    <span class="text-green">正常</span>
+                  </th:block>
+                  <th:block th:if="${item.state  == '2'}">
+                    <span class="text-red">离线</span>
+                  </th:block>
+                </li>
+              </th:block>
+            </ul>
+          </div>
+        </div>
+        <div class="boxfoot"></div>
+      </div>
+
+    </li>
+  </ul>
+</div>
+
+<script  type="text/javascript"  th:src="@{'/static/daping/js/jquery.js'}"></script>
+<script  type="text/javascript" th:src="@{'/static/dapingThree/js/jquery.liMarquee.js'}"></script>
+<script type="text/javascript" th:src="@{'/static/dapingThree/js/jquery.countup.min.js'}"></script>
+<script type="text/javascript" th:src="@{'/static/dapingThree/js/jquery.waypoints.min.js'}"></script>
+<!-- Toastr -->
+<link rel="stylesheet" th:href="@{'/static/AdminLTE/plugins/toastr/toastr.min.css'}">
+<!-- Toastr -->
+<script th:src="@{'/static/AdminLTE/plugins/toastr/toastr.min.js'}"></script>
+<script  th:inline="javascript">
+  $(window).on('load',function(){
+    $(".loading").fadeOut()
+  })
+
+  var t = null;
+  t = setTimeout(time,1000);//開始运行
+  function time()
+  {
+    clearTimeout(t);//清除定时器
+    dt = new Date();
+    var h=dt.getHours();//获取时
+    var m=dt.getMinutes();//获取分
+    var mStr = m;
+    if(m<10){
+      mStr = "0"+m;
+    }
+    var s=dt.getSeconds();//获取秒
+    var sStr = s;
+    if(s<10){
+      sStr = "0"+s;
+    }
+    document.getElementById("showTime").innerHTML = h+":"+mStr+":"+sStr;
+    t = setTimeout(time,1000); //设定定时器，循环运行
+  }
+
+  $(document).ready(function(){
+    var whei=$(window).width()
+    $("html").css({fontSize:whei/20})
+    $(window).resize(function(){
+      var whei=$(window).width()
+      $("html").css({fontSize:whei/20})
+    });
+  });
+
+
+  $('.counter').countUp();
+
+  $(function(){
+    $('.scrollDiv').liMarquee({
+      direction: 'up',//向上滚动
+      runshort: false,//内容不足时不滚动
+      scrollamount: 10//速度
+    });
+  });
+
+  const dapingRefreshTimes = [[${dapingRefreshTimes}]];
+  function reload() {
+    window.location.reload();
+  }
+  setTimeout(reload,dapingRefreshTimes);
+
+  const tipInfoMsg = [[${tipInfoMsg}]];
+  if(tipInfoMsg!=''  && tipInfoMsg!=null){
+    //toastr提示框延时10s后消失
+    toastr.options.timeOut = 10000;
+    toastr.success("<span style='font-size:16px;color:#fff'>"+tipInfoMsg+"</span>");
+  }
+</script>
+
+</body>
+</html>

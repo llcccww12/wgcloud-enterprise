@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wgcloud.mapper.AgentRunStateMapper">
+	<resultMap id="resultMap" type="com.wgcloud.entity.AgentRunState">
+		<id column="ID" property="id" jdbcType="CHAR" />
+		<result column="HOST_NAME" property="hostname" jdbcType="CHAR" />
+		<result column="ONLINE_TIME" property="onlineTime" jdbcType="INTEGER" />
+		<result column="DOWN_TIME" property="downTime" jdbcType="INTEGER" />
+		<result column="LAST_TIME" property="lastTime" jdbcType="TIMESTAMP" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<sql id="tableColumnList">
+		ID,HOST_NAME, ONLINE_TIME,DOWN_TIME,CREATE_TIME,LAST_TIME
+	</sql>
+
+	<sql id="queryByParams">
+		<if test="hostname != null">
+			<choose>
+				<when test="_databaseId == 'oracle'">
+					<![CDATA[ AND ( HOST_NAME LIKE  CONCAT(CONCAT('%',#{hostname}),'%') OR HOST_NAME IN (SELECT c.HOST_NAME FROM SYSTEM_INFO c WHERE c.REMARK LIKE  CONCAT(CONCAT('%',#{hostname}),'%') )
+				  OR HOST_NAME IN (SELECT c2.HOST_NAME FROM SYSTEM_INFO_EXT c2 WHERE c2.HOST_NAME_EXT LIKE  CONCAT(CONCAT('%',#{hostname}),'%') ) )]]>
+				</when>
+				<otherwise>
+					<![CDATA[ AND ( HOST_NAME LIKE  CONCAT('%',#{hostname},'%') OR HOST_NAME IN (SELECT c.HOST_NAME FROM SYSTEM_INFO c WHERE c.REMARK LIKE CONCAT('%',#{hostname},'%') )
+				   OR HOST_NAME IN (SELECT c2.HOST_NAME FROM SYSTEM_INFO_EXT c2 WHERE c2.HOST_NAME_EXT LIKE  CONCAT('%',#{hostname},'%') ))]]>
+				</otherwise>
+			</choose>
+		</if>
+		<if test="groupId != null">
+			<include refid="commonSqlUtil.groupIdForHostNameQueryParams" />
+		</if>
+		<if test="account != null">
+			<include refid="commonSqlUtil.hostChildAccountQueryParams" />
+		</if>
+		<if test="state != null">
+			<![CDATA[ AND HOST_NAME IN (SELECT c.HOST_NAME FROM SYSTEM_INFO c WHERE c.STATE= #{state}) ]]>
+		</if>
+	</sql>
+	
+	
+	<select id="selectById" resultMap="resultMap" parameterType="java.lang.String">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM AGENT_RUN_STATE 
+		WHERE ID=#{id} 
+	</select>
+	
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		DELETE FROM AGENT_RUN_STATE 
+		WHERE ID = #{id}
+	</delete>
+
+	<delete id="deleteByHostName" parameterType="map">
+		DELETE FROM AGENT_RUN_STATE WHERE <![CDATA[   HOST_NAME =#{hostname}]]>
+	</delete>
+	
+	<delete id="deleteById" parameterType="java.lang.String">
+		DELETE FROM
+		AGENT_RUN_STATE 
+		WHERE ID IN
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<insert id="save" parameterType="com.wgcloud.entity.AgentRunState">
+		INSERT INTO AGENT_RUN_STATE 
+    	<trim prefix="(" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >ID,</if>
+      		<if test="hostname != null" >HOST_NAME,</if>
+      		<if test="onlineTime != null">ONLINE_TIME,</if>
+      		<if test="downTime != null">DOWN_TIME,</if>
+			<if test="lastTime != null">LAST_TIME,</if>
+      		<if test="createTime != null" >CREATE_TIME</if>
+    	</trim>
+    	<trim prefix="values (" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >#{id},</if>
+      		<if test="hostname != null" >#{hostname},</if>
+      		<if test="onlineTime != null" >#{onlineTime},</if>
+      		<if test="downTime != null" >#{downTime},</if>
+			<if test="lastTime != null" >#{lastTime},</if>
+      		<if test="createTime != null" >#{createTime}</if>
+    	</trim>
+	</insert>
+
+	<insert id="insertList" parameterType="java.util.List" >
+		<choose>
+			<when test="_databaseId == 'oracle'">
+				begin
+				<foreach collection="list" item="item" index="index">
+					INSERT INTO AGENT_RUN_STATE (ID,HOST_NAME, ONLINE_TIME,DOWN_TIME,CREATE_TIME,LAST_TIME)  VALUES
+					(#{item.id},#{item.hostname},#{item.onlineTime},#{item.downTime},#{item.createTime},#{item.lastTime});
+				</foreach>
+				end;
+			</when>
+			<otherwise>
+				INSERT INTO AGENT_RUN_STATE (ID,HOST_NAME, ONLINE_TIME,DOWN_TIME,CREATE_TIME,LAST_TIME)  VALUES
+				<foreach collection="list" item="item" index="index" separator="," >
+					(#{item.id},#{item.hostname},#{item.onlineTime},#{item.downTime},#{item.createTime},#{item.lastTime})
+				</foreach>
+			</otherwise>
+		</choose>
+	</insert>
+
+	<update id="updateList" parameterType="java.util.List" >
+		<if test="_databaseId == 'oracle'">
+			begin
+		</if>
+		<foreach collection="list" item="item" index="index" >
+			UPDATE AGENT_RUN_STATE
+			<set>
+				<if test="item.hostname != null">
+					HOST_NAME = #{item.hostname},
+				</if>
+				<if test="item.onlineTime != null">
+					ONLINE_TIME = #{item.onlineTime},
+				</if>
+				<if test="item.downTime != null">
+					DOWN_TIME = #{item.downTime},
+				</if>
+				<if test="item.lastTime != null">
+					LAST_TIME = #{item.lastTime},
+				</if>
+			</set>
+			WHERE ID = #{item.id};
+		</foreach>
+		<if test="_databaseId == 'oracle'">
+			end;
+		</if>
+	</update>
+	
+	
+	<update id="updateById" parameterType="com.wgcloud.entity.AgentRunState">
+		UPDATE AGENT_RUN_STATE
+		<set>
+			<if test="hostname != null">
+				HOST_NAME = #{hostname},
+			</if>
+			<if test="onlineTime != null">
+				ONLINE_TIME = #{onlineTime},
+			</if>
+			<if test="downTime != null">
+				DOWN_TIME = #{downTime},
+			</if>
+			<if test="lastTime != null">
+				LAST_TIME = #{lastTime},
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime}
+			</if>
+		</set>
+		WHERE ID = #{id}
+	</update>
+
+	<select id="countByParams" parameterType="map" resultType="java.lang.Integer">
+		SELECT count(*)  FROM AGENT_RUN_STATE t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+	</select>
+
+
+	<select id="selectAllByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM AGENT_RUN_STATE t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		 ORDER BY ID DESC
+	</select>
+	
+	<select id="selectByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM AGENT_RUN_STATE
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		<choose>
+			<when test="orderBy !=null and orderBy != ''">
+				<![CDATA[ ORDER BY ${orderBy} ${orderType}]]>
+			</when>
+			<otherwise>
+				ORDER BY ID DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+</mapper>

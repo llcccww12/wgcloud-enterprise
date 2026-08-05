@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}" style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item active"></li>
+                </ol>
+            </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-11">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">添加进程监控</h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <form role="form" id="form1" method="post" th:action="@{'/appInfo/saveBatch'}">
+            <input type="hidden" name="id" th:value="${appInfo.id}"/>
+            <div class="card-body">
+                <div class="form-group">
+                    <label><font color="red">*</font>监控主机</label>
+                    <div th:replace="common/multiSelectHost.html"></div>
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>获取进程方法</label>
+                    <div class="input-group">
+                        <div class="icheck-primary d-inline">
+                            <input type="radio" id="appType1" name="appType" value="1" onclick="jinchengfangfa('1')" checked>
+                            <label for="appType1"><span style="opacity:.70">进程ID号</span></label>
+                        </div>
+                        <div class="icheck-yellow d-inline" style="margin-left:30px;">
+                            <input type="radio" id="appType2" name="appType" value="2" onclick="jinchengfangfa('2')">
+                            <label for="appType2"><span style="opacity:.70">PID文件路径</span></label>
+                        </div>
+                        <div class="icheck-teal d-inline" style="margin-left:30px;">
+                            <input type="radio" id="appType3" name="appType" value="3" onclick="jinchengfangfa('3')">
+                            <label for="appType3"><span style="opacity:.70">进程启动指令的关键字</span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font><span id="jinchengfangfa">进程ID号</span></label>
+                    <input type="text" autocomplete="off"  th:value="${appInfo.appPid}" class="validate[required,maxSize[200]] form-control" name="appPid" id="appPid" placeholder="输入进程ID号如9639">
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>进程名称</label>
+                    <input type="text" autocomplete="off"  th:value="${appInfo.appName}" class="validate[required,maxSize[200]] form-control" name="appName" id="appName" placeholder="如LLM平台">
+                </div>
+                <div class="form-group">
+                    <label>自动恢复指令<span data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="当检测到进程离线后触发，agent会自动执行下方输入的指令或脚本，如果不需要执行，删除指令或停止监控即可，此功能需升级到专业版" class="text-muted">（多条指令请换行输入）</span><span class="text-muted" th:text="${blockStr}">敏感字符串过滤</span></label>
+                    <textarea class="validate[maxSize[500]] form-control"   th:text="${appInfo.customShell}" name="customShell" id="customShell"></textarea>
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>告警级别</label>
+                    <div th:replace="common/warnLevel.html"></div>
+                </div>
+                <div class="form-group clearfix">
+                    <label><font color="red">*</font>监控状态</label>
+                    <div th:replace="common/activeRadio.html"></div>
+                </div>
+
+            </div>
+            <!-- /.card-body -->
+
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-right:10px;"><i class="fas fa-save"></i> 保 存</button>
+                <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+            </div>
+
+        </form>
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-10 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+
+<div th:replace="common/codemirror.html"></div>
+<script th:src="@{'/static/js/app.js?v=3.5.0'}"></script>
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $("#form1").validationEngine();
+        $('.duallistbox').bootstrapDualListbox({
+            nonSelectedListLabel: '未选监控主机',
+            selectedListLabel: '已选监控主机',
+            filterPlaceHolder: '过滤条件',
+            moveAllLabel: '添加全部',
+            removeAllLabel: '移除全部',
+            infoText: '当前列表共 {0} 项',
+            infoTextEmpty: '列表为空',
+        });
+
+        var editor = CodeMirror.fromTextArea(document.getElementById("customShell"), {
+            lineNumbers: true,
+            styleActiveLine: true,
+            matchBrackets: true,
+            mode: 'shell',
+        });
+        editor.setOption("theme", "dracula");
+        editor.setSize('auto','200px');
+    });
+
+
+
+    function jinchengfangfa(appTypeVal) {
+        var fangfa = appTypeVal;
+        if(fangfa=='1'){
+            $("#jinchengfangfa").html("进程ID号");
+            $("#appPid").attr("placeholder","输入进程ID号如9639");
+        }
+        if(fangfa=='2'){
+            $("#jinchengfangfa").html("PID文件路径");
+            $("#appPid").attr("placeholder","如：/usr/local/nginx.pid");
+        }
+        if(fangfa=='3'){
+            $("#jinchengfangfa").html("进程启动指令的关键字");
+            $("#appPid").attr("placeholder","linux或windows的进程启动指令COMMAND里的关键字符，请保证关键字符能唯一对应进程，如：cac-server-release.jar");
+        }
+        appType = fangfa;
+    }
+
+    var msg = [[${msg}]];
+    if(msg!='' && msg!=null){
+        toastr.error(msg);
+    }
+</script>
+</body>
+</html>

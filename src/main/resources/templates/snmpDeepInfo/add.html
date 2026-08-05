@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item active"></li>
+                </ol>
+            </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-11">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">添加SNMP设备深度监测（比如交换机）</h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <form role="form" id="form1" method="post" th:action="@{'/snmpDeepInfo/save'}">
+            <input type="hidden" name="id" th:value="${snmpDeepInfo.id}"/>
+            <div class="card-body">
+                <div class="form-group">
+                    <label><font color="red">*</font>设备IP</label>
+                    <input type="text" autocomplete="off"  th:value="${snmpDeepInfo.hostname}" class="validate[required,maxSize[50]] form-control" name="hostname" id="hostname" placeholder="输入IP">
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>SNMP端口</label>
+                    <input type="text" autocomplete="off"  th:value="${snmpDeepInfo.snmpPort}" class="validate[custom[number],required,maxSize[50]] form-control" name="snmpPort" id="snmpPort" placeholder="如161">
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>SNMP版本</label>
+                    <div class="input-group">
+                        <div class="icheck-primary d-inline">
+                            <input type="radio" id="snmpVer1" name="snmpVersion" value="0">
+                            <label for="snmpVer1"><span style="opacity:.70">version1</span></label>
+                        </div>
+                        <div class="icheck-success d-inline" style="margin-left:30px;">
+                            <input type="radio" id="snmpVer2" name="snmpVersion" value="1" checked>
+                            <label for="snmpVer2"><span style="opacity:.70">version2c</span></label>
+                        </div>
+                        <div class="icheck-teal d-inline" style="margin-left:30px;">
+                            <input type="radio" id="snmpVer3" name="snmpVersion" value="3">
+                            <label for="snmpVer3"><span style="opacity:.70">version3</span></label>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:none" id="snmpV3InfoDev">
+                    <div class="form-group">
+                        <label>SNMP v3用户名</label>
+                        <input type="text" autocomplete="off"  th:value="${snmpDeepInfo.securityName}" class="validate[maxSize[50]] form-control" name="securityName" id="securityName" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label>SNMP v3认证密码<span class="text-muted">（认证协议为DES）</span></label>
+                        <input type="text" autocomplete="off"  th:value="${snmpDeepInfo.authPass}" class="validate[maxSize[50]] form-control" name="authPass" id="authPass" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label>SNMP v3加密密码<span class="text-muted">（加密协议为MD5）</span></label>
+                        <input type="text" autocomplete="off"  th:value="${snmpDeepInfo.privPass}" class="validate[maxSize[50]] form-control" name="privPass" id="privPass" placeholder="">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>SNMP团体名称（community）</label>
+                    <input type="text" autocomplete="off"  th:value="${snmpDeepInfo.snmpCommunity}" class="validate[maxSize[100]] form-control" name="snmpCommunity" id="snmpCommunity" placeholder="如public">
+                </div>
+
+                <div class="form-group">
+                    <label>备注</label>
+                    <input type="text" autocomplete="off"  th:value="${snmpDeepInfo.remark}" class="validate[maxSize[100]] form-control" name="remark" id="remark" placeholder="如交换机01">
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>告警级别</label>
+                    <div th:replace="common/warnLevel.html"></div>
+                </div>
+                <div class="form-group clearfix">
+                    <label><font color="red">*</font>监控状态</label>
+                    <div th:replace="common/activeRadio.html"></div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-12"><label style="color:#fff;background:#508ff4;display:inline-block;border-radius:3px;padding:4px 8px;">监控OID记录（以下为需要监控的OID，可以添加多个OID进行监控）<span  th:if="${not #lists.isEmpty(snmpDeepStateList)}" th:text="'（已监控'+${#lists.size(snmpDeepStateList)}+'条）'"></span></label></div>
+                </div>
+                <input type="hidden" name="dataFromIndex"  id="dataFromIndex" th:value="${dataFromIndex}"/>
+                <th:block th:if="${#lists.isEmpty(snmpDeepStateList)}">
+                    <div id="dataFormList" class="form-group clearfix">
+                        <div id="dataFrom_0" class="card card-primary card-outline">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label><font color="red">*</font>OID名称<span class="text-muted">（如cpu使用率）</span></label>
+                                    <input type="text" autocomplete="off"  class="validate[required,maxSize[100]] form-control" name="oidName_0" id="oidName_0" placeholder="如cpu使用率">
+                                </div>
+                                <div class="form-group">
+                                    <label><font color="red">*</font>OID值<span class="text-muted">（如1.3.6.1.2.1.2.2.1.16.2）</span></label>
+                                    <input type="text" autocomplete="off"  class="validate[maxSize[100]] form-control" name="oidValue_0" id="oidValue_0" placeholder="如1.3.6.1.2.1.2.2.1.16.2">
+                                </div>
+                                <div class="form-group">
+                                    <label><font color="red">*</font>获取方式</label>
+                                    <div class="input-group">
+                                        <div class="icheck-primary d-inline">
+                                            <input type="radio" id="radioPrimaryGet_0" name="oidType_0" value="SNMPGET" checked>
+                                            <label for="radioPrimaryGet_0"><span style="opacity:.70">SNMPGET</span></label>
+                                        </div>
+                                        <div class="icheck-danger d-inline" style="margin-left:30px;">
+                                            <input type="radio" id="radioPrimaryWalk_0"  name="oidType_0" value="SNMPWALK">
+                                            <label for="radioPrimaryWalk_0"><span style="opacity:.70">SNMPWALK</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group float-right">
+                                    <div class="col-12"><button type="button"  onclick="ajaxTestData('_0')" class="btn btn-primary btn-sm">测试获取OID结果</button><button type="button"  style="margin-left:30px;" onclick="removeDiv('dataFrom_0')" class="btn bg-danger btn-sm"><i class="far fa-trash-alt"></i> 删除</button></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
+
+                <th:block th:if="${not #lists.isEmpty(snmpDeepStateList)}">
+                    <div id="dataFormList" class="form-group clearfix">
+                        <th:block th:each="item,iterStat : ${snmpDeepStateList}">
+                            <div th:id="'dataFrom_'+ ${item.oidOrderNum}" class="card card-primary card-outline">
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label><font color="red">*</font>OID名称</label>
+                                        <input type="text" autocomplete="off"  class="validate[required,maxSize[100]] form-control" th:name="'oidName_'+ ${item.oidOrderNum}" th:id="'oidName_'+ ${item.oidOrderNum}" th:value="${item.oidName}" placeholder="如cpu使用率">
+                                    </div>
+                                    <div class="form-group">
+                                        <label><font color="red">*</font>OID值</label>
+                                        <input type="text" autocomplete="off"  class="validate[maxSize[100]] form-control" th:name="'oidValue_'+ ${item.oidOrderNum}" th:id="'oidValue_'+ ${item.oidOrderNum}" th:value="${item.oidValue}" placeholder="如1.3.6.1.2.1.2.2.1.16.2">
+                                    </div>
+                                    <div class="form-group">
+                                        <label><font color="red">*</font>获取方式</label>
+                                        <div class="input-group">
+                                            <th:block th:if="${item.oidType  == 'SNMPGET'}">
+                                                <div class="icheck-primary d-inline">
+                                                    <input type="radio" th:id="'radioPrimaryGet_'+${item.oidOrderNum}" th:name="'oidType_'+${item.oidOrderNum}" value="SNMPGET" checked>
+                                                    <label th:for="'radioPrimaryGet_'+${item.oidOrderNum}"><span style="opacity:.70">SNMPGET</span></label>
+                                                </div>
+                                                <div class="icheck-danger d-inline" style="margin-left:30px;">
+                                                    <input type="radio" th:id="'radioPrimaryWalk_'+${item.oidOrderNum}"  th:name="'oidType_'+${item.oidOrderNum}" value="SNMPWALK">
+                                                    <label th:for="'radioPrimaryWalk_'+${item.oidOrderNum}"><span style="opacity:.70">SNMPWALK</span></label>
+                                                </div>
+                                            </th:block>
+                                            <th:block th:if="${item.oidType  == 'SNMPWALK'}">
+                                                <div class="icheck-primary d-inline">
+                                                    <input type="radio" th:id="'radioPrimaryGet_'+${item.oidOrderNum}" th:name="'oidType_'+${item.oidOrderNum}" value="SNMPGET" >
+                                                    <label th:for="'radioPrimaryGet_'+${item.oidOrderNum}"><span style="opacity:.70">SNMPGET</span></label>
+                                                </div>
+                                                <div class="icheck-danger d-inline" style="margin-left:30px;">
+                                                    <input type="radio" th:id="'radioPrimaryWalk_'+${item.oidOrderNum}"  th:name="'oidType_'+${item.oidOrderNum}" value="SNMPWALK" checked>
+                                                    <label th:for="'radioPrimaryWalk_'+${item.oidOrderNum}"><span style="opacity:.70">SNMPWALK</span></label>
+                                                </div>
+                                            </th:block>
+                                        </div>
+                                    </div>
+                                    <div class="form-group float-right">
+                                        <div class="col-12"><button type="button"  th:onclick="ajaxTestData('_[[${item.oidOrderNum}]]')" class="btn btn-primary btn-sm">测试获取OID结果</button><button type="button"  style="margin-left:30px;" th:onclick="removeDiv('dataFrom_[[${item.oidOrderNum}]]')" class="btn bg-danger btn-sm"><i class="far fa-trash-alt"></i> 删除</button></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </th:block>
+                    </div>
+                </th:block>
+                <div class="form-group row">
+                    <div class="col-12"><button  type="button" onclick="addDataForm()" class="btn btn-primary btn-sm float-right"><i class="fa fa-plus-circle"></i> 添加一行</button>&nbsp;</div>
+                </div>
+
+            </div>
+            <!-- /.card-body -->
+
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-right:10px;"><i class="fas fa-save"></i> 保 存</button>
+                <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+            </div>
+
+        </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<!-- 动态添加一行数据 -->
+<div  id="dataHideContent" style="display: none">
+    <div id="dataFrom_{num}" class="card card-primary card-outline">
+        <div class="card-body">
+            <div class="form-group">
+                <label><font color="red">*</font>OID名称</label>
+                <input type="text" autocomplete="off"  class="validate[required,maxSize[100]] form-control" name="oidName_{num}" id="oidName_{num}" placeholder="如cpu使用率">
+            </div>
+            <div class="form-group">
+                <label><font color="red">*</font>OID值</label>
+                <input type="text" autocomplete="off"  class="validate[maxSize[100]] form-control" name="oidValue_{num}" id="oidValue_{num}" placeholder="如1.3.6.1.2.1.2.2.1.16.2">
+            </div>
+            <div class="form-group">
+                <label><font color="red">*</font>获取方式</label>
+                <div class="input-group">
+                    <div class="icheck-primary d-inline">
+                        <input type="radio" id="radioPrimaryGet_{num}" name="oidType_{num}" value="SNMPGET" checked>
+                        <label for="radioPrimaryGet_{num}"><span style="opacity:.70">SNMPGET</span></label>
+                    </div>
+                    <div class="icheck-danger d-inline" style="margin-left:30px;">
+                        <input type="radio" id="radioPrimaryWalk_{num}"  name="oidType_{num}" value="SNMPWALK">
+                        <label for="radioPrimaryWalk_{num}"><span style="opacity:.70">SNMPWALK</span></label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group float-right">
+                <div class="col-12"><button type="button"  onclick="ajaxTestData('_{num}')" class="btn btn-primary btn-sm">测试获取OID结果</button><button type="button"  style="margin-left:30px;" onclick="removeDiv('dataFrom_{num}')" class="btn bg-danger btn-sm"><i class="far fa-trash-alt"></i> 删除</button></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="snmpDeepInfo/testOidVal.html"></div>
+
+<script th:src="@{'/static/js/snmpDeepInfo.js?v=3.6.4'}"></script>
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $("#form1").validationEngine();
+        var warnLevel = [[${snmpDeepInfo.warnLevel}]];
+        $("input[name='warnLevel'][value='"+warnLevel+"']").attr('checked','true');
+        var active = [[${snmpDeepInfo.active}]];
+        $("input[name='active'][value='"+active+"']").attr('checked','true');
+        var snmpVersion = [[${snmpDeepInfo.snmpVersion}]];
+        $("input[name='snmpVersion'][value='"+snmpVersion+"']").attr('checked','true');
+        if('3'==snmpVersion){
+            $("#snmpV3InfoDev").show();
+        }
+        $('input[name="snmpVersion"]').change(function() {
+            if (this.checked) {
+                if('3'==$(this).val()){
+                    $("#snmpV3InfoDev").show();
+                }else{
+                    $("#snmpV3InfoDev").hide();
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

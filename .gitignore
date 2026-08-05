@@ -1,0 +1,45 @@
+# 构建产物
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.settings/
+.classpath
+.project
+nbproject/
+nbbuild/
+
+# 日志
+*.log
+logs/
+log/
+
+# 系统 / 临时
+.DS_Store
+Thumbs.db
+*.swp
+*.bak
+*.tmp
+*.orig
+
+# 二开辅助 / 用户本地
+application.yml
+application-local.yml
+*.local
+
+# 数据库导出/备份
+*.sql.gz
+*.dump

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header" style="height:38px">
+      <div class="container-fluid">
+        <div class="row mb-2" style="margin-top: -7px;">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="javascript:history.back()">返回上级</a></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fa-brands fa-bluesky nav-icon"></i>&nbsp;自动发现设备列表<span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="此资源需要部署server-backup监控"  style="cursor:pointer;margin-left: 10px"><i class="fa fa-comment-dots"></i></span></h3>
+        <div class=" float-sm-right">
+          <form class="form-inline ml-3">
+            <div class="input-group input-group-sm">
+              <select style="width:150px;margin-right:5px;" th:class="'form-control '+${session.themeNameSign}"  name="scanName" id="scanName" onchange="searchByScanName()">
+                <option value="">选择网络名称</option>
+                <th:block th:each="item,iterStat : ${nameList}">
+                  <option   th:value="${item}" th:text="${item}">Alabama</option>
+                </th:block>
+              </select>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <table th:class="'table table-bordered '+${session.themeTableHoverSign}">
+          <thead>
+          <tr>
+            <th style="width: 60px">序号</th>
+            <th>设备IP</th>
+            <th>响应时间</th>
+            <th>更新时间</th>
+            <th>网络名称</th>
+          </tr>
+          </thead>
+          <tbody>
+          <th:block th:each="item,iterStat : ${dataList}">
+            <tr>
+              <td th:text="${iterStat.index+1}">1</td>
+              <td th:text="${item.ip}"></td>
+              <td th:text="${item.resTimes}+'ms'"></td>
+              <td th:text="${item.createTime}">Update software</td>
+              <td th:text="${item.autoScanName}"></td>
+            </tr>
+          </th:block>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer clearfix">
+        <div class="float-left">共<span th:text="${#lists.size(dataList)}"></span>条</div>
+        <div class="float-right"><button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button></div>
+      </div>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:inline="javascript">
+  function searchByScanName(){
+    window.location.href = SERVER_SERVLET_CONTEXT_PATH + "/scanIPMonitor/list?scanName="+$("#scanName").val();
+  }
+  $("#scanName").val([[${scanName}]]);
+  var msg = [[${msg}]];
+  if(msg!='' && msg!=null){
+    toastr.info(msg);
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+  <!--ztree 3.5.48-->
+  <link rel="stylesheet" th:href="@{'/static/common/ztree/zTreeStyle/zTreeStyle.css'}">
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header" style="height:38px">
+      <div class="container-fluid">
+        <div class="row mb-2" style="margin-top: -7px;">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="javascript:history.back()">返回上级</a></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fa fa-users nav-icon"></i>&nbsp;成员账号列表</h3>
+        <div class=" float-sm-right">
+          <form class="form-inline ml-3" th:action="@{'/accountInfo/list'}">
+          <!-- SEARCH FORM -->
+          <th:block th:if="${session.LOGIN_KEY.role != 'guest'}">
+            <button type="button" onclick="showMenuToAdmin()" class="btn btn-warning btn-sm" style="margin-right:5px;color:#fff">设置管理员菜单</button>
+            <button type="button" onclick="delChecks('/accountInfo/del')"  class="btn bg-danger btn-sm" style="margin-right:5px;">删除</button>
+            <button type="button" onclick="add()" class="btn btn-primary btn-sm" style="margin-right:5px;">添加</button>
+          </th:block>
+          </form>
+
+        </div>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <table th:class="'table table-bordered '+${session.themeTableHoverSign}">
+          <thead>
+          <tr>
+            <th style="width: 20px"> <input type="checkbox" value="" name="checkall" id="checkall"></th>
+            <th style="width: 60px">序号</th>
+            <th>登录账号</th>
+            <th>用户邮箱</th>
+            <th>用户标识</th>
+            <th>用户类型</th>
+            <th>备注</th>
+            <th>手机号</th>
+            <th>主机数量</th>
+            <th>创建时间</th>
+              <th>操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <th:block th:each="item,iterStat : ${page.list}">
+            <tr>
+              <td><input type="checkbox" th:value="${item.id}" name="todo2" th:id="${item.id}+'_check'"/></td>
+              <td th:text="${iterStat.index+1}">1</td>
+              <td th:text="${item.account}">Update software</td>
+              <td th:text="${item.email}">Update software</td>
+              <td th:text="${item.accountKey}">Update software</td>
+              <td>
+                <th:block th:if="${item.role  == 'user'}">
+                  <span class="badge bg-primary">成员账号</span>
+                </th:block>
+                <th:block th:if="${item.role  == 'guest'}">
+                  <span  class="badge bg-teal">只读账号</span>
+                </th:block>
+              </td>
+              <td th:text="${item.remark}">Update software</td>
+              <td th:text="${item.accountPhone}">Update software</td>
+              <td><a th:href="'/systemInfo/systemInfoList?account='+${item.account}"><span class="badge bg-primary" th:text="${item.hostNum}"></span></a></td>
+              <td th:text="${#dates.format(item.createTime,'yyyy-MM-dd HH:mm:ss')}">Update software</td>
+              <td>
+                <th:block th:if="${session.LOGIN_KEY.role != 'guest'}">
+                  <button type="button"  th:onclick="edit([[${item.id}]])"  class="btn btn-primary  btn-sm">编辑</button>
+                  <button type="button"  th:onclick="del([[${item.id}]])"  class="btn bg-danger btn-sm">删除</button>
+                  <button type="button"  th:onclick="editPasswd([[${item.id}]])"  class="btn btn-primary  btn-sm">修改密码</button>
+                  <button type="button" th:if="${item.role  != 'guest'}" th:onclick="showMoveAllToAccount([[${item.account}]])" title="将该账号的所有监控资源转移到其他账号" class="btn btn-warning btn-sm" style="margin-right:5px;color:#fff">迁移</button>
+                </th:block>
+            </tr>
+          </th:block>
+
+          </tbody>
+        </table>
+      </div>
+      <!-- /.card-body -->
+      <div th:replace="common/page.html"></div>
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+  <div th:replace="common/moveAccount.html"></div>
+
+  <div class="modal fade" id="modal-default2">
+    <div class="modal-dialog">
+      <form method="post" id="form2" th:action="@{'/accountInfo/saveAdminMenus'}">
+        <div class="modal-content" style="font-size:0.90rem">
+          <div class="modal-header">
+            <h4 class="modal-title">菜单<span class="text-muted">（请选择管理员可以操作的菜单）</span></h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group"><span class="text-muted">若重启server服务，设置菜单会失效，需要重新再次设置菜单</span></div>
+            <input type="hidden" name="menuIds" id="menuIds"/>
+            <ul id="treeMenu" class="ztree"></ul>
+            </p>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default  btn-sm" data-dismiss="modal">关 闭</button>
+            <button type="button" onclick="ajaxSaveAdminMenus()" class="btn btn-primary btn-sm">保 存</button>
+          </div>
+        </div>
+      </form>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:src="@{'/static/common/ztree/jquery.ztree.core.min.js'}"></script>
+<script th:src="@{'/static/common/ztree/jquery.ztree.excheck.min.js'}"></script>
+<script th:src="@{'/static/js/accountInfo.js?v=3.5.7'}"></script>
+
+<script th:inline="javascript">
+  var setting = {
+    check: {
+      enable: true
+    },
+    data: {
+      simpleData: {
+        enable: true
+      }
+    }
+  };
+
+  var zNodes = [[${menuTreeNodeDtoList}]];
+
+  $(document).ready(function(){
+    $.fn.zTree.init($("#treeMenu"), setting, zNodes);
+  });
+  var msg = [[${msg}]];
+  if(msg!='' && msg!=null){
+    toastr.info(msg);
+  }
+</script>
+
+</body>
+</html>

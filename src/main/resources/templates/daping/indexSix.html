@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title th:text="${application.wgName}">cac监控系统</title>
+  <base href="./" th:href="'/'"/>
+  <meta charset="utf-8">
+  <link rel="shortcut icon" type="image/x-icon" th:href="${application.icoUrl}"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" th:href="@{'/static/dapingThree/css/comon2.css'}">
+  <style>
+    .device{
+      justify-content: start !important;
+      margin-left: 0.4rem;
+    }
+  </style>
+</head>
+<body style="overflow: hidden;">
+<div class="loading">
+  <div class="loadbox"> <img th:src="@{'/static/dapingThree/images/loading.gif'}"> 页面加载中... </div>
+</div>
+<div class="head">
+  <h1 th:text="${application.wgName}">cac监控系统</h1>
+</div>
+<div class="mainbox">
+  <ul class="clearfix">
+
+    <li>
+      <div class="boxall"  style="height:95%">
+        <div class="tit02" id="showTime">11:39:27</div>
+        <div class="boxnav nav03">
+          <div class="listhead listhead1">
+            <span style="width:100%">&nbsp;系统日志摘要</span>
+          </div>
+          <div class="listnav listnav1 scrollDiv">
+            <ul>
+              <th:block th:each="item,iterStat : ${logInfoList}">
+                <li>
+                  <span style="width:100%" th:text="${#dates.format(item.createTime,'yyyy-MM-dd HH:mm:ss')+' '+item.hostname}"></span>
+                </li>
+              </th:block>
+            </ul>
+          </div>
+
+
+        </div>
+        <div class="boxfoot"></div>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<script  type="text/javascript"  th:src="@{'/static/daping/js/jquery.js'}"></script>
+<script  type="text/javascript" th:src="@{'/static/dapingThree/js/jquery.liMarquee.js'}"></script>
+<script type="text/javascript" th:src="@{'/static/dapingThree/js/jquery.countup.min.js'}"></script>
+<script type="text/javascript" th:src="@{'/static/dapingThree/js/jquery.waypoints.min.js'}"></script>
+<!-- Toastr -->
+<link rel="stylesheet" th:href="@{'/static/AdminLTE/plugins/toastr/toastr.min.css'}">
+<!-- Toastr -->
+<script th:src="@{'/static/AdminLTE/plugins/toastr/toastr.min.js'}"></script>
+<script  th:inline="javascript">
+  $(window).on('load',function(){
+    $(".loading").fadeOut()
+  })
+
+  var t = null;
+  t = setTimeout(time,1000);//開始运行
+  function time()
+  {
+    clearTimeout(t);//清除定时器
+    dt = new Date();
+    var h=dt.getHours();//获取时
+    var m=dt.getMinutes();//获取分
+    var mStr = m;
+    if(m<10){
+      mStr = "0"+m;
+    }
+    var s=dt.getSeconds();//获取秒
+    var sStr = s;
+    if(s<10){
+      sStr = "0"+s;
+    }
+    document.getElementById("showTime").innerHTML = h+":"+mStr+":"+sStr;
+    t = setTimeout(time,1000); //设定定时器，循环运行
+  }
+
+  $(document).ready(function(){
+    var whei=$(window).width()
+    $("html").css({fontSize:whei/20})
+    $(window).resize(function(){
+      var whei=$(window).width()
+      $("html").css({fontSize:whei/20})
+    });
+  });
+
+
+  $('.counter').countUp();
+
+  $(function(){
+    $('.scrollDiv').liMarquee({
+      direction: 'up',//向上滚动
+      runshort: false,//内容不足时不滚动
+      scrollamount: 10//速度
+    });
+  });
+
+  const dapingRefreshTimes = [[${dapingRefreshTimes}]];
+  function reload() {
+    window.location.reload();
+  }
+  setTimeout(reload,dapingRefreshTimes);
+
+  const tipInfoMsg = [[${tipInfoMsg}]];
+  if(tipInfoMsg!=''  && tipInfoMsg!=null){
+    //toastr提示框延时10s后消失
+    toastr.options.timeOut = 10000;
+    toastr.success("<span style='font-size:16px;color:#fff'>"+tipInfoMsg+"</span>");
+  }
+</script>
+
+</body>
+</html>

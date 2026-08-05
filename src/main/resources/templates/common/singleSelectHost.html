@@ -1,0 +1,11 @@
+<select  name="hostname" id="hostname"  class="validate[required] form-control select2 col-md-11">
+    <option value="">请选择</option>
+    <th:block th:each="item,iterStat : ${systemInfoList}">
+        <th:block th:if="${item.remark} == null or ${item.remark} == ''">
+            <option  data-select2-id="" th:value="${item.hostname}" th:attr="data-select2-id=${item.hostname}" th:text="${item.hostname}+' ('+${item.platForm}+')'">Alabama</option>
+        </th:block>
+        <th:block th:if="${item.remark} != null and ${item.remark} != ''">
+            <option  data-select2-id="" th:value="${item.hostname}" th:attr="data-select2-id=${item.hostname}" th:text="${item.hostname}+' ('+${item.remark}+'，'+${item.platForm}+')'">Alabama</option>
+        </th:block>
+    </th:block>
+</select>

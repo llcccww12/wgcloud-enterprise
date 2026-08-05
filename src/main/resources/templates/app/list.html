@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}" style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header" style="height:38px">
+      <div class="container-fluid">
+        <div class="row mb-2" style="margin-top: -7px;">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="正在监控中的资源"><a th:href="@{'/appInfo/list?active=1'}">监控中</a></li>
+              <li class="breadcrumb-item" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="已停止监控的资源"><a th:href="@{'/appInfo/list?active=2'}">已停止</a></li>
+              <li class="breadcrumb-item"><a href="javascript:history.back()">返回上级</a></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-tasks nav-icon"></i>&nbsp;进程列表</h3>
+        <div class=" float-sm-right">
+          <!-- SEARCH FORM -->
+          <form class="form-inline ml-3" th:action="@{'/appInfo/list'}">
+            <button type="button" onclick="searchByOnline('')" class="btn btn-primary btn-sm" style="margin-right:5px;">全部</button>
+            <button type="button" onclick="searchByOnline('1')" class="btn btn-success btn-sm" style="margin-right:5px;">在线</button>
+            <button type="button" onclick="searchByOnline('2')" class="btn bg-danger btn-sm" style="margin-right:5px;">已离线</button>
+            <th:block th:if="${session.LOGIN_KEY.role != 'guest'}">
+              <button type="button" onclick="startMonitor('/appInfo/updateActive')" class="btn btn-primary btn-sm" style="margin-right:5px;">开始监控</button>
+              <button type="button" onclick="stopMonitor('/appInfo/updateActive')" class="btn btn-default btn-sm" style="margin-right:5px;">停止监控</button>
+              <button type="button" onclick="delChecks('/appInfo/del')"  class="btn bg-danger btn-sm" style="margin-right:5px;">删除</button>
+              <th:block th:if="${application.hostGroup == 'true'}"><button type="button" th:onclick="showSetGroupId()" class="btn btn-primary btn-sm" style="margin-right:5px;">设置标签</button></th:block>
+              <button type="button" onclick="add()" class="btn btn-primary btn-sm" style="margin-right:5px;">添加</button>
+              <button type="button" onclick="addBatch()" class="btn btn-primary btn-sm" style="margin-right:5px;">批量添加</button>
+            </th:block>
+            <div th:replace="common/groupSelect.html"></div>
+            <div th:replace="common/accountSelect.html"></div>
+            <div class="input-group input-group-sm">
+              <input th:class="'form-control '+${session.themeNameSign}"  id="hostname" name="hostname" autocomplete="off" th:value="${appInfo.hostname}" type="text" placeholder="输入ip或进程名称">
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="submit">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+
+            </div>
+          </form>
+
+        </div>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <table th:class="'table table-bordered '+${session.themeTableHoverSign}">
+          <thead>
+          <tr>
+            <th style="width: 20px"> <input type="checkbox" value="" name="checkall" id="checkall"></th>
+            <th style="width: 60px">序号</th>
+            <th:block th:if="${appInfo.orderBy  == 'HOST_NAME'}">
+              <th:block th:if="${appInfo.orderType  == 'ASC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('HOST_NAME','DESC')">IP<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-up" style="vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+              <th:block th:if="${appInfo.orderType  == 'DESC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('HOST_NAME','ASC')">IP<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-down" style="color: #dc3545!important;vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+            </th:block>
+            <th:block th:if="${appInfo.orderBy  ne 'HOST_NAME'}">
+              <th style="cursor:pointer" onclick="searchByOrder('HOST_NAME','ASC')">IP<small  class="text-muted mr-1 float-right"><i class="fa-solid fa-up-down" style="vertical-align:bottom;"></i></small></th>
+            </th:block>
+
+
+            <th>进程名称</th>
+
+            <th:block th:if="${appInfo.orderBy  == 'GATHER_PID'}">
+              <th:block th:if="${appInfo.orderType  == 'ASC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('GATHER_PID','DESC')">PID<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-up" style="vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+              <th:block th:if="${appInfo.orderType  == 'DESC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('GATHER_PID','ASC')">PID<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-down" style="color: #dc3545!important;vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+            </th:block>
+            <th:block th:if="${appInfo.orderBy  ne 'GATHER_PID'}">
+              <th style="cursor:pointer" onclick="searchByOrder('GATHER_PID','ASC')">PID<small  class="text-muted mr-1 float-right"><i class="fa-solid fa-up-down" style="vertical-align:bottom;"></i></small></th>
+            </th:block>
+
+
+            <th:block th:if="${appInfo.orderBy  == 'MEM_PER'}">
+              <th:block th:if="${appInfo.orderType  == 'ASC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('MEM_PER','DESC')">内存<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-up" style="vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+              <th:block th:if="${appInfo.orderType  == 'DESC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('MEM_PER','ASC')">内存<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-down" style="color: #dc3545!important;vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+            </th:block>
+            <th:block th:if="${appInfo.orderBy  ne 'MEM_PER'}">
+              <th style="cursor:pointer" onclick="searchByOrder('MEM_PER','ASC')">内存<small  class="text-muted mr-1 float-right"><i class="fa-solid fa-up-down" style="vertical-align:bottom;"></i></small></th>
+            </th:block>
+
+
+
+            <th:block th:if="${appInfo.orderBy  == 'CPU_PER'}">
+              <th:block th:if="${appInfo.orderType  == 'ASC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('CPU_PER','DESC')">CPU%<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-up" style="vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+              <th:block th:if="${appInfo.orderType  == 'DESC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('CPU_PER','ASC')">CPU%<small   class="text-success mr-1 float-right"><i class="fas fa-arrow-down" style="color: #dc3545!important;vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+            </th:block>
+            <th:block th:if="${appInfo.orderBy  ne 'CPU_PER'}">
+              <th style="cursor:pointer" onclick="searchByOrder('CPU_PER','ASC')">CPU%<small  class="text-muted mr-1 float-right"><i class="fa-solid fa-up-down" style="vertical-align:bottom;"></i></small></th>
+            </th:block>
+
+
+            <th:block th:if="${appInfo.orderBy  == 'APP_TIMES'}">
+              <th:block th:if="${appInfo.orderType  == 'ASC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('APP_TIMES','DESC')">启动时间<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-up" style="vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+              <th:block th:if="${appInfo.orderType  == 'DESC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('APP_TIMES','ASC')">启动时间<small   class="text-success mr-1 float-right"><i class="fas fa-arrow-down" style="color: #dc3545!important;vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+            </th:block>
+            <th:block th:if="${appInfo.orderBy  ne 'APP_TIMES'}">
+              <th style="cursor:pointer" onclick="searchByOrder('APP_TIMES','ASC')">启动时间<small  class="text-muted mr-1 float-right"><i class="fa-solid fa-up-down" style="vertical-align:bottom;"></i></small></th>
+            </th:block>
+
+
+            <th:block th:if="${appInfo.orderBy  == 'READ_BYTES'}">
+              <th:block th:if="${appInfo.orderType  == 'ASC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('READ_BYTES','DESC')" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="从磁盘累计读取数据">读取<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-up" style="vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+              <th:block th:if="${appInfo.orderType  == 'DESC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('READ_BYTES','ASC')" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="从磁盘累计读取数据">读取<small   class="text-success mr-1 float-right"><i class="fas fa-arrow-down" style="color: #dc3545!important;vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+            </th:block>
+            <th:block th:if="${appInfo.orderBy  ne 'READ_BYTES'}">
+              <th style="cursor:pointer" onclick="searchByOrder('READ_BYTES','ASC')" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="从磁盘累计读取数据">读取<small  class="text-muted mr-1 float-right"><i class="fa-solid fa-up-down" style="vertical-align:bottom;"></i></small></th>
+            </th:block>
+
+
+            <th:block th:if="${appInfo.orderBy  == 'WRITES_BYTES'}">
+              <th:block th:if="${appInfo.orderType  == 'ASC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('WRITES_BYTES','DESC')" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="累计往磁盘写入数据">写入<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-up" style="vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+              <th:block th:if="${appInfo.orderType  == 'DESC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('WRITES_BYTES','ASC')" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="累计往磁盘写入数据">写入<small   class="text-success mr-1 float-right"><i class="fas fa-arrow-down" style="color: #dc3545!important;vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+            </th:block>
+            <th:block th:if="${appInfo.orderBy  ne 'WRITES_BYTES'}">
+              <th style="cursor:pointer" onclick="searchByOrder('WRITES_BYTES','ASC')" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="累计往磁盘写入数据">写入<small  class="text-muted mr-1 float-right"><i class="fa-solid fa-up-down" style="vertical-align:bottom;"></i></small></th>
+            </th:block>
+
+
+            <th:block th:if="${appInfo.orderBy  == 'THREADS_NUM'}">
+              <th:block th:if="${appInfo.orderType  == 'ASC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('THREADS_NUM','DESC')" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="进程当前使用的线程数量">线程数<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-up" style="vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+              <th:block th:if="${appInfo.orderType  == 'DESC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('THREADS_NUM','ASC')" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="进程当前使用的线程数量">线程数<small   class="text-success mr-1 float-right"><i class="fas fa-arrow-down" style="color: #dc3545!important;vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+            </th:block>
+            <th:block th:if="${appInfo.orderBy  ne 'THREADS_NUM'}">
+              <th style="cursor:pointer" onclick="searchByOrder('THREADS_NUM','ASC')" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="进程当前使用的线程数量">线程数<small  class="text-muted mr-1 float-right"><i class="fa-solid fa-up-down" style="vertical-align:bottom;"></i></small></th>
+            </th:block>
+
+
+            <th:block th:if="${appInfo.orderBy  == 'NET_CONNECTIONS'}">
+              <th:block th:if="${appInfo.orderType  == 'ASC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('NET_CONNECTIONS','DESC')" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="包括tcp、udp等连接数量">连接数<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-up" style="vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+              <th:block th:if="${appInfo.orderType  == 'DESC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('NET_CONNECTIONS','ASC')" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="包括tcp、udp等连接数量">连接数<small   class="text-success mr-1 float-right"><i class="fas fa-arrow-down" style="color: #dc3545!important;vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+            </th:block>
+            <th:block th:if="${appInfo.orderBy  ne 'NET_CONNECTIONS'}">
+              <th style="cursor:pointer" onclick="searchByOrder('NET_CONNECTIONS','ASC')" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="包括tcp、udp等连接数量">连接数<small  class="text-muted mr-1 float-right"><i class="fa-solid fa-up-down" style="vertical-align:bottom;"></i></small></th>
+            </th:block>
+
+
+            <th data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="进程所有者(主机上的用户)">所有者</th>
+            <th>监控状态</th>
+            <th th:if="${application.showWarnCount == 'true'}" title="累积告警次数">告警次数</th>
+            <th data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="若已离线，显示最后在线时间，但监控仍在继续">更新时间</th>
+            <th th:if="${application.hostGroup == 'true'}">标签</th>
+            <th>告警级别</th>
+            <th th:if="${application.LICENSE_STATE eq '1' && application.userInfoManage == 'true' && session.LOGIN_KEY.role == 'admin'}">账号</th>
+              <th>操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <th:block th:each="item,iterStat : ${page.list}">
+            <tr>
+              <td><input type="checkbox" th:value="${item.id}" name="todo2" th:id="${item.id}+'_check'"/></td>
+              <td th:text="${iterStat.index+1}">1</td>
+              <th:block th:if="${item.hostState  == '2'}">
+                <td><span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="主机已离线">
+                  <i class="fa-solid fa-plug-circle-xmark" style="color:oklch(57.7% .245 27)!important;margin-right:1px;"></i><span th:text="${item.hostname}"></span></span></td>
+              </th:block>
+              <th:block th:if="${item.hostState  != '2'}">
+                <td th:text="${item.hostname}">Update software</td>
+              </th:block>
+
+              <th:block th:if="${item.state  == '2'}">
+                <td><span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="已离线，若已配置自动恢复指令，agent将在几分钟内执行" class="badge bg-danger"   th:text="${item.appName}"></span></td>
+              </th:block>
+              <th:block th:if="${item.state  != '2'}">
+                <th:block th:if="${item.customShell  != ''}">
+                <td><span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="'自动恢复指令：'+${item.customShell}" th:text="${item.appName}"></span></td>
+                </th:block>
+                <th:block th:if="${item.customShell  == ''}">
+                  <td><span  th:text="${item.appName}"></span></td>
+                </th:block>
+              </th:block>
+
+
+              <td th:text="${item.gatherPid}"></td>
+
+              <td><span class="badge bg-primary" th:text="${item.memPer}+'MB'"></span></td>
+              <td>
+                  <th:block th:if="${item.cpuPer >= 60}">
+                      <span class="badge bg-danger" th:text="${item.cpuPer}"></span>
+                  </th:block>
+                  <th:block th:if="${item.cpuPer < 60  }">
+                      <span class="badge bg-primary" th:text="${item.cpuPer}"></span>
+                  </th:block>
+              </td>
+              <td th:text="${item.appTimes}"></td>
+              <td th:text="${item.readBytes}"></td>
+              <td th:text="${item.writesBytes}"></td>
+              <td th:text="${item.threadsNum}"></td>
+              <td th:text="${item.netConnections}"></td>
+              <td th:text="${item.proUsername}"></td>
+              <td>
+                <th:block th:if="${item.active  == '1'}">
+                  <span class="badge bg-primary">监控中<span th:if="${item.customShell != ''}" title="已添加自动恢复指令"><i style="margin-left:2px;" class="fa-solid fa-toolbox"></i></span></span>
+                </th:block>
+                <th:block th:if="${item.active  != '1'}">
+                  <span  style="background:#6c757d!important;" class="badge bg-danger">已停止</span>
+                </th:block>
+              </td>
+              <td th:if="${application.showWarnCount == 'true'}"><span style="cursor:pointer;color:#007bff;font-weight:bold" th:onclick="goHrefLogInfo([[${item.warnQueryWd}]])" th:text="${item.warnCount}"></span></td>
+              <td th:text="${#dates.format(item.createTime,'yyyy-MM-dd HH:mm:ss')}">Update software</td>
+              <td th:if="${application.hostGroup == 'true'}"><span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="${item.groupId}" th:text="${#strings.abbreviate(item.groupId,60)}"></span></td>
+              <td>
+                <th:block th:if="${item.warnLevel  == 'ERROR'}">
+                  <span class="badge bg-primary">重要</span>
+                </th:block>
+                <th:block th:if="${item.warnLevel  == 'WARN'}">
+                  <span   style="color:#fff!important" class="badge bg-yellow">一般</span>
+                </th:block>
+                <th:block th:if="${item.warnLevel  == 'INFO'}">
+                  <span  class="badge bg-teal">信息</span>
+                </th:block>
+              </td>
+              <td th:text="${item.account}" th:if="${application.LICENSE_STATE eq '1' && application.userInfoManage == 'true' && session.LOGIN_KEY.role == 'admin'}"></td>
+              <td>
+                <th:block th:if="${session.LOGIN_KEY.role != 'guest'}">
+                  <button type="button"  th:onclick="edit([[${item.id}]])"  class="btn btn-primary btn-sm">编辑</button>
+                  <button type="button"  th:onclick="del([[${item.id}]])"  class="btn bg-danger btn-sm">删除</button>
+                </th:block>
+                <button type="button"  th:onclick="view([[${item.id}]])"  class="btn btn-primary btn-sm">图表</button></td>
+            </tr>
+          </th:block>
+
+          </tbody>
+        </table>
+      </div>
+      <!-- /.card-body -->
+      <div th:replace="common/page.html"></div>
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+  <div class="modal fade" id="modal-default3">
+    <div class="modal-dialog">
+      <form method="post" id="form4" th:action="@{'/appInfo/saveGroupId'}">
+        <div class="modal-content" style="font-size:0.90rem">
+          <div class="modal-header">
+            <h4 class="modal-title">设置标签<span class="text-muted">（可多选，在系统管理中维护标签）</span></h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>
+              <input type="hidden" id="id3" name="ids"/>
+              <select class="select2" multiple="multiple" data-placeholder="请选择" style="width: 100%;" name="groupId">
+                <option  value="">请选择</option>
+                <th:block th:each="item,iterStat : ${hostGroupList}">
+                  <option  th:value="${item.id}"  th:text="${item.groupName}">Alabama</option>
+                </th:block>
+              </select>
+            </p>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default  btn-sm" data-dismiss="modal">关 闭</button>
+            <button type="button" onclick="ajaxSaveGroupId()" class="btn btn-primary btn-sm">保 存</button>
+          </div>
+        </div>
+      </form>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:src="@{'/static/js/app.js?v=3.5.6'}"></script>
+
+<script th:inline="javascript">
+  $(document).ready(function(){
+    $("#groupId").val([[${appInfo.groupId}]]);
+    $("#account").val([[${appInfo.account}]]);
+    $('.select2').select2();
+  });
+  var msg = [[${msg}]];
+  if(msg!='' && msg!=null){
+    toastr.info(msg);
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wgcloud.mapper.UfmMonitorMapper">
+	<resultMap id="resultMap" type="com.wgcloud.entity.UfmMonitor">
+		<id column="ID" property="id" jdbcType="CHAR" />
+		<result column="GUID" property="guid" jdbcType="CHAR" />
+		<result column="SYSTEM_NAME" property="systemName" jdbcType="CHAR" />
+		<result column="DEVICE_TYPE" property="deviceType" jdbcType="CHAR" />
+		<result column="DEVICE_STATE" property="deviceState" jdbcType="CHAR" />
+		<result column="SEVERITY" property="severity" jdbcType="CHAR" />
+		<result column="MB_OUT" property="mbOut" jdbcType="CHAR" />
+		<result column="MB_IN" property="mbIn" jdbcType="CHAR" />
+		<result column="PCK_OUT" property="pckOut" jdbcType="CHAR" />
+		<result column="PCK_IN" property="pckIn" jdbcType="CHAR" />
+		<result column="SYMBOL_ERRORS" property="symbolErrors" jdbcType="CHAR" />
+		<result column="LINK_RECOVERS" property="linkRecovers" jdbcType="CHAR" />
+		<result column="LINK_DOWNED" property="linkDowned" jdbcType="CHAR" />
+		<result column="RCV_ERRORS" property="rcvErrors" jdbcType="CHAR" />
+		<result column="XMT_DISCARDS" property="xmtDiscards" jdbcType="CHAR" />
+		<result column="MB_OUT_RATE" property="mbOutRate" jdbcType="CHAR" />
+		<result column="MB_IN_RATE" property="mbInRate" jdbcType="CHAR" />
+		<result column="PCK_OUT_RATE" property="pckOutRate" jdbcType="CHAR" />
+		<result column="PCK_IN_RATE" property="pckInRate" jdbcType="CHAR" />
+		<result column="ALARM_COUNT" property="alarmCount" jdbcType="CHAR" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<sql id="tableColumnList">
+		ID,GUID,SYSTEM_NAME,DEVICE_TYPE,DEVICE_STATE,SEVERITY,MB_OUT,MB_IN,PCK_OUT,PCK_IN,SYMBOL_ERRORS,LINK_RECOVERS,LINK_DOWNED,RCV_ERRORS,XMT_DISCARDS,MB_OUT_RATE,MB_IN_RATE,PCK_OUT_RATE,PCK_IN_RATE,ALARM_COUNT,CREATE_TIME
+	</sql>
+
+	<sql id="queryByParams">
+		<if test="systemName != null">
+			<choose>
+				<when test="_databaseId == 'oracle'">
+					<![CDATA[ AND SYSTEM_NAME LIKE  CONCAT(CONCAT('%',#{systemName}),'%') ]]>
+				</when>
+				<otherwise>
+					<![CDATA[ AND SYSTEM_NAME LIKE  CONCAT('%',#{systemName},'%') ]]>
+				</otherwise>
+			</choose>
+		</if>
+		<if test="severity != null">
+			<![CDATA[ AND SEVERITY = #{severity} ]]>
+		</if>
+		<if test="deviceType != null">
+			<![CDATA[ AND DEVICE_TYPE = #{deviceType} ]]>
+		</if>
+		<if test="deviceState != null">
+			<![CDATA[ AND DEVICE_STATE = #{deviceState} ]]>
+		</if>
+	</sql>
+	
+	
+	<select id="selectById" resultMap="resultMap" parameterType="java.lang.String">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM UFM_MONITOR 
+		WHERE ID=#{id} 
+	</select>
+	
+	
+	<delete id="deleteByGuid" parameterType="java.lang.String">
+		DELETE FROM UFM_MONITOR 
+		WHERE GUID = #{guid}
+	</delete>
+
+	<delete id="deleteById" parameterType="java.lang.String">
+		DELETE FROM
+		UFM_MONITOR 
+		WHERE ID IN
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<delete id="deleteByDate"  parameterType="map">
+		DELETE FROM UFM_MONITOR
+		<where>
+			<include refid="commonSqlUtil.createTimeDelParams" />
+		</where>
+	</delete>
+
+	<insert id="save" parameterType="com.wgcloud.entity.UfmMonitor">
+		INSERT INTO UFM_MONITOR 
+    	<trim prefix="(" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >ID,</if>
+      		<if test="guid != null" >GUID,</if>
+      		<if test="systemName != null">SYSTEM_NAME,</if>
+			<if test="deviceType != null">DEVICE_TYPE,</if>
+			<if test="deviceState != null">DEVICE_STATE,</if>
+			<if test="severity != null">SEVERITY,</if>
+			<if test="mbOut != null">MB_OUT,</if>
+			<if test="mbIn != null">MB_IN,</if>
+			<if test="pckOut != null">PCK_OUT,</if>
+			<if test="pckIn != null">PCK_IN,</if>
+			<if test="symbolErrors != null">SYMBOL_ERRORS,</if>
+			<if test="linkRecovers != null">LINK_RECOVERS,</if>
+			<if test="linkDowned != null">LINK_DOWNED,</if>
+			<if test="rcvErrors != null">RCV_ERRORS,</if>
+			<if test="xmtDiscards != null">XMT_DISCARDS,</if>
+			<if test="mbOutRate != null">MB_OUT_RATE,</if>
+			<if test="mbInRate != null">MB_IN_RATE,</if>
+			<if test="pckOutRate != null">PCK_OUT_RATE,</if>
+			<if test="pckInRate != null">PCK_IN_RATE,</if>
+			<if test="alarmCount != null">ALARM_COUNT,</if>
+      		<if test="createTime != null" >CREATE_TIME</if>
+    	</trim>
+    	<trim prefix="values (" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >#{id},</if>
+      		<if test="guid != null" >#{guid},</if>
+      		<if test="systemName != null" >#{systemName},</if>
+			<if test="deviceType != null" >#{deviceType},</if>
+			<if test="deviceState != null" >#{deviceState},</if>
+			<if test="severity != null" >#{severity},</if>
+			<if test="mbOut != null" >#{mbOut},</if>
+			<if test="mbIn != null" >#{mbIn},</if>
+			<if test="pckOut != null" >#{pckOut},</if>
+			<if test="pckIn != null" >#{pckIn},</if>
+			<if test="symbolErrors != null" >#{symbolErrors},</if>
+			<if test="linkRecovers != null" >#{linkRecovers},</if>
+			<if test="linkDowned != null" >#{linkDowned},</if>
+			<if test="rcvErrors != null" >#{rcvErrors},</if>
+			<if test="xmtDiscards != null" >#{xmtDiscards},</if>
+			<if test="mbOutRate != null" >#{mbOutRate},</if>
+			<if test="mbInRate != null" >#{mbInRate},</if>
+			<if test="pckOutRate != null" >#{pckOutRate},</if>
+			<if test="pckInRate != null" >#{pckInRate},</if>
+			<if test="alarmCount != null" >#{alarmCount},</if>
+      		<if test="createTime != null" >#{createTime}</if>
+    	</trim>
+	</insert>
+
+	<insert id="insertList" parameterType="java.util.List" >
+		<choose>
+			<when test="_databaseId == 'oracle'">
+				begin
+				<foreach collection="list" item="item" index="index">
+					INSERT INTO UFM_MONITOR (ID,GUID,SYSTEM_NAME,DEVICE_TYPE,DEVICE_STATE,SEVERITY,MB_OUT,MB_IN,PCK_OUT,PCK_IN,SYMBOL_ERRORS,LINK_RECOVERS,LINK_DOWNED,RCV_ERRORS,XMT_DISCARDS,MB_OUT_RATE,MB_IN_RATE,PCK_OUT_RATE,PCK_IN_RATE,ALARM_COUNT,CREATE_TIME)  VALUES
+					(#{item.id},#{item.guid},#{item.systemName},#{item.deviceType},#{item.deviceState},#{item.severity},#{item.mbOut},#{item.mbIn},#{item.pckOut},#{item.pckIn},#{item.symbolErrors},#{item.linkRecovers},#{item.linkDowned},#{item.rcvErrors},#{item.xmtDiscards},#{item.mbOutRate},#{item.mbInRate},#{item.pckOutRate},#{item.pckInRate},#{item.alarmCount},#{item.createTime});
+				</foreach>
+				end;
+			</when>
+			<otherwise>
+				INSERT INTO UFM_MONITOR (ID,GUID,SYSTEM_NAME,DEVICE_TYPE,DEVICE_STATE,SEVERITY,MB_OUT,MB_IN,PCK_OUT,PCK_IN,SYMBOL_ERRORS,LINK_RECOVERS,LINK_DOWNED,RCV_ERRORS,XMT_DISCARDS,MB_OUT_RATE,MB_IN_RATE,PCK_OUT_RATE,PCK_IN_RATE,ALARM_COUNT,CREATE_TIME)  VALUES
+				<foreach collection="list" item="item" index="index" separator="," >
+					(#{item.id},#{item.guid},#{item.systemName},#{item.deviceType},#{item.deviceState},#{item.severity},#{item.mbOut},#{item.mbIn},#{item.pckOut},#{item.pckIn},#{item.symbolErrors},#{item.linkRecovers},#{item.linkDowned},#{item.rcvErrors},#{item.xmtDiscards},#{item.mbOutRate},#{item.mbInRate},#{item.pckOutRate},#{item.pckInRate},#{item.alarmCount},#{item.createTime})
+				</foreach>
+			</otherwise>
+		</choose>
+	</insert>
+
+	<select id="countByParams" parameterType="map" resultType="java.lang.Integer">
+		SELECT count(*)  FROM UFM_MONITOR t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+	</select>
+
+
+	<select id="selectAllByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM UFM_MONITOR t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		 ORDER BY ID DESC
+	</select>
+	
+	<select id="selectByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM UFM_MONITOR
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		<choose>
+			<when test="orderBy !=null and orderBy != ''">
+				<![CDATA[ ORDER BY ${orderBy} ${orderType}]]>
+			</when>
+			<otherwise>
+				ORDER BY ID DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item active"></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-11">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">添加数据表，监控数据变化</h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <form role="form" id="form1" method="post" th:action="@{'/dbTable/save'}">
+            <input type="hidden" name="id" th:value="${dbTable.id}"/>
+            <div class="card-body">
+                <div class="form-group">
+                    <label><font color="red">*</font>数据库</label>
+                    <select  name="dbInfoId" id="dbInfoId"  class="validate[required] form-control select2 col-md-8">
+                        <option value="">请选择</option>
+                        <th:block th:each="item,iterStat : ${dbInfoList}">
+                            <option  data-select2-id="" th:value="${item.id}" th:attr="data-select2-id=${item.id}" th:text="${item.aliasName}">Alabama</option>
+                        </th:block>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>数据表名称</label>
+                    <input type="text" autocomplete="off" th:value="${dbTable.remark}" class="validate[required,maxSize[50]] form-control" name="remark" id="remark" placeholder="如统计订单总数">
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>统计SQL语句<span class="text-muted">（不能输入sql敏感字符：<span th:text="${sqlInKeys}"></span>）</span></label>
+                    <textarea class="validate[required,maxSize[2000]] form-control"   name="whereVal" id="whereVal" th:text="${dbTable.whereVal}"></textarea>
+                </div>
+                <div class="form-group">
+                    <label >SQL执行结果的取值列名<span class="text-muted">（系统会自动获取SQL查询结果的第一行的一列或多列值，多列名请用英文逗号隔开。如果查询结果只有一列，此处也可为空。查询结果可以是数字或字符串）</span></label>
+                    <input type="text" autocomplete="off" th:value="${dbTable.tableName}" class="validate[maxSize[100]] form-control" name="tableName" id="tableName" placeholder="如：COUNT(*)">
+                </div>
+                <div class="form-group">
+                    <label >告警表达式<span class="text-muted">（表达式成立时即告警，不成立不告警，如：<code class="highlighter-rouge" style="font-size:100%">(result + 10)>=100</code>，其中result为固定写法，标识为上面的SQL执行结果值(系统会自动替换为数值)，注意表达式需为英文输入法拼写。如果取值多个，从左到右对应表达式变量依次为：<code class="highlighter-rouge" style="font-size:100%">result0,result1</code>等）</span></label>
+                    <input type="text" autocomplete="off" th:value="${dbTable.resultExp}" class="validate[maxSize[100]] form-control" name="resultExp" id="resultExp" placeholder="如：(result + 10)>=100">
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>告警级别</label>
+                    <div th:replace="common/warnLevel.html"></div>
+                </div>
+                <div class="form-group clearfix">
+                    <label><font color="red">*</font>监控状态</label>
+                    <div th:replace="common/activeRadio.html"></div>
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <input type="text" autocomplete="off" th:value="${dbTable.remarkExt}" class="validate[maxSize[100]] form-control" name="remarkExt" id="remarkExt" placeholder="">
+                </div>
+
+
+            </div>
+            <!-- /.card-body -->
+
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-right:10px;"><i class="fas fa-save"></i> 保 存</button>
+                <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+            </div>
+
+        </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-10 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+<div th:replace="common/codemirror.html"></div>
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $("#form1").validationEngine();
+        var dbInfoIdStr = [[${dbTable.dbInfoId}]];
+        $("#dbInfoId").val(dbInfoIdStr).select2();
+        var editor = CodeMirror.fromTextArea(document.getElementById("whereVal"), {
+            lineNumbers: true,
+            styleActiveLine: true,
+            matchBrackets: true,
+            mode: 'sql',
+        });
+        editor.setOption("theme", "dracula");
+        editor.setSize('auto','280px');
+        if(null==dbInfoIdStr || dbInfoIdStr==''){
+            editor.setValue("SELECT COUNT(*) AS countData FROM CAC_INFO WHERE status='1' OR status='2'");
+        }
+        var warnLevel = [[${dbTable.warnLevel}]];
+        $("input[name='warnLevel'][value='"+warnLevel+"']").attr('checked','true');
+        var active = [[${dbTable.active}]];
+        $("input[name='active'][value='"+active+"']").attr('checked','true');
+    });
+
+    var msg = [[${msg}]];
+    if(msg!='' && msg!=null){
+        toastr.error(msg);
+    }
+
+</script>
+</body>
+</html>

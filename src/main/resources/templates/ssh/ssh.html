@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${hostname}+'('+${remark}+')'">xterm.js</title>
+    <div  th:replace="common/header.html"></div>
+    <link type="text/css" rel="stylesheet" th:href="@{'/static/common/xtermjs/xterm.css'}" />
+    <script th:src="@{'/static/js/jQuery/jquery-3.6.0.min.js'}"></script>
+    <script th:src="@{'/static/common/xtermjs/xterm.js'}"></script>
+    <script th:src="@{'/static/common/xtermjs/FitAddon.js'}"></script>
+    <style type="text/css">
+        #container-terminal{
+            width:99%;
+            height:99%;
+            margin: 5px 5px 5px 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="container-terminal"></div>
+<script>
+    //前端部分参考wssh
+    var socketPort = [[${webSocketPort}]];
+
+    function WSSHClient() {};
+
+    // 建立WebSocket连接并注册事件回调
+    WSSHClient.prototype.connect = function (options) {
+        var isHttps = window.location.protocol == 'https:';
+        var protocol = isHttps ? 'wss://' : 'ws://';
+        var configuredPort = socketPort == null ? '' : ('' + socketPort).trim();
+        if (configuredPort === '' || configuredPort === 'null') {
+            options.onError('webSocketPort未配置，请先在配置文件中设置socketPort。');
+            return;
+        }
+        if (!window.WebSocket) {
+            options.onError('你的浏览器不支持WebSocket。请使用谷歌或火狐浏览器');
+            return;
+        }
+        // 优先使用配置端口；HTTPS下若该端口不可达，再兜底尝试同源端口（常见于Nginx反向代理到/websocketServer）
+        var urlCandidates = [protocol + window.location.hostname + ':' + configuredPort + '/websocketServer'];
+        var sameOriginUrl = protocol + window.location.host + '/websocketServer';
+        if (isHttps && urlCandidates[0] !== sameOriginUrl) {
+            urlCandidates.push(sameOriginUrl);
+        }
+        var self = this;
+        var tryConnect = function (index) {
+            var socketUrl = urlCandidates[index];
+            self._connection = new WebSocket(socketUrl);
+            self._connection.onopen = function () {
+                //在远程打开连接时调用
+                options.onConnect();
+            };
+            self._connection.onmessage = function (evt) {
+                //在远程返回数据时调用
+                var data = evt.data.toString();
+                options.onData(data);
+            };
+            self._connection.onerror = function () {
+                if (index + 1 < urlCandidates.length) {
+                    tryConnect(index + 1);
+                    return;
+                }
+                options.onError('websocket连接错误，请检查 /websocketServer 是否可达（当前地址: ' + socketUrl + '）');
+            };
+            self._connection.onclose = function () {
+                //在远程关闭连接时调用
+                options.onClose();
+            };
+        };
+        tryConnect(0);
+    };
+
+    // 判断WebSocket是否处于可发送状态
+    WSSHClient.prototype.isOpen = function () {
+        return this._connection && this._connection.readyState === WebSocket.OPEN;
+    };
+
+    // 发送终端按键输入到后端
+    WSSHClient.prototype.send = function (data) {
+        //发送指令执行
+        if (!this.isOpen()) {
+            return false;
+        }
+        this._connection.send(JSON.stringify({"handle": "cmd", "value": data}));
+        return true;
+    };
+    // 发送终端窗口大小变化到后端
+    WSSHClient.prototype.sendResize = function (cols, rows) {
+        //同步终端大小到后端pty
+        if (!this.isOpen()) {
+            return false;
+        }
+        this._connection.send(JSON.stringify({"handle": "resize", "cols": cols, "rows": rows}));
+        return true;
+    };
+    // 发送SSH连接参数，触发后端建立主机会话
+    WSSHClient.prototype.sendOptions = function (options) {
+        //连接服务器
+        if (!this.isOpen()) {
+            return false;
+        }
+        this._connection.send(JSON.stringify(options));
+        return true;
+    }
+
+    var client = new WSSHClient();
+
+    //ssh连接主机
+    function connectHost() {
+        term.write('\r\n~$ 正在连接主机......');
+        var hostIp = $("#hostIp").val();
+        var hostUser = $("#hostUser").val();
+        var hostPwd = $("#hostPwd").val();
+        var hostSSHPort = $("#hostSSHPort").val();
+        var priKeyBasePath = $("#priKeyBasePath").val();
+        var sshInfoJson = {"handle":"connect","ip":""+hostIp+"","port":""+hostSSHPort+"","user":""+hostUser+"","pwd":""+hostPwd+"","priKeyBasePath":""+priKeyBasePath+"","cols":term.cols,"rows":term.rows};
+        if (!client.sendOptions(sshInfoJson)) {
+            term.write("\r\nwebsocket尚未就绪，请稍后重试或刷新页面。");
+            return;
+        }
+        $("#modal-default").modal("toggle");
+        term.focus();
+    }
+
+    // 获取容器宽高/字号大小，定义行数和列数
+    var rows = window.screen.height/ 16 - 10;
+    var cols = window.screen.width / 10;
+
+
+    var term = new Terminal({
+        rendererType: "canvas", //渲染类型
+        rows: parseInt(rows), //行数
+        // cols: parseInt(cols), //列数
+        cursorStyle: 'block', //光标样式
+        cursorBlink: true, // 光标闪烁
+        scrollback: 800, //回滚
+        // tabStopWidth: 8, //制表宽度
+        convertEol: true, //启用时，光标将设置为下一行的开头
+        disableStdin: false, //是否应禁用输入。
+        theme: {
+            //foreground: '#7e9192', // 字体
+            background: '#060101', // 背景色
+            cursor: 'help',//设置光标
+        },
+        screenKeys: true
+    });
+
+    term.onData(function (data) {
+        //键盘输入时的回调函数
+        client.send(data);
+    });
+
+    const fitAddon = new FitAddon();
+    term.loadAddon(fitAddon);
+    term.open(document.getElementById('container-terminal'));
+    fitAddon.fit();
+    term.focus();
+    // 窗口大小变化时，同步xterm尺寸到后端pty，保证vi/top显示正常
+    window.addEventListener('resize', function () {
+        fitAddon.fit();
+        if (client && client._connection && client._connection.readyState === WebSocket.OPEN) {
+            client.sendResize(term.cols, term.rows);
+        }
+    });
+
+    //执行连接操作
+    client.connect({
+        onError: function (error) {
+            //连接失败回调
+            term.write('Error: ' + error + '\r\n');
+        },
+        onConnect: function () {
+            //连接成功回调
+            if (client && client._connection && client._connection.readyState === WebSocket.OPEN) {
+                client.sendResize(term.cols, term.rows);
+            }
+            term.focus();
+        },
+        onClose: function () {
+            //连接关闭回调
+            term.write("\r\nwebsocket服务连接已断开");
+        },
+        onData: function (data) {
+            //收到数据时回调
+            term.write(data);
+        }
+    });
+
+
+    term.writeln('欢迎使用cac的Web SSH。重新连接请刷新浏览器。');
+    term.writeln('Copyright ©2026 cac. All rights reserved.');
+    term.writeln('');
+</script>
+
+<div class="modal fade" id="modal-default">
+    <div class="modal-dialog">
+        <form id="form1"  method="post">
+            <div class="modal-content" style="font-size:0.90rem">
+                <div class="modal-header">
+                    <h4 class="modal-title">主机SSH连接信息</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <div class="form-group">
+                                <label><font color="red">*</font>主机IP</label>
+                                <input type="text" autocomplete="off" th:value="${hostname}"  class="validate[required,maxSize[100] form-control" id="hostIp" placeholder="主机IP">
+                            </div>
+                            <div class="form-group">
+                                <label><font color="red">*</font>SSH端口</label>
+                                <input type="text" autocomplete="off"  value="22" class="validate[required,custom[number],maxSize[10] form-control" id="hostSSHPort" placeholder="SSH端口">
+                            </div>
+                            <div class="form-group">
+                                <label><font color="red">*</font>用户名</label>
+                                <input type="text" autocomplete="off" value="root" class="validate[required,maxSize[50] form-control" id="hostUser" placeholder="用户名">
+                            </div>
+                            <div class="form-group clearfix">
+                                <label><font color="red">*</font>身份验证方式</label></br>
+                                    <div class="icheck-turquoise d-inline">
+                                        <input type="radio" onclick="hideKeyPath()" id="radioPrimary2" name="method" value="1" checked>
+                                        <label for="radioPrimary2"> 密码 </label>
+                                    </div>
+                                    <div class="icheck-wisteria d-inline" style="margin-left:30px;">
+                                        <input type="radio" onclick="showKeyPath()" id="radioPrimary4" value="2" name="method" >
+                                        <label for="radioPrimary4">密钥文件(私钥)</label>
+                                    </div>
+                            </div>
+                            <div class="form-group" id="hostPwdDiv">
+                                <label>密码<span onclick="javascript:showPasswd();" style="cursor:pointer;margin-left: 10px"><i id="eyeSwitch" class="fa fa-eye"></i></span></label>
+                                <input type="password" autocomplete="off"   class="validate[maxSize[50] form-control" id="hostPwd" placeholder="请输入密码">
+                            </div>
+                            <div class="form-group" id="priKeyBasePathDiv" style="display: none">
+                                <label><span class="text-muted">请将密钥存在server/template/下</span></label>
+                                <select  name="priKeyBasePath" id="priKeyBasePath"  class="form-control select2" style="width: 100%;">
+                                    <option value="">请选择</option>
+                                    <th:block th:each="item,iterStat : ${keyFileList}">
+                                            <option  data-select2-id="" th:value="${item}" th:attr="data-select2-id=${item}" th:text="${item}">Alabama</option>
+                                    </th:block>
+                                </select>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关 闭</button>
+                    <button type="button" onclick="connectHost()" class="btn btn-primary">连 接</button>
+                </div>
+            </div>
+        </form>
+            <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+
+<!-- Bootstrap 4 -->
+<script th:src="@{'/static/AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js'}"></script>
+<!-- Select2 -->
+<script  th:src="@{'/static/AdminLTE/plugins/select2/js/select2.full.min.js'}"></script>
+<!-- ChartJS -->
+<script th:src="@{'/static/AdminLTE/plugins/chart.js/Chart.min.js'}"></script>
+<!-- Sparkline -->
+<script th:src="@{'/static/AdminLTE/plugins/sparklines/sparkline.js'}"></script>
+<!-- JQVMap -->
+<script th:src="@{'/static/AdminLTE/plugins/jqvmap/jquery.vmap.min.js'}"></script>
+<script th:src="@{'/static/AdminLTE/plugins/jqvmap/maps/jquery.vmap.usa.js'}"></script>
+<!-- jQuery Knob Chart -->
+<script th:src="@{'/static/AdminLTE/plugins/jquery-knob/jquery.knob.min.js'}"></script>
+<!-- InputMask -->
+<script th:src="@{'/static/AdminLTE/plugins/moment/moment.min.js'}"></script>
+<script th:src="@{'/static/AdminLTE/plugins/inputmask/min/jquery.inputmask.bundle.min.js'}"></script>
+<!-- daterangepicker -->
+<script th:src="@{'/static/AdminLTE/plugins/daterangepicker/daterangepicker.js'}"></script>
+<!-- Tempusdominus Bootstrap 4 -->
+<script th:src="@{'/static/AdminLTE/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js'}"></script>
+<!-- Summernote -->
+<script th:src="@{'/static/AdminLTE/plugins/summernote/summernote-bs4.min.js'}"></script>
+<!-- overlayScrollbars -->
+<script th:src="@{'/static/AdminLTE/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js'}"></script>
+<!-- AdminLTE App -->
+<script th:src="@{'/static/AdminLTE/dist/js/adminlte.js'}"></script>
+<!-- SweetAlert2 -->
+<script th:src="@{'/static/AdminLTE/plugins/sweetalert2/sweetalert2.min.js'}"></script>
+<!-- Toastr -->
+<script th:src="@{'/static/AdminLTE/plugins/toastr/toastr.min.js'}"></script>
+<!-- AdminLTE for demo purposes -->
+<script th:src="@{'/static/AdminLTE/dist/js/demo.js'}"></script>
+<link rel="stylesheet" th:href="@{'/static/js/jQuery/validationEngine.jquery.css'}" type="text/css"/>
+<script th:src="@{'/static/js/jQuery/jquery.validationEngine-zh_CN.js'}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{'/static/js/jQuery/jquery.validationEngine.js'}" type="text/javascript" charset="utf-8"></script>
+<script>
+    $(document).ready(function(){
+        $("#modal-default").modal();
+        $("#form1").validationEngine();
+    });
+
+    function showKeyPath() {
+        $("#priKeyBasePathDiv").show();
+        $("#hostPwdDiv").hide();
+        $("#hostPwd").val("");
+    }
+
+    function hideKeyPath() {
+        $("#priKeyBasePathDiv").hide();
+        $("#hostPwdDiv").show();
+    }
+
+    function showPasswd(){
+        var type = $("#hostPwd").attr("type");
+        if(type=='text'){
+            $("#eyeSwitch").attr("class","fa fa-eye");
+            $("#hostPwd").attr("type","password");
+        }else{
+            $("#eyeSwitch").attr("class","fa fa-eye-slash");
+            $("#hostPwd").attr("type","text");
+        }
+
+    }
+
+</script>
+</body>
+</html>

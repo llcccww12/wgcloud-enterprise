@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item active"></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">UFM InfiniBand 设备详情</h3>
+        <div class=" float-sm-right">
+          <a href="javascript:history.back()">返回上级</a>
+        </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+      <form role="form">
+        <div class="card-body">
+          <table class="table table-bordered">
+            <tr>
+              <th style="width:180px;background-color:#f4f4f4;">设备名称</th>
+              <td th:text="${ufmMonitor.systemName}"></td>
+            </tr>
+            <tr>
+              <th style="background-color:#f4f4f4;">GUID</th>
+              <td th:text="${ufmMonitor.guid}"></td>
+            </tr>
+            <tr>
+              <th style="background-color:#f4f4f4;">设备类型</th>
+              <td th:text="${ufmMonitor.deviceType}"></td>
+            </tr>
+            <tr>
+              <th style="background-color:#f4f4f4;">设备状态</th>
+              <td>
+                <th:block th:if="${ufmMonitor.deviceState == 'active'}">
+                  <span class="badge bg-success">active</span>
+                </th:block>
+                <th:block th:if="${ufmMonitor.deviceState != 'active'}">
+                  <span class="badge bg-danger" th:text="${ufmMonitor.deviceState}"></span>
+                </th:block>
+              </td>
+            </tr>
+            <tr>
+              <th style="background-color:#f4f4f4;">健康等级</th>
+              <td>
+                <th:block th:if="${ufmMonitor.severity == 'Info'}">
+                  <span class="badge bg-info">Info</span>
+                </th:block>
+                <th:block th:if="${ufmMonitor.severity == 'Warning'}">
+                  <span class="badge bg-warning">Warning</span>
+                </th:block>
+                <th:block th:if="${ufmMonitor.severity == 'Critical'}">
+                  <span class="badge bg-danger">Critical</span>
+                </th:block>
+                <th:block th:if="${ufmMonitor.severity != 'Info' and ufmMonitor.severity != 'Warning' and ufmMonitor.severity != 'Critical'}">
+                  <span class="badge bg-secondary" th:text="${ufmMonitor.severity}"></span>
+                </th:block>
+              </td>
+            </tr>
+            <tr>
+              <th style="background-color:#f4f4f4;">发送流量(MB)</th>
+              <td th:text="${ufmMonitor.mbOut}"></td>
+            </tr>
+            <tr>
+              <th style="background-color:#f4f4f4;">接收流量(MB)</th>
+              <td th:text="${ufmMonitor.mbIn}"></td>
+            </tr>
+            <tr>
+              <th style="background-color:#f4f4f4;">发送数据包</th>
+              <td th:text="${ufmMonitor.pckOut}"></td>
+            </tr>
+            <tr>
+              <th style="background-color:#f4f4f4;">接收数据包</th>
+              <td th:text="${ufmMonitor.pckIn}"></td>
+            </tr>
+            <tr>
+              <th style="background-color:#f4f4f4;">符号错误</th>
+              <td th:text="${ufmMonitor.symbolErrors}"></td>
+            </tr>
+            <tr>
+              <th style="background-color:#f4f4f4;">链路恢复</th>
+              <td th:text="${ufmMonitor.linkRecovers}"></td>
+            </tr>
+            <tr>
+              <th style="background-color:#f4f4f4;">链路中断</th>
+              <td th:text="${ufmMonitor.linkDowned}"></td>
+            </tr>
+            <tr>
+              <th style="background-color:#f4f4f4;">接收错误</th>
+              <td th:text="${ufmMonitor.rcvErrors}"></td>
+            </tr>
+            <tr>
+              <th style="background-color:#f4f4f4;">发送丢弃</th>
+              <td th:text="${ufmMonitor.xmtDiscards}"></td>
+            </tr>
+            <tr>
+              <th style="background-color:#f4f4f4;">发送流量速率(MB/s)</th>
+              <td th:text="${ufmMonitor.mbOutRate}"></td>
+            </tr>
+            <tr>
+              <th style="background-color:#f4f4f4;">接收流量速率(MB/s)</th>
+              <td th:text="${ufmMonitor.mbInRate}"></td>
+            </tr>
+            <tr>
+              <th style="background-color:#f4f4f4;">发送数据包速率</th>
+              <td th:text="${ufmMonitor.pckOutRate}"></td>
+            </tr>
+            <tr>
+              <th style="background-color:#f4f4f4;">接收数据包速率</th>
+              <td th:text="${ufmMonitor.pckInRate}"></td>
+            </tr>
+            <tr>
+              <th style="background-color:#f4f4f4;">告警数</th>
+              <td><span class="badge bg-primary" th:text="${ufmMonitor.alarmCount}"></span></td>
+            </tr>
+            <tr>
+              <th style="background-color:#f4f4f4;">更新时间</th>
+              <td th:text="${#dates.format(ufmMonitor.createTime,'yyyy-MM-dd HH:mm:ss')}"></td>
+            </tr>
+          </table>
+        </div>
+        <!-- /.card-body -->
+      </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+</body>
+</html>

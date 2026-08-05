@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+  <!--ztree 3.5.48-->
+  <link rel="stylesheet" th:href="@{'/static/common/ztree/zTreeStyle/zTreeStyle.css'}">
+  <style>
+    /* 表格容器样式 */
+    .table-container {
+      max-height: 400px; /* 设置最大高度，超出部分将滚动 */
+      overflow-y: auto; /* 纵向滚动 */
+    }
+
+    /* 固定表头样式 */
+    .table-sticky th {
+      position: sticky;
+      top: 0;
+      z-index: 10; /* 确保表头在内容上方 */
+      background-color: #fff; /* 背景色覆盖内容 */
+      box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1); /* 表头下方阴影，增强视觉分离 */
+    }
+  </style>
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header" style="height:38px">
+      <div class="container-fluid">
+        <div class="row mb-2" style="margin-top: -7px;">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right"><li class="breadcrumb-item" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="查看没有设置自定义告警的主机列表"><a th:href="@{'/hostWarnDiy/hostListNoAdd'}">未设置自定义告警的主机</a></li>
+              <li class="breadcrumb-item" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="已启用的配置"><a th:href="@{'/hostWarnDiy/list?active=1'}">已启用</a></li>
+              <li class="breadcrumb-item" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="已停用的配置"><a th:href="@{'/hostWarnDiy/list?active=2'}">已停止</a></li>
+              <li class="breadcrumb-item"><a href="javascript:history.back()">返回上级</a></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-bell nav-icon"></i>&nbsp;主机自定义告警配置列表</h3>
+        <div class=" float-sm-right">
+          <!-- SEARCH FORM -->
+          <form class="form-inline ml-3" th:action="@{'/hostWarnDiy/list'}">
+            <th:block th:if="${session.LOGIN_KEY.role != 'guest'}">
+              <button type="button" onclick="viewServerFile()" class="btn btn-primary btn-sm" style="margin-right:5px;">查看server配置</button>
+              <button th:if="${session.LOGIN_KEY.role == 'admin'}" type="button" onclick="showMenuToAdmin()" class="btn btn-warning btn-sm" style="margin-right:5px;color:#fff">设置管理员菜单</button>
+              <button type="button" onclick="copyHostWarnDiy()" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制出一条具有相同配置信息的数据(除主机IP外)" class="btn btn-primary btn-sm" style="margin-right:5px;">复制</button>
+              <button type="button" onclick="startMonitor('/hostWarnDiy/updateActive')" class="btn btn-primary btn-sm" style="margin-right:5px;">启用配置</button>
+              <button type="button" onclick="stopMonitor('/hostWarnDiy/updateActive')" class="btn btn-default btn-sm" style="margin-right:5px;">停用配置</button>
+              <button type="button" onclick="delChecks('/hostWarnDiy/del')"  class="btn bg-danger btn-sm" style="margin-right:5px;">删除</button>
+              <button type="button" th:if="${application.LICENSE_STATE eq '1' && application.userInfoManage == 'true' && session.LOGIN_KEY.role == 'admin'}" onclick="showMoveToAccount('10')"  class="btn btn-warning btn-sm" style="margin-right:5px;">迁移</button>
+              <button type="button" onclick="add()" class="btn btn-primary btn-sm" style="margin-right:5px;">添加</button>
+              <button type="button" onclick="addBatch()" class="btn btn-primary btn-sm" style="margin-right:5px;">批量添加</button>
+            </th:block>
+            <div th:replace="common/accountSelect.html"></div>
+            <div class="input-group input-group-sm">
+              <input th:class="'form-control '+${session.themeNameSign}" id="hostname" name="hostname" autocomplete="off" th:value="${hostWarnDiy.hostname}" type="text" placeholder="IP">
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="submit">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+            </div>
+          </form>
+
+        </div>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <table th:class="'table table-sticky table-bordered '+${session.themeTableHoverSign}">
+          <thead>
+          <tr>
+            <th style="width: 20px"> <input type="checkbox" value="" name="checkall" id="checkall"></th>
+            <th style="width: 60px">序号</th>
+            <th>IP</th>
+            <th>主机离线告警</th>
+            <th>CPU告警</th>
+            <th>内存告警</th>
+            <th>磁盘告警</th>
+            <th>上行速率告警</th>
+            <th>下行速率告警</th>
+            <th  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="是否关闭该主机所有告警">是否停止所有告警</th>
+            <th  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="是否启用自定义配置，若不启用，则默认使用server配置中的告警配置">是否启用配置</th>
+            <th>添加时间</th>
+            <th th:if="${application.LICENSE_STATE eq '1' && application.userInfoManage == 'true' && session.LOGIN_KEY.role == 'admin'}">账号</th>
+            <th>操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <th:block th:each="item,iterStat : ${page.list}">
+            <tr>
+              <td><input type="checkbox" th:value="${item.id}" name="todo2" th:id="${item.id}+'_check'"/></td>
+              <td th:text="${iterStat.index+1}">1</td>
+              <td th:text="${item.hostname}">Update software</td>
+              <td>
+                <th:block th:if="${item.hostDownWarnMail  == 'no'}">
+                  <span class="badge bg-danger">停止</span>
+                </th:block>
+                <th:block th:if="${item.hostDownWarnMail  != 'no'}">
+                  <span  class="badge bg-primary">开启</span>
+                </th:block>
+              </td>
+              <td>
+                <th:block th:if="${item.cpuWarnMail  == 'no'}">
+                  <span class="badge bg-danger">停止</span>
+                </th:block>
+                <th:block th:if="${item.cpuWarnMail  != 'no'}">
+                  <span  class="badge bg-primary">开启</span>
+                </th:block>
+              </td>
+              <td>
+                <th:block th:if="${item.memWarnMail  == 'no'}">
+                  <span class="badge bg-danger">停止</span>
+                </th:block>
+                <th:block th:if="${item.memWarnMail  != 'no'}">
+                  <span  class="badge bg-primary">开启</span>
+                </th:block>
+              </td>
+              <td>
+                <th:block th:if="${item.diskWarnMail  == 'no'}">
+                  <span class="badge bg-danger">停止</span>
+                </th:block>
+                <th:block th:if="${item.diskWarnMail  != 'no'}">
+                  <span  class="badge bg-primary">开启</span>
+                </th:block>
+              </td>
+              <td>
+                <th:block th:if="${item.upSpeedMail  == 'no'}">
+                  <span class="badge bg-danger">停止</span>
+                </th:block>
+                <th:block th:if="${item.upSpeedMail  != 'no'}">
+                  <span  class="badge bg-primary">开启</span>
+                </th:block>
+              </td>
+              <td>
+                <th:block th:if="${item.downSpeedMail  == 'no'}">
+                  <span class="badge bg-danger">停止</span>
+                </th:block>
+                <th:block th:if="${item.downSpeedMail  != 'no'}">
+                  <span  class="badge bg-primary">开启</span>
+                </th:block>
+              </td>
+              <td>
+                <th:block th:if="${item.hostBlockAllWarn  == 'no'}">
+                  <span  class="badge bg-primary">开启告警</span>
+                </th:block>
+                <th:block th:if="${item.hostBlockAllWarn  != 'no'}">
+                  <span class="badge bg-danger">停止告警</span>
+                </th:block>
+              </td>
+              <td>
+                <th:block th:if="${item.active  == '1'}">
+                  <span class="badge bg-primary">启用</span>
+                </th:block>
+                <th:block th:if="${item.active  == '2'}">
+                  <span class="badge bg-danger">已停止</span>
+                </th:block>
+              </td>
+              <td th:text="${#dates.format(item.createTime,'yyyy-MM-dd HH:mm:ss')}">Update software</td>
+              <td th:text="${item.account}" th:if="${application.LICENSE_STATE eq '1' && application.userInfoManage == 'true' && session.LOGIN_KEY.role == 'admin'}"></td>
+              <td>
+                <th:block th:if="${session.LOGIN_KEY.role != 'guest'}">
+                  <button type="button"  th:onclick="edit([[${item.id}]])"  class="btn btn-primary  btn-sm">编辑</button>
+                  <button type="button"  th:onclick="del([[${item.id}]])"  class="btn bg-danger btn-sm">删除</button>
+                </th:block>
+                  <button type="button"  th:onclick="view([[${item.id}]])"  class="btn btn-primary btn-sm">查看</button>
+                  <button type="button"  th:onclick="viewHost([[${item.hostname}]])"  class="btn btn-primary btn-sm">主机</button></td>
+            </tr>
+          </th:block>
+
+          </tbody>
+        </table>
+      </div>
+      <!-- /.card-body -->
+      <div th:replace="common/page.html"></div>
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+  <div class="modal fade" id="modal-default3">
+    <div class="modal-dialog">
+      <form method="post" id="form4" th:action="@{'/hostWarnDiy/copyHostWarnDiy'}">
+        <div class="modal-content" style="font-size:0.90rem">
+          <div class="modal-header">
+            <h4 class="modal-title">选择主机<span class="text-muted">（复制后的新数据将默认为该主机）</span></h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>
+              <input type="hidden" id="idCopy" name="idCopy"/>
+              <div th:replace="common/singleSelectHost.html"></div>
+            </p>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default  btn-sm" data-dismiss="modal">关 闭</button>
+            <button type="button" onclick="ajaxSaveCopyHostWarnDiy()" class="btn btn-primary btn-sm">保 存</button>
+          </div>
+        </div>
+      </form>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+
+  <div class="modal fade" id="modal-default2">
+    <div class="modal-dialog">
+      <form method="post" id="form2" th:action="@{'/accountInfo/saveAdminMenus'}">
+        <div class="modal-content" style="font-size:0.90rem">
+          <div class="modal-header">
+            <h4 class="modal-title">菜单<span class="text-muted">（请选择管理员可以操作的菜单）</span></h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group"><span class="text-muted">若重启server服务，设置菜单会失效，需要重新再次设置菜单</span></div>
+            <input type="hidden" name="menuIds" id="menuIds"/>
+            <ul id="treeMenu" class="ztree"></ul>
+            </p>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default  btn-sm" data-dismiss="modal">关 闭</button>
+            <button type="button" onclick="ajaxSaveAdminMenus()" class="btn btn-primary btn-sm">保 存</button>
+          </div>
+        </div>
+      </form>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <div th:replace="common/moveAccount.html"></div>
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:src="@{'/static/common/ztree/jquery.ztree.core.min.js'}"></script>
+<script th:src="@{'/static/common/ztree/jquery.ztree.excheck.min.js'}"></script>
+<script th:src="@{'/static/js/hostWarnDiy.js?v=3.5.7'}"></script>
+
+<script th:inline="javascript">
+  var setting = {
+    check: {
+      enable: true
+    },
+    data: {
+      simpleData: {
+        enable: true
+      }
+    }
+  };
+
+  var zNodes = [[${menuTreeNodeDtoList}]];
+  $(document).ready(function(){
+    $("#account").val([[${hostWarnDiy.account}]]);
+    $('.select2').select2();
+    $.fn.zTree.init($("#treeMenu"), setting, zNodes);
+  });
+  var msg = [[${msg}]];
+  if(msg!='' && msg!=null){
+    toastr.info(msg);
+  }
+</script>
+
+</body>
+</html>

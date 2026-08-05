@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item active"></li>
+                </ol>
+            </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-11">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">添加自定义监控项
+            <span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="Agent会模拟执行指令[Telnet 目标IP 端口]，测试目标主机的端口是否可以连通"  style="cursor:pointer;margin-left: 10px"><i class="fa fa-comment-dots"></i></span></h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <form role="form" id="form1" method="post" th:action="@{'/customInfo/saveBatch'}">
+            <input type="hidden" name="id" th:value="${customInfo.id}"/>
+            <div class="card-body">
+                <div class="form-group">
+                    <label><font color="red">*</font>监控主机</label>
+                    <div th:replace="common/multiSelectHost.html"></div>
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font><span>自定义监控项名称</span>
+                        <span class="text-muted">（系统会自动获取下面指令或脚本执行结果的最后一行内容，内容可以是数字或字符串，内容中的空格系统会自动过滤掉，也可以不输出任何内容。如果需要输出多个数字值，此处名称也对应用英文逗号隔开，如：<code class="highlighter-rouge" style="font-size:100%">名称1,名称2</code>，对应输出值：<code class="highlighter-rouge" style="font-size:100%">值1,值2</code>）</span>
+                    </label>
+                    <input type="text" autocomplete="off"  th:value="${customInfo.customName}" class="validate[required,maxSize[200]] form-control" name="customName" id="customName" placeholder="如：统计文件数量">
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>自定义监控项执行的指令或脚本
+                        <span class="text-muted" th:text="${blockStr}">敏感字符串过滤</span></label>
+                    <label><span class="text-muted">（多条指令请换行输入，脚本执行结果的最后一行内容可以输出数字或字符串，如果返回多个值请用英文逗号隔开，如：<code class="highlighter-rouge" style="font-size:100%">值1,值2</code>）</span></label>
+                    <textarea class="validate[required,maxSize[2000]] form-control"   name="customShell" id="customShell" th:text="${customInfo.customShell}"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>告警表达式
+                        <span class="text-muted">（表达式成立时即告警，不成立不告警，如：<code class="highlighter-rouge" style="font-size:100%">result>=100</code>，其中<code class="highlighter-rouge" style="font-size:100%">result</code>为固定写法，标识为上面的指令或脚本输出结果值(系统会自动替换为数值)，注意表达式需为英文输入法拼写。如果脚本输出多个值，从左到右对应表达式变量依次为：<code class="highlighter-rouge" style="font-size:100%">result0,result1</code>等）</span>
+                    </label>
+                    <input type="text" autocomplete="off" th:value="${customInfo.resultExp}" class="validate[maxSize[100]] form-control" name="resultExp" id="resultExp" placeholder="如：(result + 10)>=100">
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>告警级别</label>
+                    <div th:replace="common/warnLevel.html"></div>
+                </div>
+                <div class="form-group clearfix">
+                    <label><font color="red">*</font>监控状态</label>
+                    <div th:replace="common/activeRadio.html"></div>
+                </div>
+
+            </div>
+            <!-- /.card-body -->
+
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-right:10px;"><i class="fas fa-save"></i> 保 存</button>
+                <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+            </div>
+
+        </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-10 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+<div th:replace="common/codemirror.html"></div>
+<script th:src="@{'/static/js/customInfo.js?v=3.5.0'}"></script>
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $("#form1").validationEngine();
+        $('.duallistbox').bootstrapDualListbox({
+            nonSelectedListLabel: '未选监控主机',
+            selectedListLabel: '已选监控主机',
+            filterPlaceHolder: '过滤条件',
+            moveAllLabel: '添加全部',
+            removeAllLabel: '移除全部',
+            infoText: '当前列表共 {0} 项',
+            infoTextEmpty: '列表为空',
+        });
+        var editor = CodeMirror.fromTextArea(document.getElementById("customShell"), {
+            lineNumbers: true,
+            styleActiveLine: true,
+            matchBrackets: true,
+            mode: 'shell',
+        });
+        editor.setOption("theme", "dracula");
+        editor.setSize('auto','220px');
+    });
+
+</script>
+</body>
+</html>

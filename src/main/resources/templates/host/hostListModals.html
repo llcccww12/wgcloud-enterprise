@@ -1,0 +1,113 @@
+<div class="modal fade" id="modal-default">
+    <div class="modal-dialog">
+        <form method="post" id="form2" th:action="@{'/systemInfo/save'}">
+            <div class="modal-content" style="font-size:0.90rem">
+                <div class="modal-header">
+                    <h4 class="modal-title">编辑主机备注</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        <input type="hidden" id="id" name="id"/>
+                        <input type="text"  autocomplete="off" class="validate[required,maxSize[40] form-control" name="remark" id="remark" placeholder="输入完成请点击保存">
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default  btn-sm" data-dismiss="modal">关 闭</button>
+                    <button type="button" onclick="ajaxSaveRemark()" class="btn btn-primary btn-sm">保 存</button>
+                </div>
+            </div>
+        </form>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade" id="modal-default2">
+    <div class="modal-dialog">
+        <form method="post" id="form3" th:action="@{'/systemInfo/saveWinConsole'}">
+            <div class="modal-content" style="font-size:0.90rem">
+                <div class="modal-header">
+                    <h4 class="modal-title">windows服务http地址</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        <input type="hidden" id="id2" name="id"/>
+                        <input type="text"  autocomplete="off" class="validate[required,maxSize[255] form-control" name="winConsole" id="winConsole" placeholder="http://10.102.11.2:9000">
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default  btn-sm" data-dismiss="modal">关 闭</button>
+                    <button type="button" onclick="ajaxSaveWinConsole()" class="btn btn-primary btn-sm">保存 & 连接</button>
+                    <button type="button" onclick="viewWinConsole()" class="btn btn-primary btn-sm">连 接</button>
+                </div>
+            </div>
+        </form>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade" id="modal-default3">
+    <div class="modal-dialog">
+        <form method="post" id="form4" th:action="@{'/systemInfo/saveGroupId'}">
+            <div class="modal-content" style="font-size:0.90rem">
+                <div class="modal-header">
+                    <h4 class="modal-title">设置主机标签<span class="text-muted">（可多选，在系统管理中维护标签）</span></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        <input type="hidden" id="id3" name="ids"/>
+                        <select class="select2" multiple="multiple" data-placeholder="请选择" style="width: 100%;" name="groupId">
+                            <option  value="">请选择</option>
+                            <th:block th:each="item,iterStat : ${hostGroupList}">
+                                <option  th:value="${item.id}"  th:text="${item.groupName}">Alabama</option>
+                            </th:block>
+                        </select>
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default  btn-sm" data-dismiss="modal">关 闭</button>
+                    <button type="button" onclick="ajaxSaveGroupId()" class="btn btn-primary btn-sm">保 存</button>
+                </div>
+            </div>
+        </form>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade" id="modal-default6">
+    <div class="modal-dialog">
+        <form method="post" id="form6" th:action="@{'/systemInfo/updateOrderNum'}">
+            <div class="modal-content" style="font-size:0.90rem">
+                <div class="modal-header">
+                    <h4 class="modal-title">编辑主机排序序号</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        <input type="hidden" id="id6" name="id"/>
+                        <input type="text"  autocomplete="off" class="validate[custom[number],maxSize[10] form-control" name="orderNum" id="hostOrderNum" placeholder="默认从大到小排序，数字可以重复，也可以是负数">
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default  btn-sm" data-dismiss="modal">关 闭</button>
+                    <button type="button" onclick="ajaxSaveOrderNum()" class="btn btn-primary btn-sm">保 存</button>
+                </div>
+            </div>
+        </form>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>

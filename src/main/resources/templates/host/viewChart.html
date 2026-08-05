@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item active"></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+          <h3 class="card-title"><span th:utext="${systemInfo.image}"></span><span style="margin-left:5px" th:text="${systemInfo.hostname}"></span>
+              <th:block th:if="${systemInfo.remark ne '' && systemInfo.remark ne null}">
+                  (备注：<span th:text="${systemInfo.remark}"></span>)
+              </th:block>
+              <span class="btncopy" th:data-clipboard-text="${systemInfo.hostname}" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制" style="cursor:pointer;margin-left: 5px"><i class="fa fa-copy"></i></span>
+              </h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+
+
+        <div class="row">
+            <div class="col-12 table-responsive">
+                <table class="table table-striped"><tbody><tr>
+
+                    <th:block th:each="item : ${amList}">
+                        <th:block th:if="${item.code eq  am}">
+                            <td width="2%" style="vertical-align:bottom;"> <button type="button" style="background:#1652f0;color:#fff;border-color:#1652f0;" title="当前已显示该时间段图表" class="btn btn-block btn-outline-danger btn-sm disabled" th:text="${item.msg}">Primary</button></td>
+                        </th:block>
+                        <th:block th:unless="${item.code eq  am}">
+                            <td width="2%" style="vertical-align:bottom;"> <button type="button"  th:onclick="viewDate([[${systemInfo.id}]],[[${item.code}]])" class="btn btn-block btn-outline-primary btn-sm" th:text="${item.msg}">Primary</button></td>
+                        </th:block>
+                    </th:block>
+
+                    <td width="10%">
+                        <form class="form-inline ml-3   float-sm-right" th:action="@{'/systemInfo/chart'}">
+                            <input type="hidden" name="id" th:value="${systemInfo.id}"/>
+                            <div class="input-group input-group-sm">
+                            <input type="text" autocomplete="off" value="" class="validate[maxSize[50]] form-control"  th:value="${startTime}" name="startTime" id="startTime" placeholder="开始时间" style="margin-right:5px;">
+                            <label style="margin-right:5px;">至</label>
+                            <input type="text" autocomplete="off" value="" class="validate[maxSize[50]] form-control"  th:value="${endTime}" name="endTime" id="endTime" placeholder="结束时间" style="margin-right:5px;">
+                            <button type="submit" class="btn btn-primary btn-sm" style="margin-right:5px;">查询</button>
+                            <button type="button" onclick="resetParam()" class="btn bg-danger btn-sm" style="margin-right:5px;">重置</button>
+                            </div>
+                        </form>
+                    </td>
+
+                    <td width="2%" style="vertical-align:bottom;text-align: right"><button type="button" th:onclick="excelExport([[${systemInfo.id}]],[[${am}]])" class="btn btn-primary btn-sm">导出Excel</button></td>
+                    </tr></tbody></table>
+            </div>
+            <!-- /.col -->
+        </div>
+        <label style="margin-left: .9rem">cpu使用率%
+            <span style="margin-left:20px">最高</span><span class="description-percentage text-danger" style="margin-left:10px;margin-right:10px;"><i class="fas fa-caret-down"></i> <span th:text="${cpuSubtitleDto.maxValue}">18</span></span>
+            平均<span class="description-percentage text-warning" style="margin-left:5px;margin-right:10px;"><i class="fas fa-caret-left"></i> <span th:text="${cpuSubtitleDto.avgValue}">0</span></span>
+            最低<span class="description-percentage text-success" style="margin-left:5px;margin-right:30px;"><i class="fas fa-caret-up"></i> <span th:text="${cpuSubtitleDto.minValue}">17</span></span>
+            告警阈值: <span class="description-percentage text-danger" style="margin-left:5px;margin-right:30px;"><span th:text="${cpuWarnVal}">17</span></span></label>
+        <div id="cpuStateJson"></div>
+
+        <label style="margin-left: .9rem">内存使用率%
+            <span style="margin-left:20px">最高</span><span class="description-percentage text-danger" style="margin-left:10px;margin-right:10px;"><i class="fas fa-caret-down"></i> <span th:text="${memSubtitleDto.maxValue}">18</span></span>
+            平均<span class="description-percentage text-warning" style="margin-left:5px;margin-right:10px;"><i class="fas fa-caret-left"></i> <span th:text="${memSubtitleDto.avgValue}">0</span></span>
+            最低<span class="description-percentage text-success" style="margin-left:5px;margin-right:30px;"><i class="fas fa-caret-up"></i> <span th:text="${memSubtitleDto.minValue}">17</span></span>
+            告警阈值: <span class="description-percentage text-danger" style="margin-left:5px;margin-right:30px;"><span th:text="${memWarnVal}">17</span></span></label>
+        <div id="memStateJson"></div>
+
+        <label style="margin-left: .9rem">网络下行/上行传输速率，KB/秒
+            <span style="margin-left:20px">下行最高</span><span class="description-percentage text-danger" style="margin-left:10px;margin-right:10px;"><i class="fas fa-caret-down"></i> <span th:text="${rxbytSubtitleDto.maxValue}">18</span></span>
+            平均<span class="description-percentage text-warning" style="margin-left:5px;margin-right:10px;"><i class="fas fa-caret-left"></i> <span th:text="${rxbytSubtitleDto.avgValue}">0</span></span>
+            最低<span class="description-percentage text-success" style="margin-left:5px;margin-right:30px;"><i class="fas fa-caret-up"></i> <span th:text="${rxbytSubtitleDto.minValue}">17</span></span>
+            上行最高<span class="description-percentage text-danger" style="margin-left:10px;margin-right:10px;"><i class="fas fa-caret-down"></i> <span th:text="${txbytSubtitleDto.maxValue}">18</span></span>
+            平均<span class="description-percentage text-warning" style="margin-left:5px;margin-right:10px;"><i class="fas fa-caret-left"></i> <span th:text="${txbytSubtitleDto.avgValue}">0</span></span>
+            最低<span class="description-percentage text-success" style="margin-left:5px;margin-right:30px;"><i class="fas fa-caret-up"></i> <span th:text="${txbytSubtitleDto.minValue}">17</span></span>
+            告警阈值: 下行<span class="description-percentage text-danger" style="margin-left:5px;margin-right:30px;"><span th:text="${downSpeedVal}">17</span></span>
+            上行<span class="description-percentage text-danger" style="margin-left:5px;margin-right:30px;"><span th:text="${upSpeedVal}">17</span></span>
+            监控网卡: <span class="description-percentage text-danger" style="margin-left:5px;margin-right:30px;"><span th:text="${systemInfo.netInterfaceName}">17</span></span></label>
+        <div id="netIoStateByt"></div>
+
+        <label style="margin-left: .9rem">网络接收/发送，包数/秒
+            <span style="margin-left:20px">接收最高</span><span class="description-percentage text-danger" style="margin-left:10px;margin-right:10px;"><i class="fas fa-caret-down"></i> <span th:text="${rxpckSubtitleDto.maxValue}">18</span></span>
+            平均<span class="description-percentage text-warning" style="margin-left:5px;margin-right:10px;"><i class="fas fa-caret-left"></i> <span th:text="${rxpckSubtitleDto.avgValue}">0</span></span>
+            最低<span class="description-percentage text-success" style="margin-left:5px;margin-right:30px;"><i class="fas fa-caret-up"></i> <span th:text="${rxpckSubtitleDto.minValue}">17</span></span>
+            发送最高<span class="description-percentage text-danger" style="margin-left:10px;margin-right:10px;"><i class="fas fa-caret-down"></i> <span th:text="${txpckSubtitleDto.maxValue}">18</span></span>
+            平均<span class="description-percentage text-warning" style="margin-left:5px;margin-right:10px;"><i class="fas fa-caret-left"></i> <span th:text="${txpckSubtitleDto.avgValue}">0</span></span>
+            最低<span class="description-percentage text-success" style="margin-left:5px;margin-right:30px;"><i class="fas fa-caret-up"></i> <span th:text="${txpckSubtitleDto.minValue}">17</span></span>
+            监控网卡: <span class="description-percentage text-danger" style="margin-left:5px;margin-right:30px;"><span th:text="${systemInfo.netInterfaceName}">17</span></span></label>
+        <div id="netIoStatePck"></div>
+
+        <label style="margin-left: .9rem">系统负载
+            <span style="margin-left:20px">1分钟最高</span><span class="description-percentage text-danger" style="margin-left:10px;margin-right:10px;"><i class="fas fa-caret-down"></i> <span th:text="${oneLoadSubtitleDto.maxValue}">18</span></span>
+            平均<span class="description-percentage text-warning" style="margin-left:5px;margin-right:10px;"><i class="fas fa-caret-left"></i> <span th:text="${oneLoadSubtitleDto.avgValue}">0</span></span>
+            最低<span class="description-percentage text-success" style="margin-left:5px;margin-right:30px;"><i class="fas fa-caret-up"></i> <span th:text="${oneLoadSubtitleDto.minValue}">17</span></span>
+            5分钟最高<span class="description-percentage text-danger" style="margin-left:10px;margin-right:10px;"><i class="fas fa-caret-down"></i> <span th:text="${fiveLoadSubtitleDto.maxValue}">18</span></span>
+            平均<span class="description-percentage text-warning" style="margin-left:5px;margin-right:10px;"><i class="fas fa-caret-left"></i> <span th:text="${fiveLoadSubtitleDto.avgValue}">0</span></span>
+            最低<span class="description-percentage text-success" style="margin-left:5px;margin-right:30px;"><i class="fas fa-caret-up"></i> <span th:text="${fiveLoadSubtitleDto.minValue}">17</span></span>
+            15分钟最高<span class="description-percentage text-danger" style="margin-left:10px;margin-right:10px;"><i class="fas fa-caret-down"></i> <span th:text="${fifteenLoadSubtitleDto.maxValue}">18</span></span>
+            平均<span class="description-percentage text-warning" style="margin-left:5px;margin-right:10px;"><i class="fas fa-caret-left"></i> <span th:text="${fifteenLoadSubtitleDto.avgValue}">0</span></span>
+            最低<span class="description-percentage text-success" style="margin-left:5px;margin-right:30px;"><i class="fas fa-caret-up"></i> <span th:text="${fifteenLoadSubtitleDto.minValue}">17</span></span>
+            告警阈值(5分钟负载): <span class="description-percentage text-danger" style="margin-left:5px;margin-right:30px;"><span th:text="${sysLoadWarnVal}">17</span></span></label>
+        <div id="sysLoadStateJson"></div>
+
+        <label style="margin-left: .9rem">主机连接数（包括tcp、udp、inet）
+            <span style="margin-left:20px">最高</span><span class="description-percentage text-danger" style="margin-left:10px;margin-right:10px;"><i class="fas fa-caret-down"></i> <span th:text="${connsSubtitleDto.maxValue}">18</span></span>
+            平均<span class="description-percentage text-warning" style="margin-left:5px;margin-right:10px;"><i class="fas fa-caret-left"></i> <span th:text="${connsSubtitleDto.avgValue}">0</span></span>
+            最低<span class="description-percentage text-success" style="margin-left:5px;margin-right:30px;"><i class="fas fa-caret-up"></i> <span th:text="${connsSubtitleDto.minValue}">17</span></span>
+            告警阈值: <span class="description-percentage text-danger" style="margin-left:5px;margin-right:30px;"><span th:text="${netConnectionsWarnVal}">17</span></span></label>
+        <div id="netConnectionsJson"></div>
+
+        <label style="margin-left: .9rem">主机运行进程数量
+            <span style="margin-left:20px">最高</span><span class="description-percentage text-danger" style="margin-left:10px;margin-right:10px;"><i class="fas fa-caret-down"></i> <span th:text="${procsNumSubtitleDto.maxValue}">18</span></span>
+            平均<span class="description-percentage text-warning" style="margin-left:5px;margin-right:10px;"><i class="fas fa-caret-left"></i> <span th:text="${procsNumSubtitleDto.avgValue}">0</span></span>
+            最低<span class="description-percentage text-success" style="margin-left:5px;margin-right:30px;"><i class="fas fa-caret-up"></i> <span th:text="${procsNumSubtitleDto.minValue}">17</span></span></label>
+        <div id="procsNumJson"></div>
+
+        <!-- GPU 使用率图表（无 GPU 数据时仅显示提示） -->
+        <label style="margin-left: .9rem">GPU使用率% （监测到 <span th:text="${gpuCardCount}">0</span> 张卡）
+            <span style="margin-left:20px">最高</span><span class="description-percentage text-danger" style="margin-left:10px;margin-right:10px;"><i class="fas fa-caret-down"></i> <span th:text="${gpuSubtitleDto.maxValue}">0</span></span>
+            平均<span class="description-percentage text-warning" style="margin-left:5px;margin-right:10px;"><i class="fas fa-caret-left"></i> <span th:text="${gpuSubtitleDto.avgValue}">0</span></span>
+            最低<span class="description-percentage text-success" style="margin-left:5px;margin-right:30px;"><i class="fas fa-caret-up"></i> <span th:text="${gpuSubtitleDto.minValue}">0</span></span></label>
+        <div id="gpuStateJson"></div>
+        <div th:if="${gpuCardCount == 0}" style="margin-left: .9rem;margin-bottom:10px;" class="text-muted">该时段无 GPU 数据（需要被监控主机安装 nvidia-smi 并由 agent 采集）</div>
+
+        <label style="margin-left: .9rem">网络传入/传出，丢弃包数/秒，监控网卡: <span class="description-percentage text-danger" style="margin-left:5px;margin-right:30px;"><span th:text="${systemInfo.netInterfaceName}">17</span></span></label>
+        <div id="netIoStateDropPck"></div>
+        <div class="card-footer">
+            <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+        </div>
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:src="@{'/static/js/host.js?v=3.5.0'}"></script>
+
+
+<script th:inline="javascript">
+
+    var startTimeResponse =[[${startTime}]];
+    var endTimeResponse =[[${endTime}]];
+    $(document).ready(function(){
+        var startTime = $('#startTime');
+        if(startTime!=null && startTime != undefined){
+            startTime.daterangepicker({
+                singleDatePicker: true,
+                timePicker: true,
+                timePicker24Hour : true,
+                "opens": "center",
+                "locale": {
+                    format: 'YYYY-MM-DD HH:mm',
+                    applyLabel: "应用",
+                    cancelLabel: "取消",
+                    daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
+                    monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+                }
+            });
+            if(startTimeResponse=='' || startTimeResponse==null){
+                startTime.val("");
+            }
+        }
+
+        var endTime = $('#endTime');
+        if(endTime!=null && endTime != undefined){
+            endTime.daterangepicker({
+                singleDatePicker: true,
+                timePicker: true,
+                timePicker24Hour : true,
+                "opens": "center",
+                "locale": {
+                    format: 'YYYY-MM-DD HH:mm',
+                    applyLabel: "应用",
+                    cancelLabel: "取消",
+                    daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
+                    monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+                }
+            });
+            if(endTimeResponse=='' || endTimeResponse==null){
+                endTime.val("");
+            }
+        }
+        var clipboard = new ClipboardJS('.btncopy');
+        clipboard.on('success', function (e) {
+            toastr.success("复制成功");
+        });
+    });
+
+    function resetParam(){
+        $("#startTime").val("");
+        $("#endTime").val("");
+    }
+
+
+    var cpuStateJson =[[${cpuStateList}]];
+    var memStateJson =[[${memStateList}]];
+    var sysLoadStateJson =[[${sysLoadStateList}]];
+    var netIoStateJson =[[${netIoStateList}]];
+    $(function(){
+        var chart = new G2.Chart({
+            container: 'cpuStateJson',
+            forceFit: true,
+            height: 400,
+            padding: [30, 40, 70, 60]
+        });
+
+        chart.axis('dateStr', {
+            label: {
+                textStyle: {
+                    fill: '#aaaaaa'
+                }
+            }
+        });
+        chart.tooltip({
+            crosshairs: false
+        });
+        chart.legend({
+            position: 'top-center'
+        });
+
+        chart.source(cpuStateJson, {
+            sys: {
+                alias: 'cpu使用率',
+                min: 0
+            }
+        });
+        chart.scale('dateStr',{tickCount: 12,alias: '时间'});
+        chart.line().position('dateStr*sys').color('#1890ff');
+        chart.render();
+
+        var chart2 = new G2.Chart({
+            container: 'memStateJson',
+            forceFit: true,
+            height: 400,
+            padding: [30, 40, 70, 60]
+        });
+        chart2.axis('dateStr', {
+            label: {
+                textStyle: {
+                    fill: '#aaaaaa'
+                }
+            }
+        });
+        chart2.axis('usePer', {
+            label: {
+                textStyle: {
+                    fill: '#aaaaaa'
+                }
+            }
+        });
+        chart2.tooltip({
+            crosshairs: false
+        });
+        chart2.legend({
+            position: 'top-center'
+        });
+        chart2.source(memStateJson, {
+            usePer: {
+                alias: '内存使用率',
+                min: 0
+            }
+        });
+        chart2.scale('dateStr',{tickCount: 12,alias: '时间'});
+        chart2.line().position('dateStr*usePer').color('#1890ff');
+        chart2.render();
+
+        var chart3 = new G2.Chart({
+            container: 'sysLoadStateJson',
+            forceFit: true,
+            height: 400,
+            padding: [30, 40, 70, 60]
+        });
+        chart3.axis('dateStr', {
+            label: {
+                textStyle: {
+                    fill: '#aaaaaa'
+                }
+            }
+        });
+        chart3.axis('fiveLoad', false);
+        chart3.axis('fifteenLoad', false);
+        chart3.tooltip({
+            crosshairs: false
+        });
+        chart3.legend({
+            position: 'top-center'
+        });
+        chart3.source(sysLoadStateJson, {
+            oneLoad: {
+                alias: '1分钟负载',
+                min: 0,
+                max: [[${sysLoadStateMaxVal}]]
+            },
+            fiveLoad: {
+                alias: '5分钟负载',
+                min: 0,
+                max: [[${sysLoadStateMaxVal}]]
+            },
+            fifteenLoad: {
+                alias: '15分钟负载',
+                min: 0,
+                max: [[${sysLoadStateMaxVal}]]
+            }
+        });
+        chart3.scale('dateStr',{tickCount: 12,alias: '时间'});
+        chart3.line().position('dateStr*oneLoad').color('#1890ff');
+        chart3.line().position('dateStr*fiveLoad').color('#2fc25b');
+        chart3.line().position('dateStr*fifteenLoad').color('#ffca0b');
+        chart3.render();
+
+        var chart4 = new G2.Chart({
+            container: 'netIoStateByt',
+            forceFit: true,
+            height: 400,
+            padding: [30, 40, 70, 48]
+        });
+        chart4.axis('dateStr', {
+            label: {
+                textStyle: {
+                    fill: '#aaaaaa'
+                }
+            }
+        });
+        chart4.axis('txbyt', false);
+        chart4.axis('rxbyt', {
+            label: {
+                formatter: val => {
+                    if(val>=10000){
+                        return String(val/1000) + 'K';
+                    }else{
+                        return String(val);
+                    }
+                }
+            }
+        });
+        chart4.tooltip({
+            crosshairs: false
+        });
+        chart4.legend({
+            position: 'top-center'
+        });
+        chart4.source(netIoStateJson, {
+            rxbyt: {
+                alias: '下行KB/秒',
+                min: 0,
+                max: [[${netIoStateBytMaxVal}]]
+            },
+            txbyt: {
+                alias: '上行KB/秒',
+                min: 0,
+                max: [[${netIoStateBytMaxVal}]]
+            }
+        });
+        chart4.scale('dateStr',{tickCount: 12,alias: '时间'});
+        chart4.line().position('dateStr*rxbyt').color('#1890ff');
+        chart4.line().position('dateStr*txbyt').color('#2fc25b');
+        chart4.render();
+
+
+        var chart5 = new G2.Chart({
+            container: 'netIoStatePck',
+            forceFit: true,
+            height: 400,
+            padding: [30, 40, 70, 48]
+        });
+        chart5.axis('dateStr', {
+            label: {
+                textStyle: {
+                    fill: '#aaaaaa'
+                }
+            }
+        });
+        chart5.axis('txpck', false);
+        chart5.axis('rxpck', {
+            label: {
+                formatter: val => {
+                    if(val>=10000){
+                        return String(val/1000) + 'K';
+                    }else{
+                        return String(val);
+                    }
+                }
+            }
+        });
+        chart5.tooltip({
+            crosshairs: false
+        });
+        chart5.legend({
+            position: 'top-center'
+        });
+        chart5.source(netIoStateJson, {
+            rxpck: {
+                alias: '接收包数/秒',
+                min: 0,
+                max: [[${netIoStatePckMaxVal}]]
+            },
+            txpck: {
+                alias: '发送包数/秒',
+                    min: 0,
+                    max: [[${netIoStatePckMaxVal}]]
+            }
+        });
+        chart5.scale('dateStr',{tickCount: 12,alias: '时间'});
+        chart5.line().position('dateStr*rxpck').color('#1890ff');
+        chart5.line().position('dateStr*txpck').color('#2fc25b');
+        chart5.render();
+
+
+        var chart6 = new G2.Chart({
+            container: 'netIoStateDropPck',
+            forceFit: true,
+            height: 400,
+            padding: [30, 40, 70, 48]
+        });
+        chart6.axis('dateStr', {
+            label: {
+                textStyle: {
+                    fill: '#aaaaaa'
+                }
+            }
+        });
+        chart6.axis('dropin', false);
+        chart6.tooltip({
+            crosshairs: false
+        });
+        chart6.legend({
+            position: 'top-center'
+        });
+        chart6.source(netIoStateJson, {
+            dropin: {
+                alias: '传入丢弃包数/秒',
+                min: 0,
+                max: [[${netIoStateDropPckMaxVal}]]
+            },
+            dropout: {
+                alias: '传出丢弃包数/秒',
+                min: 0,
+                max: [[${netIoStateDropPckMaxVal}]]
+            }
+        });
+        chart6.scale('dateStr',{tickCount: 12,alias: '时间'});
+        chart6.line().position('dateStr*dropin').color('#FFD22F');
+        chart6.line().position('dateStr*dropout').color('#FF5371');
+        chart6.render();
+
+        var chart7 = new G2.Chart({
+            container: 'netConnectionsJson',
+            forceFit: true,
+            height: 400,
+            padding: [30, 40, 70, 60]
+        });
+        chart7.axis('dateStr', {
+            label: {
+                textStyle: {
+                    fill: '#aaaaaa'
+                }
+            }
+        });
+        chart7.axis('netConnections', {
+            label: {
+                textStyle: {
+                    fill: '#aaaaaa'
+                }
+            }
+        });
+        chart7.tooltip({
+            crosshairs: false
+        });
+        chart7.legend({
+            position: 'top-center'
+        });
+        chart7.source(netIoStateJson, {
+            netConnections: {
+                alias: '连接数'
+            }
+        });
+        chart7.scale('dateStr',{tickCount: 12,alias: '时间'});
+        chart7.line().position('dateStr*netConnections');
+        chart7.render();
+
+        var chart8 = new G2.Chart({
+            container: 'procsNumJson',
+            forceFit: true,
+            height: 400,
+            padding: [30, 40, 70, 60]
+        });
+        chart8.axis('dateStr', {
+            label: {
+                textStyle: {
+                    fill: '#aaaaaa'
+                }
+            }
+        });
+        chart8.axis('procsNum', {
+            label: {
+                textStyle: {
+                    fill: '#aaaaaa'
+                }
+            }
+        });
+        chart8.tooltip({
+            crosshairs: false
+        });
+        chart8.legend({
+            position: 'top-center'
+        });
+        chart8.source(cpuStateJson, {
+            procsNum: {
+                alias: '运行进程数量'
+            }
+        });
+        chart8.scale('dateStr',{tickCount: 12,alias: '时间'});
+        chart8.line().position('dateStr*procsNum').color("#FF3F74");
+        chart8.render();
+
+        // GPU 使用率折线图：多卡按 gpuName 分线着色
+        var gpuStateJson = [[${gpuStateList}]];
+        if (gpuStateJson && gpuStateJson.length > 0) {
+            var chart9 = new G2.Chart({
+                container: 'gpuStateJson',
+                forceFit: true,
+                height: 400,
+                padding: [30, 40, 70, 60]
+            });
+            chart9.axis('dateStr', {
+                label: {
+                    textStyle: {
+                        fill: '#aaaaaa'
+                    }
+                }
+            });
+            chart9.tooltip({ crosshairs: false });
+            chart9.legend({ position: 'top-center' });
+            chart9.source(gpuStateJson, {
+                gpuValue: {
+                    alias: 'GPU使用率%',
+                    min: 0,
+                    max: 100
+                }
+            });
+            chart9.scale('dateStr', { tickCount: 12, alias: '时间' });
+            chart9.line().position('dateStr*gpuValue').color('gpuName').size(2);
+            chart9.render();
+        }
+    })
+
+    var msg = [[${msg}]];
+    if(msg!='' && msg!=null){
+        toastr.info(msg);
+    }
+
+    var compressDataMsg = [[${compressDataMsg}]];
+    if(compressDataMsg!='' && compressDataMsg!=null){
+        toastr.success(compressDataMsg);
+    }
+</script>
+
+
+</body>
+</html>

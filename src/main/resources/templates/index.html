@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}" style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+          </div><!-- /.col -->
+         <!-- <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Dashboard v1</li>
+            </ol>
+          </div>--><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+
+      <div th:replace="common/indexTop.html"></div>
+
+      <div class="row  mb-2">
+          <div class="col-sm-12" style="color: #495057;">
+              <span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="最近1小时系统的告警通知数量">最近1小时告警：</span><span style="margin-right:10px;font-weight:700;color:#4567ee!important;"><span  th:text="${application.warnCountAnHour}">18</span></span>
+              <span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="所有监控主机的平均监控频率">主机平均监控时间(秒)：</span><span style="margin-right:10px;font-weight:700;color:#4567ee!important;"><i class="far fa-clock"></i><span style="margin-left:5px;" th:text="${avgSubmitSeconds}">18</span></span>
+              <span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="即监控历史数据最长保留多少天，在server配置文件设置">历史数据保留时间(天)：</span><span style="margin-right:10px;font-weight:700;color:#4567ee!important;"><span th:text="${historyDataOut}">0</span></span>
+              <span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="告警通知的方式">告警通知：</span><span style="margin-right:10px;font-weight:700;color:#4567ee!important;"><span th:text="${warnType}">17</span></span>
+              <span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="告警级别告警级别从高到底共3级：重要、一般、信息三个级别">默认告警级别：</span><span style="margin-right:10px;font-weight:700;color:#4567ee!important;"><span th:text="${defaultWarnLevel}"></span></span>
+              <span data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="查看公众看板页面不需要登录，在server配置文件设置">公众看板：</span><span style="margin-right:10px;font-weight:700;color:#4567ee!important;"><span th:text="${dapingView}"></span></span>
+              <span data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="管理员登录的账号和密码有没有修改">管理员账号/密码：</span><span style="margin-right:10px;font-weight:700;color:#4567ee!important;"><span th:text="${adminAccount}"></span>/<span th:text="${adminPwd}"></span></span>
+              <span data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="密码过期后所有账号都不能登录系统">密码过期时间：</span><span style="margin-right:10px;font-weight:700;color:#4567ee!important;"><span th:text="${pwdExpDateShow}"></span></span>
+              <span data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="server和agent的通信密钥wgToken">通信Token：</span><span style="margin-right:10px;font-weight:700;color:#4567ee!important;"><span th:text="${wgToken}"></span></span>
+              <span data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="web ssh服务">Web SSH：</span><span style="margin-right:10px;font-weight:700;color:#4567ee!important;"><span th:text="${webSSH}"></span></span>
+              <span data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="单点登录、免密登录服务">免密登录：</span><span style="margin-right:10px;font-weight:700;color:#4567ee!important;"><span th:text="${openSSO}"></span></span>
+              <span data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="分组标签管理">分组标签：</span><span style="margin-right:10px;font-weight:700;color:#4567ee!important;"><span th:text="${hostGroup}"></span></span>
+              <th:block th:if="${#strings.contains(session.LOGIN_KEY.menuIds,',d3,') && session.LOGIN_KEY.role != 'guest'}">
+              <span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="查看server配置文件"><a th:href="@{'/hostWarnDiy/list'}" style="margin-right:10px;font-weight:700;color:#4567ee!important;">查看server配置文件</a></span>
+              </th:block>
+              <th:block th:if="${session.LOGIN_KEY.role == 'admin'}">
+              <span data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="成员账号">成员账号：</span><span style="margin-right:10px;font-weight:700;color:#4567ee!important;"><span th:text="${userInfoManage}"></span></span>
+              </th:block>
+              <th:block th:if="${WARN_LICENSE_CHECK_SIGN == false}">
+                  <span data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="当前监控主机数量已超过允许监控的数量，系统已停止发送告警，请适当减少主机数量或者升级授权" style="margin-right:10px;font-weight:700;color:#dc3545!important;">系统已停止发送告警通知</span>
+              </th:block>
+              <th:block th:if="${application.LICENSE_STATE != '1'}">
+                 <span data-trigger="hover" id="middleContentTip" data-container="body" data-toggle="popover" data-placement="top" data-content="升级到专业版或企业版，隐藏此提示" style="margin-right:10px;"><a target="_blank" href="https://www.wgstart.com/help/docs4.html" style="color:#F23F40;font-weight:700;">🍋 升级到专业版</a></span>
+              </th:block>
+          </div>
+      </div>
+
+      <div th:replace="common/indexCommon.html"></div>
+
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <div th:replace="common/chart.html"></div>
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+
+<script th:inline="javascript">
+
+  const data1 = [[${chartInfoList1}]];
+  //mem使用率区间图表
+  const chart1 = new G2.Chart({
+    container: 'chartInfoList1',
+    forceFit: true,
+    height: 400
+  });
+  chart1.source(data1, {
+    percent: {
+      formatter: val => {
+      val = (val * 100) + '%';
+      if(val.length > 10 ){
+        val = val.substr(0,5)+'%';
+      }
+      return val;
+  }
+  }
+  });
+  chart1.tooltip({
+    showTitle: false,
+    itemTpl: '<li><span style="background-color:{color};" class="g2-tooltip-marker"></span>{name}的主机数量: {value}</li>'
+  });
+  chart1.coord('theta', {
+    startAngle: Math.PI, // 起始角度
+    endAngle: Math.PI * (3 / 2) // 结束角度
+  });
+  chart1.intervalStack()
+          .position('percent')
+          .color('item',['#FF5371','#FFD22F','#26A3FF','#26CD7B']);
+  chart1.render();
+
+  const data2 = [[${chartInfoList2}]];
+  //cpu使用率区间图表
+  const chart3 = new G2.Chart({
+      container: 'chartInfoList2',
+      forceFit: true,
+      height: 400
+  });
+  chart3.source(data2, {
+      percent: {
+          formatter: val => {
+          val = (val * 100) + '%';
+          if(val.length > 10 ){
+              val = val.substr(0,5)+'%';
+          }
+          return val;
+  }
+  }
+  });
+  chart3.coord('theta');
+  chart3.tooltip({
+      showTitle: false,
+  });
+  chart3.intervalStack()
+          .position('percent')
+          .color('item',['#FF5371','#FFD22F','#26A3FF','#26CD7B'])
+          .tooltip('item*percent', (item, percent) => {
+            percent = (percent * 100) + '%';
+            if(percent.length > 10 ){
+              percent = percent.substr(0,5)+'%';
+            }
+          return {
+            name: item+"的主机数量",
+            value: percent
+          };
+          })
+          .style({
+            lineWidth: 1,
+            stroke: '#fff'
+          });
+  chart3.render();
+
+
+  const dataTable = [[${dbTableList}]];
+  //数据表监控的图表
+  if(dataTable.length>0){
+    const chart2 = new G2.Chart({
+      container: 'dbTableList',
+      forceFit: true,
+      padding: 'auto',
+      height: 400
+    });
+    chart2.source(dataTable);
+    chart2.scale('value', {
+      tickInterval: 20
+    });
+    chart2.axis('remark', {
+      label: {
+        textStyle: {
+          fill: '#aaaaaa'
+        }
+      }
+    });
+    chart2.source(dataTable, {
+      value: {
+        min: 0,
+        nice: false,
+        alias: '响应时间ms'
+      }
+    });
+    chart2.axis('value', {
+      label: null,
+      grid: null, // 关闭 Y 轴网格线（最常见的虚线）
+      title: {
+        offset: 30,
+        textStyle: {
+          fontSize: 12,
+          fontWeight: 300
+        }
+      }
+    });
+   if(dataTable.length>20) {
+      chart2.interval().position('remark*value');
+   }else{
+      chart2.interval().position('remark*value').size(40);
+   }
+    chart2.render();
+  }
+
+  const huantuChartInfos = [[${huantuChartInfos}]];
+  //各种监控资源的数量占比
+  const chart6 = new G2.Chart({
+    container: 'chartInfoHuantu',
+    forceFit: true,
+    height: 400,
+    animate: false
+  });
+  // chart6.legend(false);
+  chart6.source(huantuChartInfos, {
+    percent: {
+      formatter: val => {
+        val = (val * 100) + '%';
+        if(val.length > 10 ){
+          val = val.substr(0,5)+'%';
+        }
+        return val;
+      }
+    }
+  });
+  chart6.coord('theta', {
+    radius: 0.95,
+    innerRadius: 0.6
+  });
+  chart6.tooltip({
+    showTitle: false,
+    itemTpl: '<li><span style="background-color:{color};" class="g2-tooltip-marker"></span>{name}: {value}</li>'
+  });
+  // 辅助文本
+  chart6.guide().html({
+    position: [ '50%', '50%' ],
+    html: '<div style="color:#8c8c8c;font-size: 14px;text-align: center;width: 10em;">监控资源总数量<br><span style="color:#8c8c8c;font-size:20px">[[${huantuTotalSize}]]</span></div>',
+    alignX: 'middle',
+    alignY: 'middle'
+  });
+  const interval6 = chart6.intervalStack()
+          .position('percent')
+          .color('item')
+          .tooltip('item*percent', (item, percent) => {
+            percent = percent * 100 + '%';
+            if(percent.length > 10 ){
+              percent = percent.substr(0,5)+'%';
+            }
+            return {
+              name: item,
+              value: percent
+            };
+          })
+          .style({
+            lineWidth: 1,
+            stroke: '#fff'
+          });
+  chart6.render();
+  interval6.setSelected(huantuChartInfos[0]);
+
+
+  const chartInfoDownPerData = [[${chartInfoDownPer}]];
+  //各种监控资源的在线百分比
+  const chart4 = new G2.Chart({
+      container: 'chartInfoList3',
+      forceFit: true,
+      height: 400
+  });
+  chart4.source(chartInfoDownPerData);
+  chart4.coord('theta');
+  chart4.tooltip({
+      showTitle: false,
+  });
+  chart4.intervalStack().position('percent').color('item', ['#1890ff', '#37c661', '#fbce1e', '#1E3D73', '#8a4be2', '#1dc5c5','#FF5371']);
+  chart4.render();
+
+  var maxByteValue =  [[${maxByteValue}]];
+  var maxByteSource =  [[${maxByteSource}]];
+  var byteType = "KB/s";
+  if(maxByteSource>=10000){
+      byteType = "MB/s";
+  }
+  const dataByte = [
+      { name: '最高', type: '主机上行传输速率'+byteType, value: [[${maxTxbytChart}]] },
+      { name: '平均', type: '主机上行传输速率'+byteType, value: [[${avgTxbytChart}]] },
+      { name: '最低', type: '主机上行传输速率'+byteType, value: [[${minTxbytChart}]] },
+      { name: '最高', type: '主机下行传输速率'+byteType, value: [[${maxRxbytChart}]] },
+      { name: '平均', type: '主机下行传输速率'+byteType, value: [[${avgRxbytChart}]] },
+      { name: '最低', type: '主机下行传输速率'+byteType, value: [[${minRxbytChart}]] }
+  ];
+  //主机上下行的传输速率最高最低平均值
+  const chartByte = new G2.Chart({
+      container: 'chartInfoByte',
+      forceFit: true,
+      height: 300,
+      padding: 'auto'
+  });
+  chartByte.source(dataByte);
+  chartByte.scale('value', {
+      max: maxByteValue,
+      min: 0,
+  });
+  chartByte.axis('type', {
+      label: {
+          textStyle: {
+              fill: '#aaaaaa'
+          }
+      }
+  });
+  chartByte.axis('value', {
+      grid: null, // 关闭 Y 轴网格线（最常见的虚线）
+      label: {
+          textStyle: {
+              fill: '#aaaaaa'
+          },
+          formatter: val => {
+              if(val>=10000){
+                  return String(val/1000) + 'K';
+              }else{
+                  return String(val);
+              }
+          }
+      }
+  });
+  chartByte.legend({
+      position: 'top-center'
+  });
+  chartByte.interval().position('type*value').color('name')
+      .opacity(1)
+      .adjust([{
+          type: 'dodge',
+          marginRatio: 1 / 32
+      }]);
+  chartByte.render();
+
+  const dataLoad  = [
+      { name: '最高', type: '主机5分钟系统负载', value: [[${maxFiveLoad}]] },
+      { name: '平均', type: '主机5分钟系统负载', value: [[${avgFiveLoad}]] },
+      { name: '最低', type: '主机5分钟系统负载', value: [[${minFiveLoad}]] },
+      { name: '最高', type: '主机15分钟系统负载', value: [[${maxFifteenLoad}]] },
+      { name: '平均', type: '主机15分钟系统负载', value: [[${avgFifteenLoad}]] },
+      { name: '最低', type: '主机15分钟系统负载', value: [[${minFifteenLoad}]] }
+  ];
+  //主机系统负载最高最低平均值
+  const chartLoad = new G2.Chart({
+      container: 'chartInfoLoad',
+      forceFit: true,
+      height: 300,
+      padding: 'auto'
+  });
+  chartLoad.source(dataLoad);
+  chartLoad.scale('value', {
+      alias: '主机系统负载值',
+      max:  [[${maxLoadValue}]],
+      min: 0,
+  });
+  chartLoad.axis('type', {
+      label: {
+          textStyle: {
+              fill: '#aaaaaa'
+          }
+      }
+  });
+  chartLoad.axis('value', {
+      grid: null, // 关闭 Y 轴网格线（最常见的虚线）
+      label: {
+          textStyle: {
+              fill: '#aaaaaa'
+          }
+      }
+  });
+  chartLoad.legend({
+      position: 'top-center'
+  });
+  chartLoad.interval().position('type*value').color('name')
+      .opacity(1)
+      .adjust([{
+          type: 'dodge',
+          marginRatio: 1 / 32
+      }]);
+  chartLoad.render();
+
+  const dataCpuMemPer  = [
+      { name: '最高', type: '主机CPU使用率%', value: [[${maxCpuVal}]] },
+      { name: '平均', type: '主机CPU使用率%', value: [[${avgCpuVal}]] },
+      { name: '最低', type: '主机CPU使用率%', value: [[${minCpuVal}]] },
+      { name: '最高', type: '主机内存使用率%', value: [[${maxMemVal}]] },
+      { name: '平均', type: '主机内存使用率%', value: [[${avgMemVal}]] },
+      { name: '最低', type: '主机内存使用率%', value: [[${minMemVal}]] },
+      { name: '最高', type: '磁盘总使用率%', value: [[${maxDiskPerIndex}]] },
+      { name: '平均', type: '磁盘总使用率%', value: [[${avgDiskPerIndex}]] },
+      { name: '最低', type: '磁盘总使用率%', value: [[${minDiskPerIndex}]] }
+  ];
+  //cpu和内存使用百分比最高最低平均值
+  const chartCpuMemPer = new G2.Chart({
+      container: 'chartCpuMemPer',
+      forceFit: true,
+      height: 300,
+      padding: 'auto'
+  });
+  chartCpuMemPer.source(dataCpuMemPer);
+  chartCpuMemPer.scale('value', {
+      max: [[${maxCpuMemSwapPer}]],
+      min: 0
+  });
+  chartCpuMemPer.axis('type', {
+      label: {
+          textStyle: {
+              fill: '#aaaaaa'
+          }
+      }
+  });
+  chartCpuMemPer.axis('value', {
+      grid: null, // 关闭 Y 轴网格线（最常见的虚线）
+      label: {
+          textStyle: {
+              fill: '#aaaaaa'
+          }
+      }
+  });
+  chartCpuMemPer.legend({
+      position: 'top-center'
+  });
+  chartCpuMemPer.interval().position('type*value').color('name',['#FF5371','#8a4be2', '#1dc5c5'])
+      .opacity(1)
+      .adjust([{
+          type: 'dodge',
+          marginRatio: 1 / 32
+      }]);
+  chartCpuMemPer.render();
+
+  var msg = [[${msg}]];
+  if(msg!='' && msg!=null){
+      toastr.info(msg);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item active"></li>
+                </ol>
+            </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">查看SNMP设备深度监测信息</h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <form role="form" id="form1" th:action="@{'/snmpDeepInfo/save'}">
+            <input type="hidden" name="id" th:value="${snmpDeepInfo.id}"/>
+            <div class="card-body">
+                <div class="form-group">
+                    <label><span style="color:#fff;background:#0dcaf0;display:inline-block;border-radius:3px;padding:4px 8px;">基础信息</span></label>
+                    <div><strong>设备IP：</strong><span th:text="${snmpDeepInfo.hostname}"></span>，<strong>SNMP端口：</strong><span th:text="${snmpDeepInfo.snmpPort}"></span>，<strong>SNMP团体名称（community）：</strong><span th:text="${snmpDeepInfo.snmpCommunity}"></span>，
+                        <strong>监控状态：</strong><span th:text="${snmpDeepInfo.active}"></span>，<strong>SNMP版本：</strong><span th:text="${snmpDeepInfo.snmpVersion}"></span>，
+                        <strong>告警级别：</strong><span th:text="${snmpDeepInfo.warnLevel}"></span>，<strong>备注：</strong><span th:text="${snmpDeepInfo.remark}"></span>
+                        <span th:if="${application.hostGroup == 'true'}">，<strong>标签：</strong><span th:text="${snmpDeepInfo.groupId}"></span><span th:if="${snmpDeepInfo.groupId} == null or ${snmpDeepInfo.groupId} == ''">无</span></span>
+                    </div>
+                </div>
+                <div class="form-group"><strong>监控任务执行状态：</strong><code class="highlighter-rouge" style="font-size:100%;font-weight:700" th:text="${snmpDeepInfoErrorMsg}"></code></div>
+                <div class="form-group row">
+                    <div class="col-7"><label style="color:#fff;background:#508ff4;display:inline-block;border-radius:3px;padding:4px 8px;">监控OID结果<span  th:if="${not #lists.isEmpty(snmpDeepStateList)}" th:text="'（已监控'+${#lists.size(snmpDeepStateList)}+'条）'"></span><span th:if="${snmpDeepInfo.createTime ne '' && snmpDeepInfo.createTime ne null}">采集时间 <i class="far fa-clock"></i> <span th:text="${#dates.format(snmpDeepInfo.createTime,'yyyy-MM-dd HH:mm:ss')}">10 Feb. 2014</span></span></label></div>
+                </div>
+
+                <div id="dataFormList" class="form-group clearfix">
+                    <th:block th:each="item,iterStat : ${snmpDeepStateList}">
+                        <div th:id="'dataFrom_'+ ${item.oidOrderNum}" class="card card-primary card-outline">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <div>
+                                        <span data-toggle="tooltip" style="margin-right:5px;" class="badge badge-primary" th:text="${iterStat.index+1}">2</span>
+                                        <strong>OID名称：</strong><span th:text="${item.oidName}"></span>，
+                                        <strong>OID值：</strong><span th:text="${item.oidValue}"></span>，
+                                        <strong>获取方式：</strong><span th:text="${item.oidType}"></span>
+                                        <button type="button"  th:onclick="ajaxTestDataView([[${snmpDeepInfo.hostname}]],[[${snmpDeepInfo.snmpPort}]],[[${snmpDeepInfo.snmpVersion}]],[[${snmpDeepInfo.snmpCommunity}]],[[${item.oidValue}]],[[${item.oidType}]],[[${item.oidName}]],[[${snmpDeepInfo.securityName}]],[[${snmpDeepInfo.authPass}]],[[${snmpDeepInfo.privPass}]])"  class="btn btn-primary btn-sm float-right">测试获取OID结果</button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div><textarea class="form-control"  name="resultContent" th:utext="${item.oidResult}"></textarea></div>
+                                </div>
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+
+            </div>
+            <!-- /.card-body -->
+
+            <div class="card-footer">
+                <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+            </div>
+
+        </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<div th:replace="common/codemirror.html"></div>
+<div th:replace="snmpDeepInfo/testOidVal.html"></div>
+
+<script th:src="@{'/static/js/snmpDeepInfo.js?v=3.5.9'}"></script>
+<script th:inline="javascript">
+    $('textarea').each(function() {
+        var editor = CodeMirror.fromTextArea($(this)[0], {
+            lineNumbers: true,
+            styleActiveLine: true,
+            readOnly: true,
+            lineSeparator: '</br>',
+            matchBrackets: true
+        });
+        editor.setOption("theme", "dracula");
+        editor.setSize('auto','auto');
+    });
+</script>
+</body>
+</html>

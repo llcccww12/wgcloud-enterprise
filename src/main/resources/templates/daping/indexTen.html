@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title th:text="${application.wgName}">cac监控系统</title>
+  <base href="./" th:href="'/'"/>
+  <meta charset="utf-8">
+  <link rel="shortcut icon" type="image/x-icon" th:href="${application.icoUrl}"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" th:href="@{'/static/dapingTen/css/v10.css'}">
+</head>
+<body>
+<div class="container-header">
+  <ul class="nowTime">
+    <li></li>
+    <li></li>
+  </ul>
+  <div class="location">
+    <i class="icon iconfont icon-buoumaotubiao23"></i>
+    <span class="areaName"></span>
+  </div>
+  <h3 th:text="${application.wgName}">cac监控系统</h3>
+</div>
+<div class="container-content">
+  <div class="top">
+    <div class="count-base" >
+      <div class="com-count-title">监控资源总量构成</div>
+      <div class="com-screen-content">
+        <div id="main1" style="width:100%;height:300px;"></div>
+      </div>
+      <span class="left-top"></span>
+      <span class="right-top"></span>
+      <span class="left-bottom"></span>
+      <span class="right-bottom"></span>
+    </div>
+    <div class="count-resource q1">
+      <div class="com-count-title">资源总量统计</div>
+      <div class="com-screen-content2">
+        <ul class="use-data">
+          <li>
+            <p class="data-count" th:text="${cpuCoresSum}">1</p>
+            <span class="data-name">CPU核数总和</span>
+          </li>
+          <li>
+            <p class="data-count" th:text="${memSum}">1</p>
+            <span class="data-name">内存总和</span>
+          </li>
+          <li>
+            <p class="data-count" th:text="${sumDiskSizeCache}">1</p>
+            <span class="data-name">磁盘容量总和</span>
+          </li>
+        </ul>
+        <div class="com-screen-content">
+          <div id="main2" style="margin-top:10px;width:100%;height:240px;"></div>
+        </div>
+        <span class="left-top"></span>
+        <span class="right-top"></span>
+        <span class="left-bottom"></span>
+        <span class="right-bottom"></span>
+      </div>
+    </div>
+    <div class="count-resource q2">
+      <div class="com-count-title">基础库统计</div>
+      <div class="com-screen-content">
+        <ul class="data-label">
+        </ul>
+        <ul class="use-data">
+          <li><p class="data-count" th:text="${heathSize}">1</p><span class="data-name">监控接口</span></li>
+          <li><p class="data-count" th:text="${shellInfoSize}">1</p><span class="data-name">下发指令</span></li>
+          <li><p class="data-count" th:text="${dbTableSize}">1</p><span class="data-name">数据表监控</span></li>
+        </ul>
+        <div id="main3" style="margin-top:10px;width:100%;height:240px;"></div>
+      </div>
+      <span class="left-top"></span>
+      <span class="right-top"></span>
+      <span class="left-bottom"></span>
+      <span class="right-bottom"></span>
+    </div>
+  </div>
+
+  <div class="mid">
+    <div class="count-share w1" style="margin-top:30px;">
+      <div class="com-count-title">主机运行状态</div>
+      <div class="com-screen-content">
+        <div class="topRec_List">
+          <dl>
+            <dd>主机IP</dd>
+            <dd>状态</dd>
+            <dd>更新时间</dd>
+          </dl>
+          <div class="maquee">
+            <ul>
+              <th:block th:each="item,iterStat : ${systemInfoList}">
+                <li>
+                  <div th:text="${item.hostname}"></div>
+                  <th:block th:if="${item.state  != '2'}">
+                    <div style="color:#3AFF57">正常</div>
+                  </th:block>
+                  <th:block th:if="${item.state  == '2'}">
+                    <div style="color:#dc3545">离线</div>
+                  </th:block>
+                  <div th:text="${#dates.format(item.createTime,'yyyy-MM-dd HH:mm:ss')}"></div>
+                </li>
+              </th:block>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <span class="left-top"></span>
+      <span class="right-top"></span>
+      <span class="left-bottom"></span>
+      <span class="right-bottom"></span>
+    </div>
+    <div class="count-share w2" style="margin-top:30px;">
+      <div class="com-count-title">系统类型分布</div>
+      <div class="com-screen-content">
+        <div id="main5" style="width:100%;height:300px;"></div>
+      </div>
+      <span class="left-top"></span>
+      <span class="right-top"></span>
+      <span class="left-bottom"></span>
+      <span class="right-bottom"></span>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="count-topic e1" >
+      <div class="com-count-title">主机磁盘总使用率%统计</div>
+      <div class="com-screen-content">
+        <div id="main6" style="width:100%;height:300px;"></div>
+      </div>
+      <span class="left-top"></span>
+      <span class="right-top"></span>
+      <span class="left-bottom"></span>
+      <span class="right-bottom"></span>
+    </div>
+    <div class="count-topic e2" >
+      <div class="com-count-title">主机运行进程统计</div>
+      <div class="com-screen-content">
+        <div id="main7" style="width:100%;height:300px;"></div>
+      </div>
+      <span class="left-top"></span>
+      <span class="right-top"></span>
+      <span class="left-bottom"></span>
+      <span class="right-bottom"></span>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+</div>
+
+<script  type="text/javascript"  th:src="@{'/static/daping/js/jquery.js'}"></script>
+<script  type="text/javascript"  th:src="@{'/static/dapingTen/js/echarts.min.js'}"></script>
+<!-- Toastr -->
+<link rel="stylesheet" th:href="@{'/static/AdminLTE/plugins/toastr/toastr.min.css'}">
+<!-- Toastr -->
+<script th:src="@{'/static/AdminLTE/plugins/toastr/toastr.min.js'}"></script>
+
+<script  th:inline="javascript">
+  const systemTop10NameList = [[${systemTop10NameList}]];
+  const cpuTop10List = [[${cpuTop10List}]];
+  const diskPerTop10List = [[${diskPerTop10List}]];
+  const procsTop10ValList = [[${procsTop10ValList}]];
+  const load5mTop10List = [[${load5mTop10List}]];
+  const load15mTop10List = [[${load15mTop10List}]];
+  const maxCpuInfo = [[${maxCpuInfo}]];
+  const avgCpuInfo = [[${avgCpuInfo}]];
+  const minCpuInfo = [[${minCpuInfo}]];
+  const maxMemInfo = [[${maxMemInfo}]];
+  const avgMemInfo = [[${avgMemInfo}]];
+  const minMemInfo = [[${minMemInfo}]];
+  const maxSwapMemInfo = [[${maxSwapMemInfo}]];
+  const avgSwapMemInfo = [[${avgSwapMemInfo}]];
+  const minSwapMemInfo = [[${minSwapMemInfo}]];
+  const maxFiveLoad = [[${maxFiveLoad}]];
+  const minFiveLoad = [[${minFiveLoad}]];
+  const avgFiveLoad = [[${avgFiveLoad}]];
+  const maxFifteenLoad = [[${maxFifteenLoad}]];
+  const minFifteenLoad = [[${minFifteenLoad}]];
+  const avgFifteenLoad = [[${avgFifteenLoad}]];
+  const maxDiskPer = [[${maxDiskPer}]];
+  const avgDiskPer = [[${avgDiskPer}]];
+  const minDiskPer = [[${minDiskPer}]];
+
+  function autoScroll(obj){
+    $(obj).find("ul").animate({
+      marginTop : "-39px"
+    },500,function(){
+      $(this).css({marginTop : "0px"}).find("li:first").appendTo(this);
+    })
+  }
+  $(function(){
+    setInterval('autoScroll(".maquee")',2000);
+  })
+
+  // 基于准备好的dom，初始化echarts实例
+  var myChart1= echarts.init(document.getElementById('main1'));
+  var myChart2 = echarts.init(document.getElementById('main2'));
+  var myChart3 = echarts.init(document.getElementById('main3'));
+  //var myChart4 = echarts.init(document.getElementById('main4'));
+  var myChart5 = echarts.init(document.getElementById('main5'));
+  var myChart6 = echarts.init(document.getElementById('main6'));
+  var myChart7 = echarts.init(document.getElementById('main7'));
+
+  getNowFormatDate();
+  init_myChart1();
+  init_myChart2();
+  init_myChart3();
+  init_myChart5();
+  init_myChart6();
+  init_myChart7();
+
+
+  function init_myChart3() {
+    option = {
+      tooltip: {
+        trigger: 'axis',
+        formatter: function (params, ticket, callback) {
+          var res = '';
+          for (var i = 0, l = params.length; i < l; i++) {
+            res += '' + params[i].seriesName + ' : ' + params[i].value + '<br>';
+          }
+          return res;
+        },
+        transitionDuration: 0,
+        backgroundColor: 'rgba(83,93,105,0.8)',
+        borderColor: '#535b69',
+        borderRadius: 8,
+        borderWidth: 2,
+        padding: [5, 10],
+        axisPointer: {
+          type: 'line',
+          lineStyle: {
+            type: 'dashed',
+            color: '#ffff00'
+          }
+        }
+      },
+      legend: {
+        icon: 'circle',
+        itemWidth: 8,
+        itemHeight: 8,
+        itemGap: 10,
+        top: '16',
+        right: '10',
+        data: ['最高值','平均值','最低值'],
+        textStyle: {
+          fontSize: 14,
+          color: '#a0a8b9'
+        }
+      },
+      grid: {
+        top: '46',
+        left: '13%',
+        right: '10',
+        //bottom: '10%',
+        containLabel: false
+      },
+      xAxis: [{
+        type: 'category',
+        boundaryGap: false,
+        axisLabel: {
+          interval: 0,
+          rotate:25,
+          fontSize:14
+        },
+        axisLine: {
+          show: false,
+          lineStyle: {
+            color: '#a0a8b9'
+          }
+        },
+        axisTick: {
+          show: false
+        },
+        data: ['CPU%','内存%','磁盘%','5分钟负载','15分钟负载','交换区内存%'],
+        offset: 10
+      }],
+      yAxis: [{
+        type: 'value',
+        axisLine: {
+          show: false,
+          lineStyle: {
+            color: '#a0a8b9'
+          }
+        },
+        axisLabel: {
+          margin: 10,
+          textStyle: {
+            fontSize: 14
+          }
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#2b3646'
+          }
+        },
+        axisTick: {
+          show: false
+        }
+      }],
+      series: [{
+        name: '最高值',
+        type: 'line',
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+          normal: {
+            width: 2
+          }
+        },
+        areaStyle: {
+          normal: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+              offset: 0,
+              color: 'rgba(137, 189, 27, 0.3)'
+            }, {
+              offset: 0.8,
+              color: 'rgba(137, 189, 27, 0)'
+            }], false),
+            shadowColor: 'rgba(0, 0, 0, 0.1)',
+            shadowBlur: 10
+          }
+        },
+        itemStyle: {
+          normal: {
+            color: '#1cc840'
+          }
+        },
+        data: [maxCpuInfo, maxMemInfo, maxDiskPer, maxFiveLoad, maxFifteenLoad,  maxSwapMemInfo]
+      }, {
+        name: '平均值',
+        type: 'line',
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+          normal: {
+            width: 2
+          }
+        },
+        areaStyle: {
+          normal: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+              offset: 0,
+              color: 'rgba(219, 50, 51, 0.3)'
+            }, {
+              offset: 0.8,
+              color: 'rgba(219, 50, 51, 0)'
+            }], false),
+            shadowColor: 'rgba(0, 0, 0, 0.1)',
+            shadowBlur: 10
+          }
+        },
+        itemStyle: {
+          normal: {
+            color: '#eb5690'
+          }
+        },
+        data: [avgCpuInfo, avgMemInfo, avgDiskPer, avgFiveLoad, avgFifteenLoad, avgSwapMemInfo]
+      },  {
+        name: '最低值',
+        type: 'line',
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+          normal: {
+            width: 2
+          }
+        },
+        areaStyle: {
+          normal: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+              offset: 0,
+              color: 'rgba(0, 136, 212, 0.3)'
+            }, {
+              offset: 0.8,
+              color: 'rgba(0, 136, 212, 0)'
+            }], false),
+            shadowColor: 'rgba(0, 0, 0, 0.1)',
+            shadowBlur: 10
+          }
+        },
+        itemStyle: {
+          normal: {
+            color: '#43bbfb'
+          }
+        },
+        data: [minCpuInfo, minMemInfo, minDiskPer,  minFiveLoad, minFifteenLoad, minSwapMemInfo]
+      }
+      ]
+    };
+    myChart3.setOption(option);
+  }
+  function init_myChart2() {
+    option = {
+      tooltip: {
+        trigger: 'axis',
+        formatter: function (params, ticket, callback) {
+          var res = '';
+          for (var i = 0, l = params.length; i < l; i++) {
+            res += '' + params[i].seriesName + ' : ' + params[i].value + '<br>';
+          }
+          return res;
+        },
+        transitionDuration: 0,
+        backgroundColor: 'rgba(83,93,105,0.8)',
+        borderColor: '#535b69',
+        borderRadius: 8,
+        borderWidth: 2,
+        padding: [5, 10],
+        axisPointer: {
+          type: 'line',
+          lineStyle: {
+            type: 'dashed',
+            color: '#ffff00'
+          }
+        }
+      },
+      legend: {
+        icon: 'circle',
+        itemWidth: 8,
+        itemHeight: 8,
+        itemGap: 10,
+        top: '16',
+        right: '10',
+        data: ['CPU使用率%','5分钟系统负载','15分钟系统负载'],
+        textStyle: {
+          fontSize: 14,
+          color: '#a0a8b9'
+        }
+      },
+      grid: {
+        top:'46',
+        left: '13%',
+        right: '10',
+        //bottom: '10%',
+        containLabel: false
+      },
+      xAxis: [{
+        type: 'category',
+        boundaryGap: false,
+        axisLabel: {
+          interval: 0,
+          rotate:20,
+          fontSize:14
+        },
+        axisLine: {
+          show: false,
+          lineStyle: {
+            color: '#a0a8b9'
+          }
+        },
+        axisTick: {
+          show: false
+        },
+        data: systemTop10NameList,
+        offset: 10
+      }],
+      yAxis: [{
+        type: 'value',
+        axisLine: {
+          show: false,
+          lineStyle: {
+            color: '#a0a8b9'
+          }
+        },
+        axisLabel: {
+          margin: 10,
+          textStyle: {
+            fontSize: 14
+          }
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#2b3646'
+          }
+        },
+        axisTick: {
+          show: false
+        }
+      }],
+      series: [{
+        name: 'CPU使用率%',
+        type: 'line',
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+          normal: {
+            width: 2
+          }
+        },
+        areaStyle: {
+          normal: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+              offset: 0,
+              color: 'rgba(137, 189, 27, 0.3)'
+            }, {
+              offset: 0.8,
+              color: 'rgba(137, 189, 27, 0)'
+            }], false),
+            shadowColor: 'rgba(0, 0, 0, 0.1)',
+            shadowBlur: 10
+          }
+        },
+        itemStyle: {
+          normal: {
+            color: '#1cc840'
+          }
+        },
+        data: cpuTop10List
+      }, {
+        name: '5分钟系统负载',
+        type: 'line',
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+          normal: {
+            width: 2
+          }
+        },
+        areaStyle: {
+          normal: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+              offset: 0,
+              color: 'rgba(219, 50, 51, 0.3)'
+            }, {
+              offset: 0.8,
+              color: 'rgba(219, 50, 51, 0)'
+            }], false),
+            shadowColor: 'rgba(0, 0, 0, 0.1)',
+            shadowBlur: 10
+          }
+        },
+        itemStyle: {
+          normal: {
+            color: '#eb5690'
+          }
+        },
+        data: load5mTop10List
+      },  {
+        name: '15分钟系统负载',
+        type: 'line',
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+          normal: {
+            width: 2
+          }
+        },
+        areaStyle: {
+          normal: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+              offset: 0,
+              color: 'rgba(0, 136, 212, 0.3)'
+            }, {
+              offset: 0.8,
+              color: 'rgba(0, 136, 212, 0)'
+            }], false),
+            shadowColor: 'rgba(0, 0, 0, 0.1)',
+            shadowBlur: 10
+          }
+        },
+        itemStyle: {
+          normal: {
+            color: '#43bbfb'
+          }
+        },
+        data: load15mTop10List
+      }
+      ]
+    };
+    myChart2.setOption(option);
+  }
+  function init_myChart1(){
+    option = {
+      tooltip : {
+        trigger: 'item',
+        formatter: "{a} <br/>{b} : {c} ({d}%)"
+      },
+      color:['#8fc31f','#f35833','#00ccff','#ffcc00','#f5e965','#a74faf','#ff9668', '#F8B448', '#da70d6'],
+      series : [
+        {
+          name: '监控资源总量构成',
+          type: 'pie',
+          radius : '40%',
+          center: ['50%', '50%'],
+          data:[
+            {value:[[${totalSystemInfoSize}]], name:'监控主机'},
+            {value:[[${totalSizeApp}]], name:'监控进程'},
+            {value:[[${portSize}]], name:'监控端口'},
+            {value:[[${fileWarnSize}]], name:'监控日志'},
+            {value:[[${dockerSize}]], name:'监控Docker'},
+            {value:[[${fileSafeSize}]], name:'防篡改监控'},
+            {value:[[${dbInfoSize}]], name:'监控数据库'},
+            {value:[[${customInfoSize}]], name:'自定义监控项'},
+            {value:[[${dceSnmpSize}]], name:'网络设备'}
+          ],
+          itemStyle: {
+            emphasis: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)'
+            }
+          },
+          itemStyle: {
+            normal: {
+              label:{
+                show: true,
+                //	                            position:'inside',
+                formatter: '{b} : {c} ({d}%)' ,
+                fontSize : 14,    //文字的字体大小
+              }
+            },
+            labelLine :{show:true}
+          }
+        }
+      ]
+    };
+// 使用刚指定的配置项和数据显示图表。
+    myChart1.setOption(option);
+  }
+
+  function init_myChart5(){
+    var XData= [[${systemInfoTypeNameList}]];
+    var yData= [[${systemInfoTypeValList}]];
+    option = {
+      backgroundColor:"",
+      xAxis: {
+        axisTick: {
+          show: false
+        },
+        splitLine: {
+          show: false
+        },
+        splitArea: {
+          show: false
+        },
+        data: XData,
+        axisLabel: {
+          interval: 0,
+          fontSize: 14,
+          fontWeight: 100,
+          textStyle: {
+            color: '#9faeb5',
+          }
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#4d4d4d'
+          }
+        }
+      },
+      yAxis: {
+        axisTick: {
+          show: false
+        },
+        splitLine: {
+          show: false
+        },
+        splitArea: {
+          show: false
+        },
+        axisLabel: {
+          textStyle: {
+            color: '#9faeb5',
+            fontSize: 16,
+          }
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#4d4d4d'
+          }
+        }
+      },
+      "tooltip": {
+        "trigger": "axis",
+        transitionDuration: 0,
+        backgroundColor: 'rgba(83,93,105,0.8)',
+        borderColor: '#535b69',
+        borderRadius: 8,
+        borderWidth: 2,
+        padding: [5, 10],
+        axisPointer: {
+          type: 'line',
+          lineStyle: {
+            type: 'dashed',
+            color: '#ffff00'
+          }
+        }
+      },
+      series: [{
+        name:'系统类型数量',
+        type:"bar",
+        itemStyle: {
+          normal: {
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [{
+                offset: 0,
+                color: '#00d386' // 0% 处的颜色
+              }, {
+                offset: 1,
+                color: '#0076fc' // 100% 处的颜色
+              }],
+              globalCoord: false // 缺省为 false
+            },
+            barBorderRadius: 15,
+          }
+        },
+        label: {
+          normal: {
+            show: true,
+            position: "top",
+            textStyle: {
+              color: "#ffc72b",
+              fontSize: 10
+            }
+          }
+        },
+        data: yData,
+        barWidth: 16,
+      },{
+        name:'主机统计',
+        type:'line',
+        itemStyle : {  /*设置折线颜色*/
+          normal : {
+            /* color:'#c4cddc'*/
+          }
+        },
+        data:yData
+      }]
+    };
+    myChart5.setOption(option);
+  }
+  //刷新myChart5数据
+
+
+  function init_myChart6(){
+    option = {
+      "tooltip": {
+        "trigger": "axis",
+        transitionDuration: 0,
+        backgroundColor: 'rgba(83,93,105,0.8)',
+        borderColor: '#535b69',
+        borderRadius: 8,
+        borderWidth: 2,
+        padding: [5, 10],
+        axisPointer: {
+          type: 'line',
+          lineStyle: {
+            type: 'dashed',
+            color: '#ffff00'
+          }
+        }
+      },
+      "grid": {
+        "top": '40',
+        "left": '30',
+        "right": '10',
+        "bottom": '40',
+        textStyle: {
+          color: "#fff"
+        }
+      },
+      "legend": {
+        right: '24',
+        top: "24",
+        itemWidth: 8,
+        itemHeight: 12,
+        textStyle: {
+          color: '#fff',
+          fontSize:14
+        },
+        "data": ['主机磁盘总使用率%'],
+      },
+      "calculable": true,
+      xAxis: [{
+        'type': 'category',
+        "axisTick": {
+          "show": false
+        },
+        "axisLine": {
+          "show": false,
+          lineStyle: {
+            color: '#868c96'
+          }
+        },
+        "axisLabel": {
+          "interval": 0,
+          rotate:20,
+          fontSize:14
+        },
+        "splitArea": {
+          "show": false
+        },
+        'data': systemTop10NameList,
+        splitLine: {
+          show: false
+        }
+      }],
+      "yAxis": [
+        {
+          "type": "value",
+          offset: -14,
+          "splitLine": {
+            "show": false
+          },
+          "axisLine": {
+            "show": false,
+            lineStyle: {
+              color: '#868c96'
+            }
+          },
+          "axisTick": {
+            "show": false
+          },
+          "axisLabel": {
+            "interval": 0,
+            fontSize:14
+
+          },
+          "splitArea": {
+            "show": false
+          }
+        }],
+      "series": [
+        {
+          "name": "磁盘总使用率%",
+          "type": "bar",
+          "barGap": "10%",
+          itemStyle: {//图形样式
+            normal: {
+              "color": '#4a4df0'
+            }
+          },
+          label: {
+            normal: {
+              show: true,
+              position: "top",
+              textStyle: {
+                color: "#ffc72b",
+                fontSize: 10
+              }
+            }
+          },
+          "data": diskPerTop10List,
+          barWidth: 14,
+        },{
+          name:'百分比统计',
+          type:'line',
+          itemStyle : {  /*设置折线颜色*/
+            normal : {
+              color:'#c7b198'
+            }
+          },
+          data: diskPerTop10List,
+        }
+      ]
+    };
+// 使用刚指定的配置项和数据显示图表。
+    myChart6.setOption(option);
+  }
+
+  function init_myChart7(){
+    var colorList = [
+      '#ff2600',
+      '#ffc000',
+      '#00ad4e',
+      '#0073c2',
+      '#165868',
+      '#e76f00',
+      '#316194',
+      '#723761',
+      '#00b2f1',
+      '#4d6022',
+      '#4b83bf',
+      '#f9c813',
+      '#0176c0'
+    ];
+    var xData = systemTop10NameList;
+    var yData = procsTop10ValList;
+    option = {
+      color:colorList,
+      "tooltip": {
+        "trigger": "axis",
+        transitionDuration: 0,
+        backgroundColor: 'rgba(83,93,105,0.8)',
+        borderColor: '#535b69',
+        borderRadius: 8,
+        borderWidth: 2,
+        padding: [5, 10],
+        axisPointer: {
+          type: 'line',
+          lineStyle: {
+            type: 'dashed',
+            color: '#ffff00'
+          }
+        }
+      },
+      toolbox: {
+        show : true,
+        feature : {
+          mark : {
+            show: true
+          },
+        }
+      },
+      grid: {
+        "borderWidth": 0,
+        "top": '40',
+        "left": '30',
+        "right": '10',
+        "bottom": '40',
+        textStyle: {
+          color: "#fff"
+        }
+      },
+      xAxis : [
+        {
+          'type': 'category',
+          "axisTick": {
+            "show": false
+          },
+          "axisLine": {
+            "show": false,
+            lineStyle: {
+              color: '#868c96'
+            }
+          },
+          "axisLabel": {
+            "interval": 0,
+            rotate:20,
+            fontSize:14
+          },
+          "splitArea": {
+            "show": false
+          },
+          'data': xData,
+          splitLine: {
+            show: false
+          },
+        }
+      ],
+      yAxis : [
+        {
+          "type": "value",
+          offset: -14,
+          "splitLine": {
+            "show": false
+          },
+          "axisLine": {
+            "show": false,
+            lineStyle: {
+              color: '#868c96'
+            }
+          },
+          "axisTick": {
+            "show": false
+          },
+          "axisLabel": {
+            "interval": 0,
+            fontSize:14
+
+          },
+          "splitArea": {
+            "show": false
+          }
+        }
+      ],
+      series : [
+        {
+          name:'运行进程数量',
+          type:'bar',
+          data:yData,
+          itemStyle: {
+            normal: {
+              color: function(params) {
+                // build a color map as your need.
+                var colorList = [
+                  '#ff2600',
+                  '#ffc000',
+                  '#00ad4e',
+                  '#0073c2',
+                  '#165868',
+                  '#e76f00',
+                  '#316194',
+                  '#723761',
+                  '#00b2f1',
+                  '#4d6022',
+                  '#4b83bf',
+                  '#f9c813',
+                  '#0176c0'
+                ];
+                return colorList[params.dataIndex]
+              },
+            }
+          },
+          barWidth: 14,
+          label: {
+            normal: {
+              show: true,
+              position: "top",
+              textStyle: {
+                color: "#ffc72b",
+                fontSize: 10
+              }
+            }
+          },
+        },
+        {
+          name:'进程统计',
+          type:'line',
+          itemStyle : {  /*设置折线颜色*/
+            normal : {
+              color:'#d3d5fd'
+            }
+          },
+          data:yData
+        }
+      ]
+    };
+
+
+// 使用刚指定的配置项和数据显示图表。
+    myChart7.setOption(option);
+  }
+  //获取当前时间
+  function getNowFormatDate() {
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var strDate = date.getDate();
+    var Hour =  date.getHours();       // 获取当前小时数(0-23)
+    var Minute =  date.getMinutes();     // 获取当前分钟数(0-59)
+    var Second = date.getSeconds();     // 获取当前秒数(0-59)
+    var show_day=new Array('星期日','星期一','星期二','星期三','星期四','星期五','星期六');
+    var day=date.getDay();
+    if (Hour<10) {
+      Hour = "0" + Hour;
+    }
+    if (Minute <10) {
+      Minute = "0" + Minute;
+    }
+    if (Second <10) {
+      Second = "0" + Second;
+    }
+    if (month >= 1 && month <= 9) {
+      month = "0" + month;
+    }
+    if (strDate >= 0 && strDate <= 9) {
+      strDate = "0" + strDate;
+    }
+    var currentdate = '<div><p>'+year + '年' + month +'月' + strDate+'号</p><p>'+show_day[day]+'</p></div>';
+    var HMS = Hour + ':' + Minute +':' + Second;
+    var temp_time = year+'-'+month+'-'+strDate+' '+HMS;
+    $('.nowTime li:nth-child(1)').html(HMS);
+    $('.nowTime li:nth-child(2)').html(currentdate);
+    //$('.topRec_List li div:nth-child(3)').html(temp_time);
+    setTimeout(getNowFormatDate,1000);//每隔1秒重新调用一次该函数
+  }
+
+  const dapingRefreshTimes = [[${dapingRefreshTimes}]];
+  function reload() {
+    window.location.reload();
+  }
+  setTimeout(reload, dapingRefreshTimes);
+
+  const tipInfoMsg = [[${tipInfoMsg}]];
+  if(tipInfoMsg!=''  && tipInfoMsg!=null){
+    //toastr提示框延时10s后消失
+    toastr.options.timeOut = 10000;
+    toastr.success("<span style='font-size:16px;color:#fff'>"+tipInfoMsg+"</span>");
+  }
+</script>
+
+</body>
+</html>

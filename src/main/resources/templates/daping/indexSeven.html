@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title th:text="${application.wgName}">cac监控系统</title>
+  <base href="./" th:href="'/'"/>
+  <meta charset="utf-8">
+  <link rel="shortcut icon" type="image/x-icon" th:href="${application.icoUrl}"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" th:href="@{'/static/dapingSeven/css/index.css'}">
+
+</head>
+<body>
+<div class="wrap">
+  <div class="wid_1820">
+
+    <div class="header">
+      <p class="tmtext" style="font-size:14px;" id="showTime"></p>
+      <p><span class="hefont" th:text="${application.wgName}">cac监控系统</span></p>
+    </div>
+
+    <div class="content content1"> <img class="guang" th:src="@{'/static/dapingSeven/img/title.png'}"/>
+      <p class="ctitle"></p>
+      <div class="cznl">
+        <div class="czl">
+          <div class="tb tb_pos">
+            <h3>监控资源</h3>
+            <table class="table1">
+              <tr class="tb_title"><td>资源名称</td><td>总数量</td><td>离线数量</td></tr>
+              <tr><td>监控进程</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${totalSizeApp}"></td><td style="color:#dc3545;font-weight:700;;font-weight:700;" th:text="${downAppSize}"></td></tr>
+              <tr><td>异常进程</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${appExceptionSize}"></td><td>/</td></tr>
+              <tr><td>自定义监控项</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${customInfoSize}"></td><td style="color:#dc3545;font-weight:700;" th:text="${customInfoDownSize}"></td></tr>
+              <tr><td>文件防篡改监控</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${fileSafeSize}"></td><td style="color:#dc3545;font-weight:700;" th:text="${fileSafeDownSize}"></td></tr>
+              <tr><td>日志监控 </td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${fileWarnSize}"></td><td>/</td></tr>
+              <tr><td>端口监控</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${portSize}"></td><td style="color:#dc3545;font-weight:700;" th:text="${portDownSize}"></td></tr>
+              <tr><td>Docker容器监控</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${dockerSize}"></td><td style="color:#dc3545;font-weight:700;" th:text="${downDockerSize}"></td></tr>
+              <tr><td>数据库监控</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${dbInfoSize}"></td><td style="color:#dc3545;font-weight:700;" th:text="${dbInfoDownSize}"></td></tr>
+              <tr><td>数据表监控</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${dbTableSize}"></td><td style="color:#dc3545;font-weight:700;" th:text="${dbTableDownSize}"></td></tr>
+              <tr><td>服务接口监控</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${heathSize}"></td><td style="color:#dc3545;font-weight:700;" th:text="${heathDownSize}"></td></tr>
+              <tr><td>网络设备PING监控</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${dceSize}"></td><td style="color:#dc3545;font-weight:700;" th:text="${dceDownSize}"></td></tr>
+              <tr><td>网络设备SNMP监控</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${snmpSize}"></td><td style="color:#dc3545;font-weight:700;" th:text="${snmpDownSize}"></td></tr>
+              <tr><td>网络设备SNMP深度监控</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${snmpDeepSize}"></td><td style="color:#dc3545;font-weight:700;" th:text="${snmpDeepDownSize}"></td></tr>
+              <tr><td>FTP/SFTP监控</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${ftpInfoSize}"></td><td style="color:#dc3545;font-weight:700;" th:text="${ftpInfoDownSize}"></td></tr>
+              <tr><td>计划任务</td><td  style="color:rgb(114, 221, 255);font-weight:700;" th:text="${taskJobSize}"></td><td>/</td></tr>
+              <tr><td>下发指令</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${shellInfoSize}"></td><td>/</td></tr>
+              <tr><td>1小时内告警数量</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${application.warnCountAnHour}"></td><td>/</td></tr>
+              <tr><td>Redis监控数量</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${redisMonitorSize}"></td><td style="color:#dc3545;font-weight:700;" th:text="${redisMonitorDownSize}"></td></tr>
+              <tr><td>Kafka监控数量</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${kafkaSize}"></td><td style="color:#dc3545;font-weight:700;" th:text="${kafkaDownSize}"></td></tr>
+              <tr><td>动环监测数量</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${powerEnvListSize}"></td><td>/</td></tr>
+              <tr><td>RabbitMQ监控数量</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${rabbitmqListSize}"></td><td>/</td></tr>
+              <tr><td>ActiveMQ监控数量</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${activemqListSize}"></td><td>/</td></tr>
+              <tr><td>K8S监控数量</td><td style="color:rgb(114, 221, 255);font-weight:700;" th:text="${k8sSize}"></td><td>/</td></tr>
+            </table>
+          </div>
+          <div class="fxzt">
+            <div>
+              <span>服务器主机监控状态</span>
+              <ul class="fxztul">
+                <li class="litime"><span></span>总数量<p th:text="${totalSystemInfoSize}"></p></li>
+                <li class="listate"><span></span>运行状态<p>正常</p></li>
+                <li class="linumber"><span></span>离线数量<p th:text="${hostDownSize}"></p></li>
+                <li><div class="baojing"></div></li>
+              </ul>
+            </div>
+          </div>
+          <div id="line1" class="div1 line1"></div>
+          <div style="clear: both;"></div>
+          <div class="fxzt">
+            <div>
+              <span>网络设备监控状态</span>
+              <ul class="fxztul">
+                <li class="litime"><span></span>总数量<p th:text="${dceSnmpSize}"></p></li>
+                <li class="listate"><span></span>运行状态<p>正常</p></li>
+                <li class="linumber"><span></span>离线数量<p th:text="${dceSnmpDownSize}"></p></li>
+                <li><div class="baojing"></div></li>
+              </ul>
+            </div>
+          </div>
+          <div id="line2" class="div1 line1"></div>
+          <div style="clear: both;"></div>
+          <div class="fxzt">
+            <div>
+              <span>数据库监控状态</span>
+              <ul class="fxztul">
+                <li class="litime"><span></span>总数量<p th:text="${dbInfoSize}"></p></li>
+                <li class="listate"><span></span>运行状态<p>正常</p></li>
+                <li class="linumber"><span></span>离线数量<p th:text="${dbInfoDownSize}"></p></li>
+                <li><div class="baojing"></div></li>
+              </ul>
+            </div>
+          </div>
+          <div id="line3" class="div1 line1"></div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+<script  type="text/javascript"  th:src="@{'/static/daping/js/jquery.js'}"></script>
+<script  type="text/javascript"  th:src="@{'/static/dapingSeven/js/echarts.min.js'}"></script>
+
+<!-- Toastr -->
+<link rel="stylesheet" th:href="@{'/static/AdminLTE/plugins/toastr/toastr.min.css'}">
+<!-- Toastr -->
+<script th:src="@{'/static/AdminLTE/plugins/toastr/toastr.min.js'}"></script>
+<script  th:inline="javascript">
+  const systemInfoTypeNameList = [[${systemInfoTypeNameList}]];
+  const systemInfoTypeValList = [[${systemInfoTypeValList}]];
+  const hostDownSize = [[${hostDownSize}]];
+  const hostOnSize = [[${hostOnSize}]];
+
+  const systemTop10NameList = [[${systemTop10NameList}]];
+  const cpuTop10ValList = [[${cpuTop10ValList}]];
+  const memTop10ValList = [[${memTop10ValList}]];
+
+  const rxbytTop10List = [[${rxbytTop10List}]];
+  const txbytTop10List = [[${txbytTop10List}]];
+
+  $(function(){
+
+
+    var colors = ['#5793f3', '#d14a61', '#675bba'];
+
+    option = {
+      color: colors,
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          lineStyle: {
+            color: '#dddc6b'
+          }
+        }
+      },
+      legend: {
+        data:['CPU使用率%最新'],
+        icon: 'roundRect',
+        textStyle: {
+          color: '#fff'
+        }
+      },
+      grid: {
+        top: 30,
+        bottom: 60
+      },
+      xAxis: [
+        {
+          type: 'category',
+          axisTick: {
+            alignWithLabel: true
+          },
+          axisLabel: {
+            color:'#fff',
+            interval: 0,
+            fontSize :12,
+            rotate:45,
+          },
+          axisLine: {
+            onZero: false,
+            lineStyle: {
+              color: colors[1]
+            }
+          },
+          data: systemTop10NameList
+        }
+      ],
+      yAxis: [
+        {
+          type: 'value',
+          max : 100,
+          axisLabel: {
+            color:'#fff',
+            interval: 0,
+            fontSize :12,
+            formatter: '{value}'
+          },
+          min: 0,
+          splitLine: {
+            show: false
+          }
+        }
+      ],
+      series: [
+        {
+          type: 'line',
+          name: 'CPU使用率%最新',
+          symbol: 'circle',
+          symbolSize: 10,
+          smooth: true,
+          itemStyle: {
+            normal: {
+              show: false,
+              color: '#00eef8',
+              opacity: 0
+            },
+            emphasis: {
+              color: '#00eef8',
+            }
+          },
+          lineStyle: {
+            normal: {
+              color: '#00eef8',
+            }
+          },
+          data: cpuTop10ValList,
+        }
+      ]
+    };
+
+    optionbtm = {
+      color: colors,
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          lineStyle: {
+            color: '#dddc6b'
+          }
+        }
+      },
+      legend: {
+        data:['主机上行速率KB/s','主机下行速率KB/s'],
+        icon: 'roundRect',
+        textStyle: {
+          color: '#fff'
+        }
+      },
+      grid: {
+        top: 30,
+        bottom: 60
+      },
+      xAxis: [
+        {
+          type: 'category',
+          axisTick: {
+            alignWithLabel: true
+          },
+          axisLabel: {
+            color:'#fff',
+            interval: 0,
+            fontSize :12,
+            rotate:45,
+          },
+          axisLine: {
+            onZero: false,
+            lineStyle: {
+              color: colors[1]
+            }
+          },
+          data: systemTop10NameList
+        }
+      ],
+      yAxis: [
+        {
+          type: 'value',
+          axisLabel: {
+            color:'#fff',
+            interval: 0,
+            fontSize :12,
+            formatter: '{value}'
+          },
+          min: 0,
+          splitLine: {
+            show: false
+          }
+        }
+      ],
+      series: [
+        {
+          type: 'line',
+          name: '主机上行速率KB/s',
+          symbol: 'circle',
+          symbolSize: 10,
+          smooth: true,
+          itemStyle: {
+            normal: {
+              show: false,
+              color: '#00eef8',
+              opacity: 0
+            },
+            emphasis: {
+              color: '#00eef8',
+            }
+          },
+          lineStyle: {
+            normal: {
+              color: '#00eef8',
+            }
+          },
+          data: txbytTop10List,
+        },
+        {
+          type: 'line',
+          name: '主机下行速率KB/s',
+          symbol: 'circle',
+          symbolSize: 10,
+          smooth: true,
+          itemStyle: {
+            normal: {
+              color: '#ffbe0d',
+              opacity: 0
+            },
+            emphasis: {
+              color: '#ffbe0d',
+            }
+          },
+          lineStyle: {
+            normal: {
+              color: '#ffbe0d',
+            }
+          },
+          data: rxbytTop10List,
+        }
+      ]
+    };
+    optioncenter = {
+      color: colors,
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          lineStyle: {
+            color: '#dddc6b'
+          }
+        }
+      },
+      legend: {
+        data:['内存使用率%最新'],
+        icon: 'roundRect',
+        textStyle: {
+          color: '#fff'
+        }
+      },
+      grid: {
+        top: 30,
+        bottom: 60
+      },
+      xAxis: [
+        {
+          type: 'category',
+          axisTick: {
+            alignWithLabel: true
+          },
+          axisLabel: {
+            color:'#fff',
+            interval: 0,
+            fontSize :12,
+            rotate:45,
+          },
+          axisLine: {
+            onZero: false,
+            lineStyle: {
+              color: colors[1]
+            }
+          },
+          axisPointer: {
+            label: {
+              show: false,
+              formatter: function (params) {
+                return params.value
+                        + (params.seriesData.length ? '：' + params.seriesData[0].data : '');
+              }
+            }
+          },
+          data: systemTop10NameList
+        }
+      ],
+      yAxis: [
+        {
+          type: 'value',
+          max : 100,
+          axisLabel: {
+            color:'#fff',
+            interval: 0,
+            fontSize :12,
+            formatter: '{value}'
+          },
+          min: 1,
+          splitLine: {
+            show: false
+          }
+        }
+      ],
+      series: [
+        {
+          type: 'line',
+          name: '内存使用率%最新',
+          symbol: 'circle',
+          symbolSize: 10,
+          smooth: true,
+          itemStyle: {
+            normal: {
+              color: '#ffbe0d',
+              opacity: 0
+            },
+            emphasis: {
+              color: '#ffbe0d',
+            }
+          },
+          lineStyle: {
+            normal: {
+              color: '#ffbe0d',
+            }
+          },
+          data: memTop10ValList,
+        }
+      ]
+    };
+
+    $(".czl").css("display","block");
+    var myChart = echarts.init(document.getElementById('line1'));
+    var myChart01 = echarts.init(document.getElementById('line2'));
+    var myChart02 = echarts.init(document.getElementById('line3'));
+    myChart.setOption(option);
+    myChart01.setOption(optioncenter);
+    myChart02.setOption(optionbtm);
+  })
+
+  const tipInfoMsg = [[${tipInfoMsg}]];
+  if(tipInfoMsg!=''  && tipInfoMsg!=null){
+    //toastr提示框延时10s后消失
+    toastr.options.timeOut = 10000;
+    toastr.success("<span style='font-size:16px;color:#fff'>"+tipInfoMsg+"</span>");
+  }
+</script>
+
+<script  th:inline="javascript">
+  const dapingRefreshTimes = [[${dapingRefreshTimes}]];
+  var t = null;
+  t = setTimeout(time,1000);//開始运行
+  function time()
+  {
+    clearTimeout(t);//清除定时器
+    dt = new Date();
+    var y=dt.getFullYear();
+    var mt=dt.getMonth()+1;
+    var day=dt.getDate();
+    var h=dt.getHours();//获取时
+    var m=dt.getMinutes();//获取分
+    var s=dt.getSeconds();//获取秒
+    document.getElementById("showTime").innerHTML = y+"年"+mt+"月"+day+"日-"+h+"时"+m+"分"+s+"秒";
+    t = setTimeout(time,1000); //设定定时器，循环运行
+  }
+
+  function reload() {
+    window.location.reload();
+  }
+  setTimeout(reload,dapingRefreshTimes);
+
+</script>
+</body>
+</html>

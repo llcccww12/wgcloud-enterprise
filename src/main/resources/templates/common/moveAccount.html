@@ -1,0 +1,61 @@
+<div class="modal fade" id="modal-defaultMoveAccount">
+    <div class="modal-dialog">
+        <form method="post" id="formMoveAccount" th:action="@{'/accountInfo/moveToAccount'}">
+            <div class="modal-content" style="font-size:0.90rem">
+                <div class="modal-header">
+                    <h4 class="modal-title">迁移<span class="text-muted">（将该账号的监控资源迁移到其他账号）</span></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        <input type="hidden" id="idSourceAccount" name="idSourceAccount"/>
+                        <input type="hidden" id="resourceType" name="resourceType"/>
+                        <select style="width:100%;" class="form-control" data-placeholder="请选择"  name="account">
+                            <option  value="">请选择</option>
+                            <th:block th:each="item,iterStat : ${accountList}">
+                                <option  th:if="${item.role  != 'guest'}" th:value="${item.account}"  th:text="${item.account}">Alabama</option>
+                            </th:block>
+                        </select>
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default  btn-sm" data-dismiss="modal">关 闭</button>
+                    <button type="button" onclick="ajaxMoveToAccount()" class="btn btn-primary btn-sm">保 存</button>
+                </div>
+            </div>
+        </form>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<script th:inline="javascript">
+    function showMoveAllToAccount(account) {
+        $("#idSourceAccount").val(account);
+        $("#resourceType").val('');
+        $("#modal-defaultMoveAccount").modal("toggle");
+    }
+    function showMoveToAccount(resourceType) {
+        var chk_value =[];
+        $("input[name='todo2']:checkbox").each(function() {
+            if($(this).is(':checked')) {
+                chk_value.push($(this).val());
+            }
+        });
+        if(chk_value.length == 0){
+            alert("请先选择需要迁移的数据");
+            return;
+        }
+        var vals = chk_value.join(",");
+
+        $("#idSourceAccount").val(vals);
+        $("#resourceType").val(resourceType);
+        $("#modal-defaultMoveAccount").modal("toggle");
+    }
+    function ajaxMoveToAccount() {
+        $("#formMoveAccount").ajaxSubmit(function(message) {
+            window.location.href = window.location.href;
+        });
+    }
+</script>

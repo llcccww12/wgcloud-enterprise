@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}" style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header" style="height:38px">
+      <div class="container-fluid">
+        <div class="row mb-2" style="margin-top: -7px;">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="javascript:history.back()">返回上级</a></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card '+${session.themeNameSign}">
+      <div class="card-header">
+        <div class="card-title"><strong>主机：</strong><span th:text="${fileWarnInfo.hostname}"></span><span class="text-primary btncopy" th:data-clipboard-text="${fileWarnInfo.hostname}" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制"  style="cursor:pointer;margin-left: 5px"><i class="fa fa-copy"></i></span>
+          <strong style="margin-left:10px">日志文件：</strong><code class="highlighter-rouge" style="font-size:100%" th:text="${fileWarnInfo.filePath}"></code><span class="text-primary btncopy" th:data-clipboard-text="${fileWarnInfo.filePath}" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制" style="cursor:pointer;margin-left: 5px"><i class="fa fa-copy"></i></span></div>
+        <div class=" float-sm-right">
+          <!-- SEARCH FORM -->
+          <form class="form-inline ml-3" >
+            <div class="input-group input-group-sm">
+              <button type="button" th:onclick="excelExport([[${fileWarnInfo.id}]])" class="btn btn-primary btn-sm">导出Excel</button>&nbsp;
+            </div>
+          </form>
+
+        </div>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <table th:class="'table table-bordered '+${session.themeTableHoverSign}">
+          <thead>
+          <tr>
+            <th style="width: 60px">序号</th>
+            <th>日志文件路径</th>
+            <th>扫描行数</th>
+            <th>告警行数</th>
+            <th>添加时间</th>
+              <th>操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <th:block th:each="item,iterStat : ${page.list}">
+            <tr>
+              <td th:text="${iterStat.index+1}">1</td>
+              <td th:text="${item.filePath}">Update software</td>
+              <td th:text="${item.rowsCount}">Update software</td>
+              <td th:text="${item.rowsGatherCount}">Update software</td>
+              <td th:text="${#dates.format(item.createTime,'yyyy-MM-dd HH:mm:ss')}">Update software</td>
+              <td><button type="button"  th:onclick="stateView([[${item.id}]])"  class="btn btn-primary btn-sm">查看详情</button></td>
+            </tr>
+          </th:block>
+
+          </tbody>
+        </table>
+      </div>
+      <!-- /.card-body -->
+      <div th:replace="common/page.html"></div>
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:src="@{'/static/js/fileWarnInfo.js?v=3.5.0'}"></script>
+<script th:inline="javascript">
+  $(document).ready(function(){
+    var clipboard = new ClipboardJS('.btncopy');
+    clipboard.on('success', function (e) {
+      toastr.success("复制成功");
+    });
+  });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper"  >
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}" style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+      <section class="content-header" style="height:38px">
+          <div class="container-fluid">
+              <div class="row mb-2" style="margin-top: -7px;">
+                  <div class="col-sm-6"></div>
+                  <div class="col-sm-6">
+                      <ol class="breadcrumb float-sm-right">
+                          <li class="breadcrumb-item"><a href="javascript:history.back()">返回上级</a></li>
+                      </ol>
+                  </div>
+              </div>
+          </div><!-- /.container-fluid -->
+      </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-11">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title"><i class="nav-icon far fa-envelope"></i>&nbsp;告警邮件设置</h3>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <form role="form" id="form1" method="post" th:action="@{'/mailset/save'}">
+            <input type="hidden" name="id" th:value="${mailSet.id}"/>
+            <div class="card-body">
+                <!--<div class="form-group">
+                    <label for="exampleInputEmail1"><font color="red">*</font>是否启用告警邮件</label>
+                    <select class="form-control"   name="sendMail" id="sendMail">
+                        <option value="0">停用</option>
+                        <option value="1">启用</option>
+                    </select>
+                </div>-->
+                <div class="form-group" th:if="${mailSet.active  == '2'}">
+                    <label style="font-weight:700;color:#d92550!important;">当前【已暂停】邮件告警发送</label>
+                </div>
+                <div class="form-group" th:if="${mailSet.fromMailName !='' && mailSet.active != '2'}">
+                    <label style="font-weight:700;color:#3ac47d!important;">当前【已启用】邮件告警发送</label>
+                </div>
+                <div class="form-group">
+                    <label for="fromMailName"><font color="red">*</font>发送邮箱帐号</label>
+                    <input type="text"  th:value="${mailSet.fromMailName}" autocomplete="off" class="validate[required,maxSize[60]] form-control" name="fromMailName" id="fromMailName" placeholder="123456@qq.com">
+                </div>
+                <div class="form-group">
+                    <label for="fromPwd"><font color="red">*</font>发送邮箱密码<span class="btncopy" data-clipboard-action="copy" data-clipboard-target="#fromPwd" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制" style="cursor:pointer;margin-left: 10px"><i class="fa fa-copy"></i></span>
+                    <span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="显示密码" onclick="javascript:showPasswd();" style="cursor:pointer;margin-left: 10px"><i id="eyeSwitch" class="fa fa-eye"></i></span>
+                    <span class="text-muted">（注意，如果是qq或163邮箱，密码为授权码，不是登录密码）</span></label>
+                    <input type="password"  th:value="${mailSet.fromPwd}"  class="validate[required,maxSize[50]] form-control" name="fromPwd" id="fromPwd" placeholder="输入密码">
+                </div>
+                <div class="form-group">
+                    <label for="fromMailName"><font color="red">*</font>发送邮箱SMTP服务器</label>
+                    <input type="text" th:value="${mailSet.smtpHost}" autocomplete="off" class="validate[required,maxSize[100]] form-control" name="smtpHost" id="smtpHost" placeholder="如smtp.qq.com">
+                </div>
+                <div class="form-group clearfix">
+                    <label><font color="red">*</font>是否启用安全链接(SSL)</label>
+                    <div class="input-group">
+                        <div class="icheck-turquoise d-inline">
+                            <input type="radio" onclick="setSmtpPortSSL()" id="radioPrimary2" name="smtpSSL" value="1" checked>
+                            <label for="radioPrimary2"><span style="opacity:.70">启用</span></label>
+                        </div>
+                        <div class="icheck-wisteria d-inline" style="margin-left:30px;">
+                            <input type="radio" onclick="setSmtpPort()" id="radioPrimary4"  name="smtpSSL" value="0">
+                            <label for="radioPrimary4"><span style="opacity:.70">不启用</span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="fromMailName"><font color="red">*</font>发送邮箱的SMTP端口，一般为25或465<span class="text-muted">（一般启用安全链接SSL后的端口为465）</span></label>
+                    <input type="text"  th:value="${mailSet.smtpPort}" autocomplete="off" class="validate[required,custom[number],maxSize[5]] form-control" name="smtpPort" id="smtpPort" placeholder="">
+                </div>
+
+                <div class="form-group">
+                    <label for="fromMailName">接收邮件，多个邮件用;隔开</label>
+                    <input type="text" th:value="${mailSet.toMail}"  autocomplete="off" class="validate[maxSize[300]] form-control" name="toMail" id="toMail" placeholder="123@qq.com;456@qq.com">
+                </div>
+                <div class="form-group clearfix">
+                    <label>是否启用TLS v1.2<span class="text-muted">（一般不用启用，若是Outlook等使用TLS v1.2的邮箱需要启用）</span></label>
+                    <div class="input-group">
+                        <div class="icheck-turquoise d-inline">
+                            <input type="radio" id="radioJavaxMail1" name="javaxMail" value="true">
+                            <label for="radioJavaxMail1"><span style="opacity:.70">启用</span></label>
+                        </div>
+                        <div class="icheck-wisteria d-inline" style="margin-left:30px;">
+                            <input type="radio" id="radioJavaxMail2"  name="javaxMail" value="flase" checked>
+                            <label for="radioJavaxMail2"><span style="opacity:.70">不启用</span></label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.card-body -->
+
+            <div class="card-footer">
+                <th:block th:if="${session.LOGIN_KEY.role != 'guest'}">
+                    <button type="button" onclick="test()" class="btn btn-primary btn-sm" style="margin-right:10px;">测试发送</button>
+                    <button type="submit" class="btn btn-primary btn-sm" style="margin-right:10px;"><i class="fas fa-save"></i> 保 存</button>
+                    <button type="button" style="margin-right:10px;" title="不需要邮件告警可删除，其他告警脚本依然生效"  th:onclick="del([[${mailSet.id}]])"  class="btn bg-danger btn-sm"><i class="fas fa-trash"></i> 删 除</button>
+                    <th:block th:if="${mailSet.active  != '2'}">
+                        <button type="button" th:onclick="setActive('2',[[${mailSet.id}]])" class="btn bg-danger btn-sm" style="margin-right:10px;">暂停邮件</button>
+                    </th:block>
+                    <th:block th:if="${mailSet.active  == '2'}">
+                        <button type="button" th:onclick="setActive('1',[[${mailSet.id}]])" class="btn btn-primary btn-sm" style="margin-right:10px;">启用邮件</button>
+                    </th:block>
+                    <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+                </th:block>
+            </div>
+
+        </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $("#form1").validationEngine();
+        // $("#sendMail").val([[${mailSet.sendMail}]]);
+        //$("#smtpSSL").val([[${mailSet.smtpSSL}]]);
+        var smtpSSL = [[${mailSet.smtpSSL}]];
+        $("input[name='smtpSSL'][value='"+smtpSSL+"']").attr('checked','true');
+        var javaxMail = [[${mailSet.javaxMail}]];
+        $("input[name='javaxMail'][value='"+javaxMail+"']").attr('checked','true');
+        var clipboard = new ClipboardJS('.btncopy');
+        clipboard.on('success', function (e) {
+            toastr.success("复制成功");
+        });
+    });
+
+    function test() {
+        var active =  [[${mailSet.active}]];
+        if('2'==active){
+            alert("请先【启用邮件】");
+            return;
+        }
+        var toMail = $("#toMail").val();
+        if(''==toMail){
+            alert("请输入接收邮件");
+            return;
+        }
+        toastr.info("正在测试发送邮件......");
+        $("#form1").attr("action",SERVER_SERVLET_CONTEXT_PATH + "/mailset/test");
+        $("#form1").ajaxSubmit(function(message) {
+            if('success'==message){
+                toastr.success("发送完成，请查收消息");
+            }else{
+                toastr.error("发送好像出错了，请检查。"+message);
+            }
+        });
+        $("#form1").attr("action",SERVER_SERVLET_CONTEXT_PATH + "/mailset/save");
+    }
+
+    function del(id) {
+        if(confirm('您确定要删除此记录吗？')){
+            window.location.href = SERVER_SERVLET_CONTEXT_PATH + "/mailset/del?id="+id;
+        }
+    }
+
+    function setActive(active,id) {
+        window.location.href = SERVER_SERVLET_CONTEXT_PATH + "/mailset/setActive?id="+id+"&active="+active;
+    }
+
+    function setSmtpPort(){
+        $("#smtpPort").val('25')
+    }
+
+    function setSmtpPortSSL(){
+        $("#smtpPort").val('465');
+    }
+
+    function showPasswd(){
+        var type = $("#fromPwd").attr("type");
+        if(type=='text'){
+            $("#eyeSwitch").attr("class","fa fa-eye");
+            $("#fromPwd").attr("type","password");
+        }else{
+            $("#eyeSwitch").attr("class","fa fa-eye-slash");
+            $("#fromPwd").attr("type","text");
+        }
+    }
+
+    var msg = [[${msg}]];
+    if(msg!=''){
+        toastr.success(msg);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wgcloud.mapper.HostWarnDiyMapper">
+	<resultMap id="resultMap" type="com.wgcloud.entity.HostWarnDiy">
+		<id column="ID" property="id" jdbcType="CHAR" />
+		<result column="HOST_NAME" property="hostname" jdbcType="CHAR" />
+		<result column="MEM_WARN_VAL" property="memWarnVal" jdbcType="DOUBLE" />
+		<result column="CPU_WARN_VAL" property="cpuWarnVal" jdbcType="DOUBLE" />
+		<result column="UPSPEED_VAL" property="upSpeedVal" jdbcType="DOUBLE" />
+		<result column="UPSPEED_MIN_VAL" property="upSpeedMinVal" jdbcType="DOUBLE" />
+		<result column="DOWNSPEED_VAL" property="downSpeedVal" jdbcType="DOUBLE" />
+		<result column="DOWNSPEED_MIN_VAL" property="downSpeedMinVal" jdbcType="DOUBLE" />
+		<result column="CPUTEMPERATURE_WARN_VAL" property="cpuTemperatureWarnVal" jdbcType="DOUBLE" />
+		<result column="MEM_WARN_MAIL" property="memWarnMail" jdbcType="CHAR" />
+		<result column="UPSPEED_MAIL" property="upSpeedMail" jdbcType="CHAR" />
+		<result column="DOWNSPEED_MAIL" property="downSpeedMail" jdbcType="CHAR" />
+		<result column="CPU_WARN_MAIL" property="cpuWarnMail" jdbcType="CHAR" />
+		<result column="CPUTEMPERATURE_WARN_MAIL" property="cpuTemperatureWarnMail" jdbcType="CHAR" />
+		<result column="DISK_WARN_MAIL" property="diskWarnMail" jdbcType="CHAR" />
+		<result column="SMART_WARN_MAIL" property="smartWarnMail" jdbcType="CHAR" />
+		<result column="DISK_BLOCK" property="diskBlock" jdbcType="CHAR" />
+		<result column="DISK_WARN_VAL" property="diskWarnVal" jdbcType="DOUBLE" />
+		<result column="SYSLOAD_WARN_MAIL" property="sysLoadWarnMail" jdbcType="CHAR" />
+		<result column="SYSLOAD_WARN_VAL" property="sysLoadWarnVal" jdbcType="DOUBLE" />
+		<result column="HOST_DOWN_WARN_MAIL" property="hostDownWarnMail" jdbcType="CHAR" />
+		<result column="HOST_LOGIN_WARN_MAIL" property="hostLoginWarnMail" jdbcType="CHAR" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="ACCOUNT" property="account" jdbcType="CHAR" />
+		<result column="ACTIVE" property="active" jdbcType="CHAR" />
+		<result column="HOST_BLOCK_ALL_WARN" property="hostBlockAllWarn" jdbcType="CHAR" />
+		<result column="SPEED_WARN_LEVEL" property="speedWarnLevel" jdbcType="CHAR" />
+		<result column="MEM_WARN_LEVEL" property="memWarnLevel" jdbcType="CHAR" />
+		<result column="SYSLOAD_WARN_LEVEL" property="sysLoadWarnLevel" jdbcType="CHAR" />
+		<result column="CPU_WARN_LEVEL" property="cpuWarnLevel" jdbcType="CHAR" />
+		<result column="CPUTEMPERATURE_WARN_LEVEL" property="cpuTemperatureWarnLevel" jdbcType="CHAR" />
+		<result column="DISK_WARN_LEVEL" property="diskWarnLevel" jdbcType="CHAR" />
+		<result column="SMART_WARN_LEVEL" property="smartWarnLevel" jdbcType="CHAR" />
+		<result column="HOST_DOWN_WARN_LEVEL" property="hostDownWarnLevel" jdbcType="CHAR" />
+		<result column="HOST_LOGIN_WARN_LEVEL" property="hostLoginWarnLevel" jdbcType="CHAR" />
+		<result column="REMARK" property="remark" jdbcType="CHAR" />
+		<result column="NETCONNECTIONS_WARN_MAIL" property="netConnectionsWarnMail" jdbcType="CHAR" />
+		<result column="NETCONNECTIONS_WARN_VAL" property="netConnectionsWarnVal" jdbcType="DOUBLE" />
+		<result column="NETCONNECTIONS_WARN_LEVEL" property="netConnectionsWarnLevel" jdbcType="CHAR" />
+		<result column="DISK_BLOCK_SAVE" property="diskBlockSave" jdbcType="CHAR" />
+		<result column="HOST_DOWN_WARN_COUNT" property="hostDownWarnCount" jdbcType="CHAR" />
+		<result column="CUSTOM_WARN_MAIL" property="customWarnMail" jdbcType="CHAR" />
+		<result column="CUSTOM_WARN_ACCOUNT_KEY" property="customWarnAccountKey" jdbcType="CHAR" />
+		<result column="DISKIO_SPEED_WARN_MAIL" property="diskIoSpeedWarnMail" jdbcType="CHAR" />
+		<result column="DISKIO_SPEED_WARN_VAL" property="diskIoSpeedWarnVal" jdbcType="DOUBLE" />
+	</resultMap>
+	
+	<sql id="tableColumnList">
+		ID,HOST_NAME, MEM_WARN_VAL,CPU_WARN_VAL,UPSPEED_VAL,UPSPEED_MIN_VAL,DOWNSPEED_VAL,DOWNSPEED_MIN_VAL,CPUTEMPERATURE_WARN_VAL,MEM_WARN_MAIL,
+        UPSPEED_MAIL,DOWNSPEED_MAIL,CPU_WARN_MAIL,CPUTEMPERATURE_WARN_MAIL,DISK_WARN_MAIL,SMART_WARN_MAIL,DISK_BLOCK,DISK_WARN_VAL,
+        SYSLOAD_WARN_MAIL,SYSLOAD_WARN_VAL,HOST_DOWN_WARN_MAIL,HOST_LOGIN_WARN_MAIL,CREATE_TIME,ACCOUNT,ACTIVE,HOST_BLOCK_ALL_WARN,REMARK,
+        SPEED_WARN_LEVEL,MEM_WARN_LEVEL,SYSLOAD_WARN_LEVEL,CPU_WARN_LEVEL,CPUTEMPERATURE_WARN_LEVEL,DISK_WARN_LEVEL,SMART_WARN_LEVEL,HOST_DOWN_WARN_LEVEL,HOST_LOGIN_WARN_LEVEL,
+		NETCONNECTIONS_WARN_MAIL,NETCONNECTIONS_WARN_VAL,NETCONNECTIONS_WARN_LEVEL,DISK_BLOCK_SAVE,HOST_DOWN_WARN_COUNT,CUSTOM_WARN_MAIL,CUSTOM_WARN_ACCOUNT_KEY,
+        DISKIO_SPEED_WARN_MAIL,DISKIO_SPEED_WARN_VAL
+	</sql>
+
+	<sql id="queryByParams">
+		<if test="hostname != null">
+			<choose>
+				<when test="_databaseId == 'oracle'">
+					<![CDATA[ AND HOST_NAME LIKE  CONCAT(CONCAT('%',#{hostname}),'%') ]]>
+				</when>
+				<otherwise>
+					<![CDATA[ AND HOST_NAME LIKE  CONCAT('%',#{hostname},'%') ]]>
+				</otherwise>
+			</choose>
+		</if>
+		<if test="account != null">
+			<![CDATA[ AND ACCOUNT = #{account} ]]>
+		</if>
+		<if test="hostnameNe != null">
+			<![CDATA[ AND HOST_NAME != #{hostnameNe} ]]>
+		</if>
+		<if test="groupId != null">
+			<include refid="commonSqlUtil.groupIdForHostNameQueryParams" />
+		</if>
+		<if test="active != null">
+			<![CDATA[ AND ACTIVE = #{active} ]]>
+		</if>
+	</sql>
+
+	<select id="selectById" resultMap="resultMap" parameterType="java.lang.String">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM HOST_WARN_DIY 
+		WHERE ID=#{id} 
+	</select>
+	
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		DELETE FROM HOST_WARN_DIY 
+		WHERE ID = #{id}
+	</delete>
+
+	<update id="updateToTargetAccount"  parameterType="map">
+		UPDATE  HOST_WARN_DIY SET ACCOUNT = #{accountTarget}
+		<where>
+			<include refid="commonSqlUtil.updateToTargetAccountQueryParams" />
+		</where>
+	</update>
+
+	<update id="updateActive"  parameterType="map">
+		UPDATE  HOST_WARN_DIY SET ACTIVE = #{active} WHERE ID IN
+		<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<delete id="deleteById" parameterType="java.lang.String">
+		DELETE FROM
+		HOST_WARN_DIY 
+		WHERE ID IN
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<insert id="save" parameterType="com.wgcloud.entity.HostWarnDiy">
+		INSERT INTO HOST_WARN_DIY 
+    	<trim prefix="(" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >ID,</if>
+      		<if test="hostname != null">HOST_NAME,</if>
+			<if test="memWarnVal != null">MEM_WARN_VAL,</if>
+			<if test="cpuWarnVal != null">CPU_WARN_VAL,</if>
+			<if test="upSpeedVal != null">UPSPEED_VAL,</if>
+			<if test="upSpeedMinVal != null">UPSPEED_MIN_VAL,</if>
+			<if test="downSpeedVal != null">DOWNSPEED_VAL,</if>
+			<if test="downSpeedMinVal != null">DOWNSPEED_MIN_VAL,</if>
+			<if test="cpuTemperatureWarnVal != null">CPUTEMPERATURE_WARN_VAL,</if>
+			<if test="memWarnMail != null">MEM_WARN_MAIL,</if>
+			<if test="upSpeedMail != null">UPSPEED_MAIL,</if>
+			<if test="downSpeedMail != null">DOWNSPEED_MAIL,</if>
+			<if test="cpuWarnMail != null">CPU_WARN_MAIL,</if>
+			<if test="cpuTemperatureWarnMail != null">CPUTEMPERATURE_WARN_MAIL,</if>
+			<if test="diskWarnMail != null">DISK_WARN_MAIL,</if>
+			<if test="smartWarnMail != null">SMART_WARN_MAIL,</if>
+			<if test="diskBlock != null">DISK_BLOCK,</if>
+			<if test="diskWarnVal != null">DISK_WARN_VAL,</if>
+			<if test="sysLoadWarnMail != null">SYSLOAD_WARN_MAIL,</if>
+			<if test="sysLoadWarnVal != null">SYSLOAD_WARN_VAL,</if>
+			<if test="hostDownWarnMail != null">HOST_DOWN_WARN_MAIL,</if>
+			<if test="hostLoginWarnMail != null">HOST_LOGIN_WARN_MAIL,</if>
+			<if test="active != null">ACTIVE,</if>
+			<if test="account != null">ACCOUNT,</if>
+			<if test="hostBlockAllWarn != null">HOST_BLOCK_ALL_WARN,</if>
+			<if test="remark != null">REMARK,</if>
+			<if test="speedWarnLevel != null">SPEED_WARN_LEVEL,</if>
+			<if test="memWarnLevel != null">MEM_WARN_LEVEL,</if>
+			<if test="sysLoadWarnLevel != null">SYSLOAD_WARN_LEVEL,</if>
+			<if test="cpuWarnLevel != null">CPU_WARN_LEVEL,</if>
+			<if test="cpuTemperatureWarnLevel != null">CPUTEMPERATURE_WARN_LEVEL,</if>
+			<if test="diskWarnLevel != null">DISK_WARN_LEVEL,</if>
+			<if test="smartWarnLevel != null">SMART_WARN_LEVEL,</if>
+			<if test="hostDownWarnLevel != null">HOST_DOWN_WARN_LEVEL,</if>
+			<if test="hostLoginWarnLevel != null">HOST_LOGIN_WARN_LEVEL,</if>
+			<if test="netConnectionsWarnMail != null">NETCONNECTIONS_WARN_MAIL,</if>
+			<if test="netConnectionsWarnVal != null">NETCONNECTIONS_WARN_VAL,</if>
+			<if test="netConnectionsWarnLevel != null">NETCONNECTIONS_WARN_LEVEL,</if>
+			<if test="diskBlockSave != null">DISK_BLOCK_SAVE,</if>
+			<if test="hostDownWarnCount != null">HOST_DOWN_WARN_COUNT,</if>
+			<if test="customWarnMail != null">CUSTOM_WARN_MAIL,</if>
+			<if test="customWarnAccountKey != null">CUSTOM_WARN_ACCOUNT_KEY,</if>
+			<if test="diskIoSpeedWarnMail != null">DISKIO_SPEED_WARN_MAIL,</if>
+			<if test="diskIoSpeedWarnVal != null">DISKIO_SPEED_WARN_VAL,</if>
+      		<if test="createTime != null" >CREATE_TIME</if>
+    	</trim>
+    	<trim prefix="values (" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >#{id},</if>
+      		<if test="hostname != null" >#{hostname},</if>
+			<if test="memWarnVal != null" >#{memWarnVal},</if>
+			<if test="cpuWarnVal != null" >#{cpuWarnVal},</if>
+			<if test="upSpeedVal != null" >#{upSpeedVal},</if>
+			<if test="upSpeedMinVal != null" >#{upSpeedMinVal},</if>
+			<if test="downSpeedVal != null" >#{downSpeedVal},</if>
+			<if test="downSpeedMinVal != null" >#{downSpeedMinVal},</if>
+			<if test="cpuTemperatureWarnVal != null" >#{cpuTemperatureWarnVal},</if>
+			<if test="memWarnMail != null" >#{memWarnMail},</if>
+			<if test="upSpeedMail != null" >#{upSpeedMail},</if>
+			<if test="downSpeedMail != null" >#{downSpeedMail},</if>
+			<if test="cpuWarnMail != null" >#{cpuWarnMail},</if>
+			<if test="cpuTemperatureWarnMail != null" >#{cpuTemperatureWarnMail},</if>
+			<if test="diskWarnMail != null" >#{diskWarnMail},</if>
+			<if test="smartWarnMail != null" >#{smartWarnMail},</if>
+			<if test="diskBlock != null" >#{diskBlock},</if>
+			<if test="diskWarnVal != null" >#{diskWarnVal},</if>
+			<if test="sysLoadWarnMail != null" >#{sysLoadWarnMail},</if>
+			<if test="sysLoadWarnVal != null" >#{sysLoadWarnVal},</if>
+			<if test="hostDownWarnMail != null" >#{hostDownWarnMail},</if>
+			<if test="hostLoginWarnMail != null" >#{hostLoginWarnMail},</if>
+			<if test="active != null" >#{active},</if>
+			<if test="account != null" >#{account},</if>
+			<if test="hostBlockAllWarn != null" >#{hostBlockAllWarn},</if>
+			<if test="remark != null" >#{remark},</if>
+			<if test="speedWarnLevel != null" >#{speedWarnLevel},</if>
+			<if test="memWarnLevel != null" >#{memWarnLevel},</if>
+			<if test="sysLoadWarnLevel != null" >#{sysLoadWarnLevel},</if>
+			<if test="cpuWarnLevel != null" >#{cpuWarnLevel},</if>
+			<if test="cpuTemperatureWarnLevel != null" >#{cpuTemperatureWarnLevel},</if>
+			<if test="diskWarnLevel != null" >#{diskWarnLevel},</if>
+			<if test="smartWarnLevel != null" >#{smartWarnLevel},</if>
+			<if test="hostDownWarnLevel != null" >#{hostDownWarnLevel},</if>
+			<if test="hostLoginWarnLevel != null" >#{hostLoginWarnLevel},</if>
+			<if test="netConnectionsWarnMail != null" >#{netConnectionsWarnMail},</if>
+			<if test="netConnectionsWarnVal != null" >#{netConnectionsWarnVal},</if>
+			<if test="netConnectionsWarnLevel != null" >#{netConnectionsWarnLevel},</if>
+			<if test="diskBlockSave != null" >#{diskBlockSave},</if>
+			<if test="hostDownWarnCount != null" >#{hostDownWarnCount},</if>
+			<if test="customWarnMail != null" >#{customWarnMail},</if>
+			<if test="customWarnAccountKey != null" >#{customWarnAccountKey},</if>
+			<if test="diskIoSpeedWarnMail != null" >#{diskIoSpeedWarnMail},</if>
+			<if test="diskIoSpeedWarnVal != null" >#{diskIoSpeedWarnVal},</if>
+      		<if test="createTime != null" >#{createTime}</if>
+    	</trim>
+	</insert>
+
+
+	<update id="updateById" parameterType="com.wgcloud.entity.HostWarnDiy">
+		UPDATE HOST_WARN_DIY
+		<set>
+			<if test="hostname != null">
+				HOST_NAME = #{hostname},
+			</if>
+				MEM_WARN_VAL = #{memWarnVal},
+				CPU_WARN_VAL = #{cpuWarnVal},
+				UPSPEED_VAL = #{upSpeedVal},
+				UPSPEED_MIN_VAL = #{upSpeedMinVal},
+				DOWNSPEED_VAL = #{downSpeedVal},
+				DOWNSPEED_MIN_VAL = #{downSpeedMinVal},
+				CPUTEMPERATURE_WARN_VAL = #{cpuTemperatureWarnVal},
+			<if test="memWarnMail != null">
+				MEM_WARN_MAIL = #{memWarnMail},
+			</if>
+			<if test="upSpeedMail != null">
+				UPSPEED_MAIL = #{upSpeedMail},
+			</if>
+			<if test="downSpeedMail != null">
+				DOWNSPEED_MAIL = #{downSpeedMail},
+			</if>
+			<if test="cpuWarnMail != null">
+				CPU_WARN_MAIL = #{cpuWarnMail},
+			</if>
+			<if test="cpuTemperatureWarnMail != null">
+				CPUTEMPERATURE_WARN_MAIL = #{cpuTemperatureWarnMail},
+			</if>
+			<if test="diskWarnMail != null">
+				DISK_WARN_MAIL = #{diskWarnMail},
+			</if>
+			<if test="smartWarnMail != null">
+				SMART_WARN_MAIL = #{smartWarnMail},
+			</if>
+			<if test="diskBlock != null">
+				DISK_BLOCK = #{diskBlock},
+			</if>
+			<if test="diskWarnVal != null">
+				DISK_WARN_VAL = #{diskWarnVal},
+			</if>
+			<if test="sysLoadWarnMail != null">
+				SYSLOAD_WARN_MAIL = #{sysLoadWarnMail},
+			</if>
+				SYSLOAD_WARN_VAL = #{sysLoadWarnVal},
+			<if test="hostDownWarnMail != null">
+				HOST_DOWN_WARN_MAIL = #{hostDownWarnMail},
+			</if>
+			<if test="hostLoginWarnMail != null">
+				HOST_LOGIN_WARN_MAIL = #{hostLoginWarnMail},
+			</if>
+			<if test="active != null">
+				ACTIVE = #{active},
+			</if>
+			<if test="hostBlockAllWarn != null">
+				HOST_BLOCK_ALL_WARN = #{hostBlockAllWarn},
+			</if>
+			<if test="remark != null">
+				REMARK = #{remark},
+			</if>
+			<if test="speedWarnLevel != null">
+				SPEED_WARN_LEVEL = #{speedWarnLevel},
+			</if>
+			<if test="memWarnLevel != null">
+				MEM_WARN_LEVEL = #{memWarnLevel},
+			</if>
+			<if test="sysLoadWarnLevel != null">
+				SYSLOAD_WARN_LEVEL = #{sysLoadWarnLevel},
+			</if>
+			<if test="cpuWarnLevel != null">
+				CPU_WARN_LEVEL = #{cpuWarnLevel},
+			</if>
+			<if test="cpuTemperatureWarnLevel != null">
+				CPUTEMPERATURE_WARN_LEVEL = #{cpuTemperatureWarnLevel},
+			</if>
+			<if test="diskWarnLevel != null">
+				DISK_WARN_LEVEL = #{diskWarnLevel},
+			</if>
+			<if test="smartWarnLevel != null">
+				SMART_WARN_LEVEL = #{smartWarnLevel},
+			</if>
+			<if test="hostDownWarnLevel != null">
+				HOST_DOWN_WARN_LEVEL = #{hostDownWarnLevel},
+			</if>
+			<if test="hostLoginWarnLevel != null">
+				HOST_LOGIN_WARN_LEVEL = #{hostLoginWarnLevel},
+			</if>
+			<if test="netConnectionsWarnMail != null">
+				NETCONNECTIONS_WARN_MAIL = #{netConnectionsWarnMail},
+			</if>
+				NETCONNECTIONS_WARN_VAL = #{netConnectionsWarnVal},
+			<if test="netConnectionsWarnLevel != null">
+				NETCONNECTIONS_WARN_LEVEL = #{netConnectionsWarnLevel},
+			</if>
+			<if test="diskBlockSave != null">
+				DISK_BLOCK_SAVE = #{diskBlockSave},
+			</if>
+			<if test="hostDownWarnCount != null">
+				HOST_DOWN_WARN_COUNT = #{hostDownWarnCount},
+			</if>
+			<if test="customWarnMail != null">
+				CUSTOM_WARN_MAIL = #{customWarnMail},
+			</if>
+			<if test="customWarnAccountKey != null">
+				CUSTOM_WARN_ACCOUNT_KEY = #{customWarnAccountKey},
+			</if>
+			<if test="diskIoSpeedWarnMail != null">
+				DISKIO_SPEED_WARN_MAIL = #{diskIoSpeedWarnMail},
+			</if>
+			<if test="diskIoSpeedWarnVal != null">
+				DISKIO_SPEED_WARN_VAL = #{diskIoSpeedWarnVal},
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime}
+			</if>
+		</set>
+		WHERE ID = #{id}
+	</update>
+
+	<select id="countByParams" parameterType="map" resultType="java.lang.Integer">
+		SELECT count(*)  FROM HOST_WARN_DIY t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+	</select>
+
+
+	<select id="selectAllByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM HOST_WARN_DIY t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		 ORDER BY ID DESC
+	</select>
+	
+	<select id="selectByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM HOST_WARN_DIY
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		<choose>
+			<when test="orderBy !=null and orderBy != ''">
+				<![CDATA[ ORDER BY ${orderBy} ${orderType}]]>
+			</when>
+			<otherwise>
+				ORDER BY ID DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+</mapper>

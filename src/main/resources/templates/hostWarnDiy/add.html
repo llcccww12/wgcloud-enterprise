@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item active"></li>
+                </ol>
+            </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-11">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">添加主机自定义告警信息
+            <span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="添加后的主机自定义告警配置，告警通知就会以自定义告警配置为准进行告警，如果主机没有添加自定义告警配置，则会以server配置文件中的告警配置为准进行告警"  style="cursor:pointer;margin-left: 10px"><i class="fa fa-comment-dots"></i></span></h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <form role="form" id="form1" method="post" th:action="@{'/hostWarnDiy/save'}">
+            <input type="hidden" name="id" th:value="${hostWarnDiy.id}"/>
+            <div class="card-body">
+                <div class="form-group">
+                    <label><font color="red">*</font>监控主机<span class="text-muted"></span></label>
+                    <div th:replace="common/singleSelectHost.html"></div>
+                </div>
+                <div class="form-group"><span class="text-muted">以下配置为所选主机的告警配置，告警值可以为空，若为空则默认会使用server配置文件中对应配置的告警值。
+                    自定义告警开关和server配置文件中对应的告警开关，两者都开启才会发送告警通知，其中一个关闭则不会发送通知</span></div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group clearfix">
+                            <label>内存使用率的告警开关<span class="text-muted"></span></label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="memWarnMail1" name="memWarnMail" value="yes" checked>
+                                    <label for="memWarnMail1"><span style="opacity:.70">开启告警</span></label>
+                                </div>
+                                <div class="icheck-danger d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="memWarnMail2"  name="memWarnMail"  value="no">
+                                    <label for="memWarnMail2"><span style="opacity:.70">停止告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>内存使用率的告警级别</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="memWarnLevel1" name="memWarnLevel" value="ERROR"  checked>
+                                    <label for="memWarnLevel1"><span style="opacity:.70">重要告警</span></label>
+                                </div>
+                                <div class="icheck-yellow d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="memWarnLevel2" name="memWarnLevel" value="WARN">
+                                    <label for="memWarnLevel2"><span style="opacity:.70">一般告警</span></label>
+                                </div>
+                                <div class="icheck-teal d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="memWarnLevel3" name="memWarnLevel" value="INFO">
+                                    <label for="memWarnLevel3"><span style="opacity:.70">信息告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>内存使用率%的告警值<span class="text-muted">（超过此值即发送告警）</span></label>
+                    <input type="text" autocomplete="off"  th:value="${hostWarnDiy.memWarnVal}" class="validate[custom[number],maxSize[10]] form-control" name="memWarnVal" id="memWarnVal" placeholder="可为空，为空则会使用server配置文件中的对应告警项值">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group clearfix">
+                            <label>CPU使用率的告警开关</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="cpuWarnMail1" name="cpuWarnMail" value="yes" checked>
+                                    <label for="cpuWarnMail1"><span style="opacity:.70">开启告警</span></label>
+                                </div>
+                                <div class="icheck-danger d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="cpuWarnMail2"  name="cpuWarnMail"  value="no">
+                                    <label for="cpuWarnMail2"><span style="opacity:.70">停止告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>CPU使用率的告警级别</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="cpuWarnLevel1" name="cpuWarnLevel" value="ERROR"  checked>
+                                    <label for="cpuWarnLevel1"><span style="opacity:.70">重要告警</span></label>
+                                </div>
+                                <div class="icheck-yellow d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="cpuWarnLevel2" name="cpuWarnLevel" value="WARN">
+                                    <label for="cpuWarnLevel2"><span style="opacity:.70">一般告警</span></label>
+                                </div>
+                                <div class="icheck-teal d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="cpuWarnLevel3" name="cpuWarnLevel" value="INFO">
+                                    <label for="cpuWarnLevel3"><span style="opacity:.70">信息告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>CPU使用率%告警值<span class="text-muted">（超过此值即发送告警）</span></label>
+                    <input type="text" autocomplete="off"  th:value="${hostWarnDiy.cpuWarnVal}" class="validate[custom[number],maxSize[10]] form-control" name="cpuWarnVal" id="cpuWarnVal" placeholder="可为空，为空则会使用server配置文件中的对应告警项值">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group clearfix">
+                            <label>主机连接数量的告警开关</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="netConnectionsWarnMail1" name="netConnectionsWarnMail" value="yes" checked>
+                                    <label for="netConnectionsWarnMail1"><span style="opacity:.70">开启告警</span></label>
+                                </div>
+                                <div class="icheck-danger d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="netConnectionsWarnMail2"  name="netConnectionsWarnMail"  value="no">
+                                    <label for="netConnectionsWarnMail2"><span style="opacity:.70">停止告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>主机连接数量的告警级别</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="netConnectionsWarnLevel1" name="netConnectionsWarnLevel" value="ERROR"  checked>
+                                    <label for="netConnectionsWarnLevel1"><span style="opacity:.70">重要告警</span></label>
+                                </div>
+                                <div class="icheck-yellow d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="netConnectionsWarnLevel2" name="netConnectionsWarnLevel" value="WARN">
+                                    <label for="netConnectionsWarnLevel2"><span style="opacity:.70">一般告警</span></label>
+                                </div>
+                                <div class="icheck-teal d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="netConnectionsWarnLevel3" name="netConnectionsWarnLevel" value="INFO">
+                                    <label for="netConnectionsWarnLevel3"><span style="opacity:.70">信息告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>主机连接数量告警值<span class="text-muted">（超过此值即发送告警）</span></label>
+                    <input type="text" autocomplete="off"  th:value="${hostWarnDiy.netConnectionsWarnVal}" class="validate[custom[number],maxSize[10]] form-control" name="netConnectionsWarnVal" id="netConnectionsWarnVal" placeholder="可为空，为空则会使用server配置文件中的对应告警项值">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group clearfix">
+                            <label>上行速率的告警开关</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="upSpeedMail1" name="upSpeedMail" value="yes" checked>
+                                    <label for="upSpeedMail1"><span style="opacity:.70">开启告警</span></label>
+                                </div>
+                                <div class="icheck-danger d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="upSpeedMail2"  name="upSpeedMail"  value="no">
+                                    <label for="upSpeedMail2"><span style="opacity:.70">停止告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>上行和下行传输速率的告警级别</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="speedWarnLevel1" name="speedWarnLevel" value="ERROR"  checked>
+                                    <label for="speedWarnLevel1"><span style="opacity:.70">重要告警</span></label>
+                                </div>
+                                <div class="icheck-yellow d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="speedWarnLevel2" name="speedWarnLevel" value="WARN">
+                                    <label for="speedWarnLevel2"><span style="opacity:.70">一般告警</span></label>
+                                </div>
+                                <div class="icheck-teal d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="speedWarnLevel3" name="speedWarnLevel" value="INFO">
+                                    <label for="speedWarnLevel3"><span style="opacity:.70">信息告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>上行速率<span class="text-danger">最大</span>告警值<span class="text-muted">（单位KB/s，<span class="text-danger">高于此值</span>时发送告警）</span></label>
+                            <input type="text" autocomplete="off"  th:value="${hostWarnDiy.upSpeedVal}" class="validate[custom[number],maxSize[10]] form-control" name="upSpeedVal" id="upSpeedVal" placeholder="可为空，为空则会使用server配置文件中的对应告警项值">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>上行速率<span class="text-danger">最小</span>告警值<span class="text-muted">（单位KB/s，<span class="text-danger">低于此值</span>时发送告警）</span></label>
+                            <input type="text" autocomplete="off"  th:value="${hostWarnDiy.upSpeedMinVal}" class="validate[custom[number],maxSize[10]] form-control" name="upSpeedMinVal" id="upSpeedMinVal" placeholder="可为空，为空则会使用server配置文件中的对应告警项值">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label>下行速率告警开关</label>
+                    <div class="input-group">
+                    <div class="icheck-primary d-inline">
+                        <input type="radio" id="downSpeedMail1" name="downSpeedMail" value="yes" checked>
+                        <label for="downSpeedMail1"><span style="opacity:.70">开启告警</span></label>
+                    </div>
+                    <div class="icheck-danger d-inline" style="margin-left:20px;">
+                        <input type="radio" id="downSpeedMail2"  name="downSpeedMail"  value="no">
+                        <label for="downSpeedMail2"><span style="opacity:.70">停止告警</span></label>
+                    </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>下行速率<span class="text-danger">最大</span>告警值<span class="text-muted">（单位KB/s，<span class="text-danger">高于此值</span>时发送告警）</span></label>
+                            <input type="text" autocomplete="off"  th:value="${hostWarnDiy.downSpeedVal}" class="validate[custom[number],maxSize[10]] form-control" name="downSpeedVal" id="downSpeedVal" placeholder="可为空，为空则会使用server配置文件中的对应告警项值">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>下行速率<span class="text-danger">最小</span>告警值<span class="text-muted">（单位KB/s，<span class="text-danger">低于此值</span>时发送告警）</span></label>
+                            <input type="text" autocomplete="off"  th:value="${hostWarnDiy.downSpeedMinVal}" class="validate[custom[number],maxSize[10]] form-control" name="downSpeedMinVal" id="downSpeedMinVal" placeholder="可为空，为空则会使用server配置文件中的对应告警项值">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group clearfix">
+                            <label>CPU温度的告警开关</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="cpuTemperatureWarnMail1" name="cpuTemperatureWarnMail" value="yes" checked>
+                                    <label for="cpuTemperatureWarnMail1"><span style="opacity:.70">开启告警</span></label>
+                                </div>
+                                <div class="icheck-danger d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="cpuTemperatureWarnMail2"  name="cpuTemperatureWarnMail"  value="no">
+                                    <label for="cpuTemperatureWarnMail2"><span style="opacity:.70">停止告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>CPU温度的告警级别</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="cpuTemperatureWarnLevel1" name="cpuTemperatureWarnLevel" value="ERROR"  checked>
+                                    <label for="cpuTemperatureWarnLevel1"><span style="opacity:.70">重要告警</span></label>
+                                </div>
+                                <div class="icheck-yellow d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="cpuTemperatureWarnLevel2" name="cpuTemperatureWarnLevel" value="WARN">
+                                    <label for="cpuTemperatureWarnLevel2"><span style="opacity:.70">一般告警</span></label>
+                                </div>
+                                <div class="icheck-teal d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="cpuTemperatureWarnLevel3" name="cpuTemperatureWarnLevel" value="INFO">
+                                    <label for="cpuTemperatureWarnLevel3"><span style="opacity:.70">信息告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>CPU温度告警值<span class="text-muted">（单位℃，高于此值即发送告警）</span></label>
+                    <input type="text" autocomplete="off"  th:value="${hostWarnDiy.cpuTemperatureWarnVal}" class="validate[custom[number],maxSize[10]] form-control" name="cpuTemperatureWarnVal" id="cpuTemperatureWarnVal" placeholder="可为空，为空则会使用server配置文件中的对应告警项值">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group clearfix">
+                            <label>磁盘使用率的告警开关</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="diskWarnMail1" name="diskWarnMail" value="yes" checked>
+                                    <label for="diskWarnMail1"><span style="opacity:.70">开启告警</span></label>
+                                </div>
+                                <div class="icheck-danger d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="diskWarnMail2"  name="diskWarnMail"  value="no">
+                                    <label for="diskWarnMail2"><span style="opacity:.70">停止告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>磁盘使用率的告警级别</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="diskWarnLevel1" name="diskWarnLevel" value="ERROR"  checked>
+                                    <label for="diskWarnLevel1"><span style="opacity:.70">重要告警</span></label>
+                                </div>
+                                <div class="icheck-yellow d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="diskWarnLevel2" name="diskWarnLevel" value="WARN">
+                                    <label for="diskWarnLevel2"><span style="opacity:.70">一般告警</span></label>
+                                </div>
+                                <div class="icheck-teal d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="diskWarnLevel3" name="diskWarnLevel" value="INFO">
+                                    <label for="diskWarnLevel3"><span style="opacity:.70">信息告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>不需要告警的磁盘<span class="text-muted">（多个盘符用,隔开，如/boot,/dev。支持Ant路径匹配规则，如/dev/**。特殊符号用单引号，如'C:'）</span></label>
+                    <input type="text" autocomplete="off"  th:value="${hostWarnDiy.diskBlock}" class="validate[maxSize[200]] form-control" name="diskBlock" id="diskBlock" placeholder="可为空，为空则会使用server配置文件中的对应告警项值">
+                </div>
+                <div class="form-group">
+                    <label>磁盘使用率%告警值<span class="text-muted">（高于此值即发送告警，针对单个盘符设置）</span></label>
+                    <input type="text" autocomplete="off"  th:value="${hostWarnDiy.diskWarnVal}" class="validate[maxSize[50]] form-control" name="diskWarnVal" id="diskWarnVal" placeholder="可为空，为空则会使用server配置文件中的对应告警项值">
+                </div>
+                <div class="form-group">
+                    <label>不需要采集和保存的磁盘<span class="text-muted">（多个盘符用,隔开，如/boot,/dev。支持Ant路径匹配规则，如/dev/**。特殊符号用单引号，如'C:'）</span></label>
+                    <input type="text" autocomplete="off"  th:value="${hostWarnDiy.diskBlockSave}" class="validate[maxSize[200]] form-control" name="diskBlockSave" id="diskBlockSave" placeholder="可为空，为空则会使用server配置文件中的对应配置项值">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group clearfix">
+                            <label>磁盘IO读写速率的告警开关</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="diskIoSpeedWarnMail1" name="diskIoSpeedWarnMail" value="yes" checked>
+                                    <label for="diskIoSpeedWarnMail1"><span style="opacity:.70">开启告警</span></label>
+                                </div>
+                                <div class="icheck-danger d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="diskIoSpeedWarnMail2"  name="diskIoSpeedWarnMail"  value="no">
+                                    <label for="diskIoSpeedWarnMail2"><span style="opacity:.70">停止告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>磁盘IO读写速率的告警值（MB/s）<span class="text-muted">（告警级别和磁盘使用率告警级别一致）</span></label>
+                            <div class="input-group">
+                                <input type="text" autocomplete="off"  th:value="${hostWarnDiy.diskIoSpeedWarnVal}" class="validate[custom[number],maxSize[10]] form-control" name="diskIoSpeedWarnVal" id="diskIoSpeedWarnVal" placeholder="可为空，为空则会使用server配置文件中的对应告警项值">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group clearfix">
+                            <label>磁盘SMART检测的告警开关</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="smartWarnMail1" name="smartWarnMail" value="yes" checked>
+                                    <label for="smartWarnMail1"><span style="opacity:.70">开启告警</span></label>
+                                </div>
+                                <div class="icheck-danger d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="smartWarnMail2"  name="smartWarnMail"  value="no">
+                                    <label for="smartWarnMail2"><span style="opacity:.70">停止告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>磁盘SMART的告警级别</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="smartWarnLevel1" name="smartWarnLevel" value="ERROR"  checked>
+                                    <label for="smartWarnLevel1"><span style="opacity:.70">重要告警</span></label>
+                                </div>
+                                <div class="icheck-yellow d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="smartWarnLevel2" name="smartWarnLevel" value="WARN">
+                                    <label for="smartWarnLevel2"><span style="opacity:.70">一般告警</span></label>
+                                </div>
+                                <div class="icheck-teal d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="smartWarnLevel3" name="smartWarnLevel" value="INFO">
+                                    <label for="smartWarnLevel3"><span style="opacity:.70">信息告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group clearfix">
+                            <label>系统负载告警开关</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="sysLoadWarnMail1" name="sysLoadWarnMail" value="yes" checked>
+                                    <label for="sysLoadWarnMail1"><span style="opacity:.70">开启告警</span></label>
+                                </div>
+                                <div class="icheck-danger d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="sysLoadWarnMail2"  name="sysLoadWarnMail"  value="no">
+                                    <label for="sysLoadWarnMail2"><span style="opacity:.70">停止告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>系统负载的告警级别</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="sysLoadWarnLevel1" name="sysLoadWarnLevel" value="ERROR"  checked>
+                                    <label for="sysLoadWarnLevel1"><span style="opacity:.70">重要告警</span></label>
+                                </div>
+                                <div class="icheck-yellow d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="sysLoadWarnLevel2" name="sysLoadWarnLevel" value="WARN">
+                                    <label for="sysLoadWarnLevel2"><span style="opacity:.70">一般告警</span></label>
+                                </div>
+                                <div class="icheck-teal d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="sysLoadWarnLevel3" name="sysLoadWarnLevel" value="INFO">
+                                    <label for="sysLoadWarnLevel3"><span style="opacity:.70">信息告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>系统负载告警值<span class="text-muted">（以5分钟系统负载值为准进行告警，超过此值即发送告警）</span></label>
+                    <input type="text" autocomplete="off"  th:value="${hostWarnDiy.sysLoadWarnVal}" class="validate[maxSize[50]] form-control" name="sysLoadWarnVal" id="sysLoadWarnVal" placeholder="可为空，为空则会使用server配置文件中的对应告警项值">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group clearfix">
+                            <label>主机离线告警开关</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="hostDownWarnMail1" name="hostDownWarnMail" value="yes" checked>
+                                    <label for="hostDownWarnMail1"><span style="opacity:.70">开启告警</span></label>
+                                </div>
+                                <div class="icheck-danger d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="hostDownWarnMail2"  name="hostDownWarnMail"  value="no">
+                                    <label for="hostDownWarnMail2"><span style="opacity:.70">停止告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>主机离线的告警级别</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="hostDownWarnLevel1" name="hostDownWarnLevel" value="ERROR"  checked>
+                                    <label for="hostDownWarnLevel1"><span style="opacity:.70">重要告警</span></label>
+                                </div>
+                                <div class="icheck-yellow d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="hostDownWarnLevel2" name="hostDownWarnLevel" value="WARN">
+                                    <label for="hostDownWarnLevel2"><span style="opacity:.70">一般告警</span></label>
+                                </div>
+                                <div class="icheck-teal d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="hostDownWarnLevel3" name="hostDownWarnLevel" value="INFO">
+                                    <label for="hostDownWarnLevel3"><span style="opacity:.70">信息告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group clearfix">
+                            <label>主机登录提醒通知开关</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="hostLoginWarnMail1" name="hostLoginWarnMail" value="yes" checked>
+                                    <label for="hostLoginWarnMail1"><span style="opacity:.70">开启告警</span></label>
+                                </div>
+                                <div class="icheck-danger d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="hostLoginWarnMail2"  name="hostLoginWarnMail"  value="no">
+                                    <label for="hostLoginWarnMail2"><span style="opacity:.70">停止告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>主机登录提醒的告警级别</label>
+                            <div class="input-group">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="hostLoginWarnLevel1" name="hostLoginWarnLevel" value="ERROR"  checked>
+                                    <label for="hostLoginWarnLevel1"><span style="opacity:.70">重要告警</span></label>
+                                </div>
+                                <div class="icheck-yellow d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="hostLoginWarnLevel2" name="hostLoginWarnLevel" value="WARN">
+                                    <label for="hostLoginWarnLevel2"><span style="opacity:.70">一般告警</span></label>
+                                </div>
+                                <div class="icheck-teal d-inline" style="margin-left:20px;">
+                                    <input type="radio" id="hostLoginWarnLevel3" name="hostLoginWarnLevel" value="INFO">
+                                    <label for="hostLoginWarnLevel3"><span style="opacity:.70">信息告警</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>告警接收邮箱<span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="多个邮箱用分号;隔开，配置此处邮箱后，主机相关告警将只会发给此处设置的邮箱，不会发送其他地方设置的邮箱"  style="cursor:pointer;margin-left: 10px"><i class="fa fa-comment-dots"></i></span></label>
+                            <input type="text" autocomplete="off"  th:value="${hostWarnDiy.customWarnMail}" class="validate[maxSize[100]] form-control" name="customWarnMail" id="customWarnMail" placeholder="可为空">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>告警用户标识<span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="告警用户标识，第三方的用户标识，用来在发送告警脚本时候，发给指定用户（脚本调用第二个参数即是用户标识值），主机告警将只会发给此用户标识，不会发送成员账号设置的用户标识"  style="cursor:pointer;margin-left: 10px"><i class="fa fa-comment-dots"></i></span></label>
+                            <input type="text" autocomplete="off"  th:value="${hostWarnDiy.customWarnAccountKey}" class="validate[maxSize[100]] form-control" name="customWarnAccountKey" id="customWarnAccountKey" placeholder="可为空">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                        <label>是否停止该主机所有告警<span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="包括该主机的监控端口、进程、docker、日志文件、防篡改文件、自定义监控项也将停止告警通知"  style="cursor:pointer;margin-left: 10px"><i class="fa fa-comment-dots"></i></span></label>
+                        <div class="input-group">
+                            <div class="icheck-primary d-inline">
+                                <input type="radio" id="hostBlockAllWarn2"  name="hostBlockAllWarn"  value="no" checked>
+                                <label for="hostBlockAllWarn2"><span style="opacity:.70">开启告警</span></label>
+                            </div>
+                            <div class="icheck-danger d-inline" style="margin-left:20px;">
+                                <input type="radio" id="hostBlockAllWarn1" name="hostBlockAllWarn" value="yes">
+                                <label for="hostBlockAllWarn1"><span style="opacity:.70">停止告警</span></label>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>主机连续几次不上报监控数据，判定离线<span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="默认为空，标识1次，以被控主机配置上报时间为准"  style="cursor:pointer;margin-left: 10px"><i class="fa fa-comment-dots"></i></span></label>
+                            <input type="text" autocomplete="off"  th:value="${hostWarnDiy.hostDownWarnCount}" class="validate[maxSize[10]] form-control" name="hostDownWarnCount" id="hostDownWarnCount" placeholder="可为空">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label><font color="red">*</font>是否启用以上自定义配置<span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="若不启用，则默认使用server配置中的告警配置"  style="cursor:pointer;margin-left: 10px"><i class="fa fa-comment-dots"></i></span></label>
+                    <div class="input-group">
+                        <div class="icheck-primary d-inline">
+                            <input type="radio" id="radioPrimary1" name="active" value="1" checked>
+                            <label for="radioPrimary1"><span style="opacity:.70">启用</span></label>
+                        </div>
+                        <div class="icheck-danger d-inline" style="margin-left:30px;">
+                            <input type="radio" id="radioPrimary3" value="2" name="active" >
+                            <label for="radioPrimary3"><span style="opacity:.70">停止</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>备注</label>
+                    <input type="text" autocomplete="off"  th:value="${hostWarnDiy.remark}" class="validate[maxSize[255]] form-control" name="remark" id="remark" placeholder="">
+                </div>
+
+            </div>
+            <!-- /.card-body -->
+
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-right:10px;"><i class="fas fa-save"></i> 保 存</button>
+                <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+            </div>
+
+        </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-10 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+
+<script th:src="@{'/static/js/hostWarnDiy.js?v=3.5.0'}"></script>
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $("#form1").validationEngine();
+        //Initialize Select2 Elements
+        $('.select2').select2()
+        //Initialize Select2 Elements
+        $('.select2bs4').select2({
+            theme: 'bootstrap4'
+        })
+
+        $("#hostname").val([[${hostWarnDiy.hostname}]]).select2();
+        var memWarnMail = [[${hostWarnDiy.memWarnMail}]];
+        $("input[name='memWarnMail'][value='"+memWarnMail+"']").attr('checked','true');
+        var upSpeedMail = [[${hostWarnDiy.upSpeedMail}]];
+        $("input[name='upSpeedMail'][value='"+upSpeedMail+"']").attr('checked','true');
+        var downSpeedMail = [[${hostWarnDiy.downSpeedMail}]];
+        $("input[name='downSpeedMail'][value='"+downSpeedMail+"']").attr('checked','true');
+        var cpuWarnMail = [[${hostWarnDiy.cpuWarnMail}]];
+        $("input[name='cpuWarnMail'][value='"+cpuWarnMail+"']").attr('checked','true');
+        var cpuTemperatureWarnMail = [[${hostWarnDiy.cpuTemperatureWarnMail}]];
+        $("input[name='cpuTemperatureWarnMail'][value='"+cpuTemperatureWarnMail+"']").attr('checked','true');
+        var diskWarnMail = [[${hostWarnDiy.diskWarnMail}]];
+        $("input[name='diskWarnMail'][value='"+diskWarnMail+"']").attr('checked','true');
+        var smartWarnMail = [[${hostWarnDiy.smartWarnMail}]];
+        $("input[name='smartWarnMail'][value='"+smartWarnMail+"']").attr('checked','true');
+        var sysLoadWarnMail = [[${hostWarnDiy.sysLoadWarnMail}]];
+        $("input[name='sysLoadWarnMail'][value='"+sysLoadWarnMail+"']").attr('checked','true');
+        var hostDownWarnMail = [[${hostWarnDiy.hostDownWarnMail}]];
+        $("input[name='hostDownWarnMail'][value='"+hostDownWarnMail+"']").attr('checked','true');
+        var hostLoginWarnMail = [[${hostWarnDiy.hostLoginWarnMail}]];
+        $("input[name='hostLoginWarnMail'][value='"+hostLoginWarnMail+"']").attr('checked','true');
+        var hostBlockAllWarn = [[${hostWarnDiy.hostBlockAllWarn}]];
+        $("input[name='hostBlockAllWarn'][value='"+hostBlockAllWarn+"']").attr('checked','true');
+        var active = [[${hostWarnDiy.active}]];
+        $("input[name='active'][value='"+active+"']").attr('checked','true');
+        var speedWarnLevel = [[${hostWarnDiy.speedWarnLevel}]];
+        $("input[name='speedWarnLevel'][value='"+speedWarnLevel+"']").attr('checked','true');
+        var memWarnLevel = [[${hostWarnDiy.memWarnLevel}]];
+        $("input[name='memWarnLevel'][value='"+memWarnLevel+"']").attr('checked','true');
+        var sysLoadWarnLevel = [[${hostWarnDiy.sysLoadWarnLevel}]];
+        $("input[name='sysLoadWarnLevel'][value='"+sysLoadWarnLevel+"']").attr('checked','true');
+        var cpuWarnLevel = [[${hostWarnDiy.cpuWarnLevel}]];
+        $("input[name='cpuWarnLevel'][value='"+cpuWarnLevel+"']").attr('checked','true');
+        var cpuTemperatureWarnLevel = [[${hostWarnDiy.cpuTemperatureWarnLevel}]];
+        $("input[name='cpuTemperatureWarnLevel'][value='"+cpuTemperatureWarnLevel+"']").attr('checked','true');
+        var diskWarnLevel = [[${hostWarnDiy.diskWarnLevel}]];
+        $("input[name='diskWarnLevel'][value='"+diskWarnLevel+"']").attr('checked','true');
+        var smartWarnLevel = [[${hostWarnDiy.smartWarnLevel}]];
+        $("input[name='smartWarnLevel'][value='"+smartWarnLevel+"']").attr('checked','true');
+        var hostDownWarnLevel = [[${hostWarnDiy.hostDownWarnLevel}]];
+        $("input[name='hostDownWarnLevel'][value='"+hostDownWarnLevel+"']").attr('checked','true');
+        var hostLoginWarnLevel = [[${hostWarnDiy.hostLoginWarnLevel}]];
+        $("input[name='hostLoginWarnLevel'][value='"+hostLoginWarnLevel+"']").attr('checked','true');
+        $("#hostname").on("change",function (e) {checkRepeat()});
+        var netConnectionsWarnMail = [[${hostWarnDiy.netConnectionsWarnMail}]];
+        $("input[name='netConnectionsWarnMail'][value='"+netConnectionsWarnMail+"']").attr('checked','true');
+        var netConnectionsWarnLevel = [[${hostWarnDiy.netConnectionsWarnLevel}]];
+        $("input[name='netConnectionsWarnLevel'][value='"+netConnectionsWarnLevel+"']").attr('checked','true');
+        var diskIoSpeedWarnMail = [[${hostWarnDiy.diskIoSpeedWarnMail}]];
+        $("input[name='diskIoSpeedWarnMail'][value='"+diskIoSpeedWarnMail+"']").attr('checked','true');
+    });
+
+</script>
+</body>
+</html>

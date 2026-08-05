@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header" style="height:38px">
+      <div class="container-fluid">
+        <div class="row mb-2" style="margin-top: -7px;">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="javascript:history.back()">返回上级</a></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fa-solid fa-cat nav-icon"></i>&nbsp;Tomcat监测列表<span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="此资源需要部署server-backup监控"  style="cursor:pointer;margin-left: 10px"><i class="fa fa-comment-dots"></i></span></h3>
+        <div class=" float-sm-right">
+        </div>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <table th:class="'table table-bordered '+${session.themeTableHoverSign}">
+          <thead>
+          <tr>
+            <th style="width: 60px">序号</th>
+            <th>Tomcat名称</th>
+            <th>JVM空闲内存</th>
+            <th>JVM总内存</th>
+            <th>JVM最大内存</th>
+            <th>当前线程数</th>
+            <th>最大线程数</th>
+            <th>繁忙线程数</th>
+            <th>请求总数</th>
+            <th>最大处理时间</th>
+            <th>更新时间</th>
+          </tr>
+          </thead>
+          <tbody>
+          <th:block th:each="item,iterStat : ${tomcatList}">
+            <tr>
+              <td th:text="${iterStat.index+1}">1</td>
+              <td th:text="${item.name}"></td>
+              <td th:text="${item.free}+'MB'"></td>
+              <td><span class="badge bg-primary" th:text="${item.total}+'MB'"></span></td>
+              <td th:text="${item.max}+'MB'"></td>
+              <td><span class="badge bg-primary" th:text="${item.currentThreadCount}"></span></td>
+              <td th:text="${item.maxThreads}"></td>
+              <td th:text="${item.currentThreadsBusy}"></td>
+              <td th:text="${item.requestCount}"></td>
+              <td th:text="${item.maxTime}+'ms'"></td>
+              <td th:text="${item.createTime}">Update software</td>
+            </tr>
+          </th:block>
+
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer clearfix">
+        <div class="float-left">共<span th:text="${#lists.size(tomcatList)}"></span>条</div>
+      </div>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:inline="javascript">
+  var msg = [[${msg}]];
+  if(msg!='' && msg!=null){
+    toastr.info(msg);
+  }
+</script>
+
+</body>
+</html>

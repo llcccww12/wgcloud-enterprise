@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title th:text="${application.wgName}+'大屏展示'">cac监控系统</title>
+  <base href="./" th:href="'/'"/>
+  <meta charset="utf-8">
+  <link rel="shortcut icon" type="image/x-icon" th:href="${application.icoUrl}"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Font Awesome -->
+  <div  th:replace="common/header.html"></div>
+
+</head>
+<body>
+<h6>&nbsp;</h6>
+<h6 class="mb-2" style="margin-left:20px">您好，此功能需要先升级到专业版或企业版，才可以使用，请联系我们，<a href="http://www.wgstart.com">www.wgstart.com</a></h6>
+<h6>&nbsp;</h6>
+<h6 class="mb-2" style="margin-left:20px">专业版大屏（需要升级到专业版查看）</h6>
+<div class="row">
+  <div class="col-md-3">
+    <!-- Box Comment -->
+    <div class="card card-widget">
+      <div class="card-body">
+        <h6><center>v1版大屏</center></h6>
+        <img  onclick="viewWindowsUrl('/static/images/daping.jpg')" style="cursor:pointer;" class="img-fluid pad" th:src="${application.SERVER_SERVLET_CONTEXT_PATH}+'/static/images/daping.jpg'" title="cac - 大屏可视化 v1版">
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <!-- Box Comment -->
+    <div class="card card-widget">
+      <div class="card-body">
+        <h6><center>v2版大屏</center></h6>
+        <img onclick="viewWindowsUrl('/static/images/dapingNew.jpg')" style="cursor:pointer;" class="img-fluid pad" th:src="${application.SERVER_SERVLET_CONTEXT_PATH}+'/static/images/dapingNew.jpg'" title="cac - 大屏可视化 v2版">
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <!-- Box Comment -->
+    <div class="card card-widget">
+      <div class="card-body">
+        <h6><center>v3版大屏</center></h6>
+        <img onclick="viewWindowsUrl('/static/images/dapingv3.jpg')" style="cursor:pointer;" class="img-fluid pad" th:src="${application.SERVER_SERVLET_CONTEXT_PATH}+'/static/images/dapingv3.jpg'" title="cac - 大屏可视化v3版">
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <!-- Box Comment -->
+    <div class="card card-widget">
+      <div class="card-body">
+        <h6><center>v4版大屏</center></h6>
+        <img onclick="viewWindowsUrl('/static/images/dapingv4.jpg')" style="cursor:pointer;" class="img-fluid pad" th:src="${application.SERVER_SERVLET_CONTEXT_PATH}+'/static/images/dapingv4.jpg'" title="cac - 大屏可视化v4版">
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-3">
+    <!-- Box Comment -->
+    <div class="card card-widget">
+      <div class="card-body">
+        <h6><center>v5版大屏</center></h6>
+        <img  onclick="viewWindowsUrl('/static/images/dapingv5.jpg')" style="cursor:pointer;" class="img-fluid pad" th:src="${application.SERVER_SERVLET_CONTEXT_PATH}+'/static/images/dapingv5.jpg'" title="cac - 大屏可视化 v5版">
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <!-- Box Comment -->
+    <div class="card card-widget">
+      <div class="card-body">
+        <h6><center>v6版大屏</center></h6>
+        <img  onclick="viewWindowsUrl('/static/images/dapingv6.jpg')" style="cursor:pointer;" class="img-fluid pad" th:src="${application.SERVER_SERVLET_CONTEXT_PATH}+'/static/images/dapingv6.jpg'" title="cac - 大屏可视化 v6版">
+      </div>
+    </div>
+  </div>
+</div>
+<h6 class="mb-2" style="margin-left:20px">企业版大屏（包含专业版大屏，需要升级到企业版查看）</h6>
+<div class="row">
+  <div class="col-md-3">
+    <!-- Box Comment -->
+    <div class="card card-widget">
+      <div class="card-body">
+        <h6><center>v7版大屏</center></h6>
+        <img  onclick="viewWindowsUrl('/static/images/dapingv7.jpg')" style="cursor:pointer;" class="img-fluid pad" th:src="${application.SERVER_SERVLET_CONTEXT_PATH}+'/static/images/dapingv7.jpg'" title="cac - 大屏可视化 v7版">
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <!-- Box Comment -->
+    <div class="card card-widget">
+      <div class="card-body">
+        <h6><center>v8版大屏</center></h6>
+        <img  onclick="viewWindowsUrl('/static/images/dapingv8.jpg')" style="cursor:pointer;" class="img-fluid pad" th:src="${application.SERVER_SERVLET_CONTEXT_PATH}+'/static/images/dapingv8.jpg'" title="cac - 大屏可视化 v8版">
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <!-- Box Comment -->
+    <div class="card card-widget">
+      <div class="card-body">
+        <h6><center>v9版大屏</center></h6>
+        <img  onclick="viewWindowsUrl('/static/images/dapingv9.jpg')" style="cursor:pointer;" class="img-fluid pad" th:src="${application.SERVER_SERVLET_CONTEXT_PATH}+'/static/images/dapingv9.jpg'" title="cac - 大屏可视化 v9版">
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <!-- Box Comment -->
+    <div class="card card-widget">
+      <div class="card-body">
+        <h6><center>v10版大屏</center></h6>
+        <img  onclick="viewWindowsUrl('/static/images/dapingv10.jpg')" style="cursor:pointer;" class="img-fluid pad" th:src="${application.SERVER_SERVLET_CONTEXT_PATH}+'/static/images/dapingv10.jpg'" title="cac - 大屏可视化 v10版">
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  function viewWindowsUrl(url) {
+    window.open(SERVER_SERVLET_CONTEXT_PATH + url);
+  }
+
+</script>
+</body>
+</html>

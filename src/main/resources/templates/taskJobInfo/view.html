@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item active"></li>
+                </ol>
+            </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-11">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">查看计划任务
+            <span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="Agent会执行您添加的计划任务指令或者脚本"  style="cursor:pointer;margin-left: 10px"><i class="fa fa-comment-dots"></i></span>
+        </h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <input type="hidden" name="id" th:value="${taskJobInfo.id}"/>
+        <div class="card-body">
+            <div class="form-group">
+                <label><font color="red">*</font>计划任务名称</label>
+                <div  th:text="${taskJobInfo.jobName}" ></div>
+            </div>
+            <div class="form-group">
+                <label><font color="red">*</font>监控主机<span class="text-muted">（添加计划任务后，agent需要一些时间来同步到计划任务信息，之后正常执行任务）</span></label>
+                <div  th:text="${taskJobInfo.hostname}" ></div>
+            </div>
+            <div class="form-group">
+                <label><font color="red">*</font>计划任务执行时间<span class="text-muted">（输入CRON时间表达式）</span></label>
+                <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt" th:text="${taskJobInfo.cronValue}">java -version</span></code></pre></div></div>
+            </div>
+            <div class="form-group">
+                <label><font color="red">*</font>任务执行指令<span class="text-muted">(多条指令请换行输入)</span><span class="text-muted" th:text="${blockStr}">敏感字符串过滤</span></label>
+                <label><span style="color: #62d45e!important;">如果指令很多，比如超过10行或带有逻辑判断，建议将指令写入到一个脚本(存在被监控主机)，然后在这里执行脚本</span></label>
+                <textarea class="validate[required,maxSize[2000]] form-control"   name="shell" id="shell" th:text="${taskJobInfo.shell}"></textarea>
+            </div>
+            <div class="form-group">
+                <label><font color="red"></font>备注</label>
+                <div  th:text="${taskJobInfo.jobRemark}" ></div>
+            </div>
+            <div class="form-group">
+                <label><font color="red"></font>计划任务执行状态</label>
+                <div>
+                    <span><code class="highlighter-rouge" style="font-size:100%;font-weight:700" th:text="${taskJobInfo.callBackState}"></code></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label><font color="red"></font>计划任务执行结果</label>
+                <textarea class="form-control"  id="callBackResult" th:text="${taskJobInfo.callBackResult}"></textarea>
+            </div>
+            <div class="form-group">
+                <label><font color="red"></font>计划任务最新执行时间</label>
+                <div th:text="${#dates.format(taskJobInfo.callBackTime,'yyyy-MM-dd HH:mm:ss')}" ></div>
+            </div>
+            <div class="form-group">
+                <label><font color="red"></font>添加时间</label>
+                <div  th:text="${#dates.format(taskJobInfo.createTime,'yyyy-MM-dd HH:mm:ss')}" ></div>
+            </div>
+            <div class="form-group clearfix">
+                <label><font color="red">*</font>是否启用<span class="text-muted">（启用后任务开始执行，停用后任务不再执行）</span></label>
+                <div class="input-group">
+                    <div class="icheck-primary d-inline">
+                        <input type="radio" id="radioPrimary1" name="active" value="1" checked>
+                        <label for="radioPrimary1"><span style="opacity:.70">启用</span></label>
+                    </div>
+                    <div class="icheck-danger d-inline" style="margin-left:30px;">
+                        <input type="radio" id="radioPrimary3" value="2" name="active" >
+                        <label for="radioPrimary3"><span style="opacity:.70">停止</span></label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group"  th:if="${application.hostGroup == 'true'}">
+                <label>标签</label>
+                <div><span th:text="${taskJobInfo.groupId}"></span><span th:if="${taskJobInfo.groupId} == null or ${taskJobInfo.groupId} == ''">无</span></div>
+            </div>
+
+        </div>
+        <!-- /.card-body -->
+
+        <div class="card-footer">
+            <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+        </div>
+
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-10 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<div th:replace="common/codemirror.html"></div>
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $("#form1").validationEngine();
+        var active = [[${taskJobInfo.active}]];
+        $("input[name='active'][value='"+active+"']").attr('checked','true');
+
+        var editor = CodeMirror.fromTextArea(document.getElementById("shell"), {
+            lineNumbers: true,
+            styleActiveLine: true,
+            matchBrackets: true,
+            readOnly: true,
+            mode: 'shell'
+        });
+        editor.setOption("theme", "dracula");
+        editor.setSize('auto','280px');
+        var editor2 = CodeMirror.fromTextArea(document.getElementById("callBackResult"), {
+            lineNumbers: true,
+            styleActiveLine: true,
+            matchBrackets: true,
+            readOnly: true,
+            mode: 'shell'
+        });
+        editor2.setOption("theme", "dracula");
+        editor2.setSize('auto','auto');
+    });
+
+    var msg = [[${msg}]];
+    if(msg!='' && msg!=null){
+        toastr.error(msg);
+    }
+</script>
+</body>
+</html>

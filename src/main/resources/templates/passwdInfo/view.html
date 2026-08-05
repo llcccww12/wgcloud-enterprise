@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}" style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item active"></li>
+                </ol>
+            </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-11">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">查看设备账号信息</h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <form role="form" id="form1" th:action="@{'/passwdInfo/save'}">
+            <input type="hidden" name="id" th:value="${passwdInfo.id}"/>
+            <div class="card-body">
+                <div class="form-group">
+                    <label>设备名称</label>
+                    <div  th:text="${passwdInfo.hostname}" ></div>
+                </div>
+                <div class="form-group">
+                    <label>标识</label>
+                    <div><span  style="color: #e64b55!important;font-weight:700"  th:text="${passwdInfo.hostMark}" ></span><span class="btncopy" th:data-clipboard-text="${passwdInfo.hostMark}" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制" style="cursor:pointer;margin-left: 5px"><i class="fa fa-copy"></i></span></div>
+                </div>
+                <div class="form-group">
+                    <label>账号</label>
+                    <div><span  style="color: #e64b55!important;font-weight:700" th:text="${passwdInfo.hostAccount}" ></span><span class="btncopy" th:data-clipboard-text="${passwdInfo.hostAccount}" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制"  style="cursor:pointer;margin-left: 5px"><i class="fa fa-copy"></i></span></div>
+                </div>
+                <div class="form-group">
+                    <label>密码 </label>
+                    <div><span  style="color: #e64b55!important;font-weight:700" th:text="${passwdInfo.hostPasswd}" ></span><span  class="btncopy" th:data-clipboard-text="${passwdInfo.hostPasswd}" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制"  style="cursor:pointer;margin-left: 5px"><i class="fa fa-copy"></i></span></div>
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <div  th:text="${passwdInfo.hostRemark}" ></div>
+                </div>
+                <div class="form-group">
+                    <label>添加时间</label>
+                    <div  th:text="${#dates.format(passwdInfo.createTime,'yyyy-MM-dd HH:mm:ss')}" ></div>
+                </div>
+                <div class="form-group"  th:if="${application.hostGroup == 'true'}">
+                    <label>标签</label>
+                    <div><span th:text="${passwdInfo.groupId}"></span><span th:if="${passwdInfo.groupId} == null or ${passwdInfo.groupId} == ''">&nbsp;</span></div>
+                </div>
+
+
+            </div>
+            <!-- /.card-body -->
+
+        </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:src="@{'/static/js/passwdInfo.js?v=3.5.0'}"></script>
+<script th:inline="javascript">
+    $(document).ready(function(){
+        var clipboard = new ClipboardJS('.btncopy');
+        clipboard.on('success', function (e) {
+            toastr.success("复制成功");
+        });
+    });
+
+</script>
+</body>
+</html>

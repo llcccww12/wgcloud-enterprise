@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header" style="height:38px">
+      <div class="container-fluid">
+        <div class="row mb-2" style="margin-top: -7px;">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="javascript:history.back()">返回上级</a></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fa-solid fa-layer-group nav-icon"></i>&nbsp;ActiveMQ监测列表<span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="此资源需要部署server-backup监控"  style="cursor:pointer;margin-left: 10px"><i class="fa fa-comment-dots"></i></span></h3>
+        <div class=" float-sm-right">
+        </div>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <table th:class="'table table-bordered '+${session.themeTableHoverSign}">
+          <thead>
+          <tr>
+            <th style="width: 60px">序号</th>
+            <th>自定义名称</th>
+            <th>版本</th>
+            <th>brokerUrl</th>
+            <th>队列名称</th>
+            <th>堆积消息数量</th>
+            <th>更新时间</th>
+          </tr>
+          </thead>
+          <tbody>
+          <th:block th:each="item,iterStat : ${activemqList}">
+            <tr>
+              <td th:text="${iterStat.index+1}">1</td>
+
+              <th:block th:if="${item.code  == '2'}">
+                <td><span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="'连接失败" class="badge bg-danger"  th:text="${item.name}"></span></td>
+              </th:block>
+              <th:block th:if="${item.code  != '2'}">
+                <td><span   th:text="${item.name}"></span></td>
+              </th:block>
+
+              <td th:text="${item.providerVersion}"></td>
+              <td th:text="${item.brokerUrl}"></td>
+              <td th:text="${item.queueName}"></td>
+              <td><span th:text="${item.messageCount}" class="badge bg-primary"></span></td>
+              <td th:text="${item.createTime}">Update software</td>
+            </tr>
+          </th:block>
+
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer clearfix">
+        <div class="float-left">共<span th:text="${#lists.size(activemqList)}"></span>条</div>
+      </div>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:inline="javascript">
+  var msg = [[${msg}]];
+  if(msg!='' && msg!=null){
+    toastr.info(msg);
+  }
+</script>
+
+</body>
+</html>

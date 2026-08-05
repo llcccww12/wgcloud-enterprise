@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item active"></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title" ><span th:text="${systemInfo.hostname}"></span>
+            <th:block th:if="${systemInfo.remark ne '' && systemInfo.remark ne null}">
+                (备注：<span th:text="${systemInfo.remark}"></span>)
+            </th:block><span class="btncopy" th:data-clipboard-text="${systemInfo.hostname}" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制" style="cursor:pointer;margin-left: 5px"><i class="fa fa-copy"></i></span>
+            </h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+        <label><span style="margin-left: 10px;margin-top:10px;color:#fff;background:#3ac47d;display:inline-block;border-radius:3px;padding:4px 8px 4px;">全量Docker信息<span th:text="${dockerListAllSize}"></span></span>
+            <small th:if="${caijiDateTime ne '' && caijiDateTime ne null}" style="background:#508ff4;margin-left:5px;" class="badge badge-danger" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="采集时间"><i class="far fa-clock"></i> <span th:text="${caijiDateTime}">10 Feb. 2014</span></small>
+            <span style="margin-left: 10px;font-weight:700;color: #62d45e!important;" th:text="${tipInfo}"></span></label>
+        <div class="row">
+            <div class="col-12 table-responsive">
+                <table th:class="'table '+${session.themeTableHoverSign}">
+                    <thead>
+                    <tr>
+                        <th style="width: 60px">序号</th>
+                        <th>容器NAMES</th>
+                        <th>内存使用</th>
+                        <th>容器创建时间</th>
+                        <th data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="容器中所有文件的总大小(以MB为单位)">容器大小</th>
+                        <th>容器端口</th>
+                        <th>容器状态</th>
+                        <th>CPU%</th>
+                        <th>容器Status</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <th:block th:each="item,iterStat : ${dockerListAll}">
+                        <tr>
+                            <td th:text="${iterStat.index+1}">1</td>
+                            <td th:text="${item.gatherDockerNames}"></td>
+                            <td th:text="${item.memToM}+'MB'">Update software</td>
+                            <td th:text="${item.created}"></td>
+                            <td th:text="${item.sizeRootFs}+'MB'"></td>
+                            <td><span data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="${item.portStr}"  th:text="${#strings.abbreviate(item.portStr,30)}"></span></td>
+                            <td>
+                                <th:block th:if="${item.containerState  == 'running'}">
+                                    <span class="badge bg-success">running</span>
+                                </th:block>
+                                <th:block th:if="${item.containerState  == 'exited'}">
+                                    <span style="color:#fff;" class="badge btn-warning">exited</span>
+                                </th:block>
+                            </td>
+                            <td><span style="background:#9267FF!important;" class="badge bg-dark"  th:text="${item.userTime}">0.0</span></td>
+                            <td th:text="${item.status}"></td>
+                            <td><button type="button" data-toggle="modal" data-target="#modal-default" th:onclick="setHostRemark([[${item.gatherDockerNames}]],[[${item.memToM}]],[[${item.created}]],[[${item.sizeRootFs}]],[[${item.portStr}]],[[${item.containerState}]],[[${item.userTime}]],[[${item.image}]],[[${item.command}]],[[${item.status}]],[[${item.gatherContainerId}]])"  class="btn btn-primary btn-sm">查看详情</button></td>
+                        </tr>
+                    </th:block>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer clearfix">
+                <div class="float-left">共<span th:text="${#lists.size(dockerListAll)}"></span>条</div>
+            </div>
+        </div>
+
+    </div>
+    <!-- /.card -->
+
+  </div>
+  <!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<div class="modal fade" id="modal-default">
+    <div class="modal-dialog modal-lg">
+        <form method="post" id="form2" th:action="@{'/systemInfo/save'}">
+            <div class="modal-content" style="font-size:0.90rem">
+                <div class="modal-header">
+                    <h4 class="modal-title">Docker详情</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                    <div class="form-group">
+                        <label>容器ID</label>
+                        <div><span id="gatherContainerId"></span><span  class="btncopy" data-clipboard-action="copy"  data-clipboard-target="#gatherContainerId" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制" style="cursor:pointer;margin-left: 10px"><i class="fa fa-copy"></i></span></div>
+                    </div>
+                    <div class="form-group">
+                        <label>容器NAMES</label>
+                        <div><span id="gatherDockerNames"></span><span  class="btncopy" data-clipboard-action="copy"  data-clipboard-target="#gatherDockerNames" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制" style="cursor:pointer;margin-left: 10px"><i class="fa fa-copy"></i></span></div>
+                    </div>
+                    <div class="form-group">
+                        <label>内存使用</label>
+                        <div  id="memPer"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>容器创建时间</label>
+                        <div  id="dockerCreated"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>容器大小</label>
+                        <div  id="dockerSize"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>容器端口</label>
+                        <div  id="dockerPort"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>容器状态</label>
+                        <div id="dockerState"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>CPU%</label>
+                        <div  id="userTime"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>容器Image</label>
+                        <div><span id="dockerImage"></span><span  class="btncopy" data-clipboard-action="copy"  data-clipboard-target="#dockerImage" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制" style="cursor:pointer;margin-left: 10px"><i class="fa fa-copy"></i></span></div>
+                    </div>
+                    <div class="form-group">
+                        <label>容器启动命令<span  class="btncopy" data-clipboard-action="copy"  data-clipboard-target="#dockerCommand" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制" style="cursor:pointer;margin-left: 10px"><i class="fa fa-copy"></i></span></label>
+                        <div id="dockerCommand"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>容器Status</label>
+                        <div  id="dockerStatus"></div>
+                    </div>
+
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default  btn-sm" data-dismiss="modal">关 闭</button>
+                </div>
+            </div>
+        </form>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<script th:inline="javascript">
+    function setHostRemark(gatherDockerNames,memPer,dockerCreated,dockerSize,dockerPort,dockerState,userTime,dockerImage,dockerCommand,dockerStatus,gatherContainerId) {
+        $("#gatherDockerNames").html(gatherDockerNames);
+        $("#memPer").html(memPer+"MB");
+        $("#dockerCreated").html(dockerCreated);
+        $("#dockerSize").html(dockerSize+"MB");
+        $("#dockerPort").html(dockerPort);
+        if(dockerState  == 'running'){
+            $("#dockerState").html('<span class="badge bg-success">running</span>');
+        }
+        if(dockerState  == 'exited'){
+            $("#dockerState").html('<span style="color:#fff;" class="badge btn-warning">exited</span>');
+        }
+        $("#userTime").html('<span style="background:#9267FF!important;" class="badge bg-dark">'+userTime+'</span>');
+        $("#dockerImage").html(dockerImage);
+        $("#dockerCommand").html(dockerCommand);
+        $("#dockerStatus").html(dockerStatus);
+        $("#gatherContainerId").html(gatherContainerId);
+    }
+    var clipboard = new ClipboardJS('.btncopy');
+    clipboard.on('success', function (e) {
+        toastr.success("复制成功");
+    });
+</script>
+
+</body>
+</html>

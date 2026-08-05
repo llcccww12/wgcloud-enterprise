@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item active"></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-11">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">添加数据库信息</h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <form role="form" id="form1"  method="post"  th:action="@{'/dbInfo/save'}" onsubmit="onSubmit()">
+            <input type="hidden" name="id" th:value="${dbInfo.id}"/>
+            <div class="card-body">
+                <div class="form-group">
+                    <label><font color="red">*</font>数据库名称</label>
+                    <input type="text"  th:value="${dbInfo.aliasName}" autocomplete="off" class="validate[required,maxSize[50]] form-control" name="aliasName" id="aliasName" placeholder="如cac数据库">
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>数据库类型
+                        <span class="text-muted">（监控OpenGauss、Kingbase、Highgo数据库，请选择PostgreSQL。监控OceanBase、万里数据库、PolarDB、TiDB数据库，请选择MySQL。如果选择其他数据库，请使用server-backup监测）</span>
+                        </label>
+                    <select class="validate[required] form-control col-md-8" onchange="setDriver();"  name="dbType" id="dbType">
+                        <option value="mysql">MySQL</option>
+                        <option value="oracle">Oracle</option>
+                        <option value="postgresql">PostgreSQL</option>
+                        <option value="sqlserver">SQLServer</option>
+                        <option value="mariadb">MariaDB</option>
+                        <option value="redis">Redis</option>
+                        <option value="mongodb">MongoDB</option>
+                        <option value="db2">DB2</option>
+                        <option value="sqlite">SQLite</option>
+                        <option value="clickhouse">ClickHouse</option>
+                        <option value="dameng">达梦</option>
+                        <option value="other">其他数据库</option>
+                    </select>
+                </div>
+                <div class="form-group" id="driveClassNameDiv">
+                    <label><font color="red"></font>驱动名称</label>
+                    <input type="text" th:value="${dbInfo.driverName}" id="driveClassName" name="driverName" autocomplete="off" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font><span id="dbUrlSpan">JDBC连接字符串</span><span class="text-muted">（请替换IP，端口，数据库名称）</span></label>
+                    <textarea class="validate[required,maxSize[500]] form-control"   name="dbUrl" id="dbUrl"
+                              th:text="${dbInfo.dbUrl}"  rows="3" placeholder="数据库连接字符串(请替换IP，端口，数据库名称)"></textarea>
+                </div>
+                <div class="form-group" id="userNameDiv">
+                    <label><font color="red"></font><span id="userNameSpan">用户名</span></label>
+                    <input type="text"  th:value="${dbInfo.userName}" autocomplete="off" class="validate[maxSize[40]] form-control" name="userName" id="userName" placeholder="输入数据库用户名">
+                </div>
+                <div class="form-group" id="passwdDiv">
+                    <label><font color="red"></font>密码<span style="display:none" id="passwdSpan" class="text-muted">（如果Redis有用户名，那么用户名和密码中间用英文分号隔开，比如这样，用户名:密码）</span><span  class="btncopy" data-clipboard-action="copy"  data-clipboard-target="#passwd" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制密码" style="cursor:pointer;margin-left: 10px"><i class="fa fa-copy"></i></span>
+                        <span data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="显示密码" onclick="javascript:showPasswd();" style="cursor:pointer;margin-left: 10px"><i id="eyeSwitch" class="fa fa-eye"></i></span></label>
+                    <input type="password"  th:value="${dbInfo.passwd}" class="validate[maxSize[50]] form-control" name="passwd" id="passwd" placeholder="输入数据库密码">
+                </div>
+                <div class="form-group" id="testQuerySqlDiv">
+                    <label><font color="red">*</font>测试SQL</span><span class="text-muted">（一个简单的SQL，用来测试数据库是否能连接成功，不能输入sql敏感字符：<span th:text="${sqlInKeys}"></span>）</span></label>
+                    <input type="text"  th:value="${dbInfo.testQuerySql}" autocomplete="off" class="validate[maxSize[100]] form-control" name="testQuerySql" id="testQuerySql" placeholder="select version()">
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>告警级别</label>
+                    <div th:replace="common/warnLevel.html"></div>
+                </div>
+                <div class="form-group clearfix">
+                    <label><font color="red">*</font>监控状态</label>
+                    <div th:replace="common/activeRadio.html"></div>
+                </div>
+            </div>
+            <!-- /.card-body -->
+
+            <div class="card-footer">
+                <button type="button" onclick="test()" class="btn btn-primary btn-sm" style="margin-right:10px;">连接测试</button>
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-right:10px;"><i class="fas fa-save"></i> 保 存</button>
+                <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+            </div>
+
+        </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-10 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:src="@{'/static/js/dbinfo.js?v=3.5.0'}"></script>
+
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $("#form1").validationEngine();
+        $("#dbType").val([[${dbInfo.dbType}]]);
+        if($("#dbType").val()=='redis'){
+            $("#driveClassNameDiv").hide();
+            $("#dbUrlSpan").html("Redis服务器IP");
+            $("#userNameSpan").html("Redis端口");
+            $("#testQuerySqlDiv").hide();
+            $("#passwdSpan").show();
+        }
+        if($("#dbType").val()=='mongodb'){
+            $("#driveClassNameDiv").hide();
+            $("#userNameDiv").hide();
+            $("#passwdDiv").hide();
+            $("#dbUrlSpan").html("MongoDB URL");
+            $("#testQuerySqlDiv").hide();
+        }
+        var warnLevel = [[${dbInfo.warnLevel}]];
+        $("input[name='warnLevel'][value='"+warnLevel+"']").attr('checked','true');
+        var active = [[${dbInfo.active}]];
+        $("input[name='active'][value='"+active+"']").attr('checked','true');
+        var clipboard = new ClipboardJS('.btncopy');
+        clipboard.on('success', function (e) {
+            toastr.success("复制成功");
+        });
+    });
+    function onSubmit() {
+        $("#form1").attr("action",SERVER_SERVLET_CONTEXT_PATH + "/dbInfo/save");
+        return true;
+    }
+
+    function test(){
+        toastr.info("正在连接测试......");
+        $("#form1").attr("action",SERVER_SERVLET_CONTEXT_PATH + "/dbInfo/validate");
+        $("#form1").ajaxSubmit(function(message) {
+            var msg = JSON.parse(message);
+            if(msg.code!=""){
+                if(msg.msg!='' && msg.code=="0"){
+                    toastr.success(msg.msg);
+                }
+                if(msg.msg!='' &&  msg.code=="1"){
+                    toastr.error(msg.msg);
+                }
+            }
+        });
+    }
+
+    function setDriver(){
+        $("#testQuerySqlDiv").show();
+        $("#driveClassNameDiv").show();
+        $("#userNameDiv").show();
+        $("#passwdDiv").show();
+        $("#dbUrlSpan").html("JDBC连接字符串");
+        $("#userNameSpan").html("用户名");
+        $("#userName").val("");
+        $("#passwdSpan").hide();
+
+        if($("#dbType").val()=='mysql'){
+            $("#driveClassName").val('com.mysql.jdbc.Driver');
+            $("#dbUrl").val('jdbc:mysql://192.168.1.2:3306/cac');
+            $("#testQuerySql").val('select version()');
+        }
+        if($("#dbType").val()=='mariadb'){
+            $("#driveClassName").val('org.mariadb.jdbc.Driver');
+            $("#dbUrl").val('jdbc:mariadb://192.168.1.2:3306/cac');
+            $("#testQuerySql").val('select version()');
+        }
+        if($("#dbType").val()=='oracle'){
+            $("#driveClassName").val('oracle.jdbc.driver.OracleDriver');
+            $("#dbUrl").val('jdbc:oracle:thin:@192.168.1.2:1521:orcl');
+            $("#testQuerySql").val('select * from v$version');
+        }
+        if($("#dbType").val()=='postgresql'){
+            $("#driveClassName").val('org.postgresql.Driver');
+            $("#dbUrl").val('jdbc:postgresql://192.168.1.2:5432/cac');
+            $("#testQuerySql").val('select version()');
+        }
+        if($("#dbType").val()=='sqlserver'){
+            $("#driveClassName").val('com.microsoft.sqlserver.jdbc.SQLServerDriver');
+            $("#dbUrl").val('jdbc:sqlserver://192.168.1.2:1433;DatabaseName=cac;encrypt=true;trustServerCertificate=true;');
+            $("#testQuerySql").val('SELECT @@VERSION');
+        }
+        if($("#dbType").val()=='db2'){
+            $("#driveClassName").val('com.ibm.db2.jdbc.app.DB2Driver');
+            $("#dbUrl").val('jdbc:db2://192.168.1.2:5000/cac');
+            $("#testQuerySql").val('SELECT SERVICE_LEVEL FROM SYSIBMADM.ENV_INST_INFO');
+        }
+        if($("#dbType").val()=='redis'){
+            $("#driveClassNameDiv").hide();
+            $("#dbUrlSpan").html("Redis服务器IP");
+            $("#dbUrl").val('192.168.1.2');
+            $("#userNameSpan").html("Redis端口");
+            $("#userName").val("6379");
+            $("#testQuerySqlDiv").hide();
+            $("#passwdSpan").show();
+        }
+        if($("#dbType").val()=='mongodb'){
+            $("#driveClassNameDiv").hide();
+            $("#userNameDiv").hide();
+            $("#passwdDiv").hide();
+            $("#dbUrlSpan").html("MongoDB URL");
+            $("#dbUrl").val('mongodb://192.168.1.2:27017');
+            $("#testQuerySqlDiv").hide();
+        }
+        if($("#dbType").val()=='sqlite'){
+            $("#driveClassName").val('org.sqlite.JDBC');
+            $("#dbUrl").val('jdbc:sqlite:/cac.db');
+            $("#testQuerySql").val('select sqlite_version()');
+        }
+        if($("#dbType").val()=='other'){
+            $("#driveClassName").val('com.mysql.jdbc.Driver');
+            $("#dbUrl").val('jdbc:mysql://192.168.1.2:3306/cac');
+            $("#testQuerySql").val('select version()');
+        }
+        if($("#dbType").val()=='clickhouse'){
+            $("#driveClassName").val('ru.yandex.clickhouse.ClickHouseDriver');
+            $("#dbUrl").val('jdbc:clickhouse://192.168.1.2:8123/cac?compress=false');
+            $("#testQuerySql").val('select version()');
+        }
+        if($("#dbType").val()=='dameng'){
+            $("#driveClassName").val('dm.jdbc.driver.DmDriver');
+            $("#dbUrl").val('jdbc:dm://localhost:5236/YOUR_DATABASE_NAME?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=utf-8');
+            $("#testQuerySql").val('select * from v$version');
+        }
+    }
+
+    function showPasswd(){
+        var type = $("#passwd").attr("type");
+        if(type=='text'){
+            $("#eyeSwitch").attr("class","fa fa-eye");
+            $("#passwd").attr("type","password");
+        }else{
+            $("#eyeSwitch").attr("class","fa fa-eye-slash");
+            $("#passwd").attr("type","text");
+        }
+
+    }
+
+    var msg = [[${msg}]];
+    if(msg!='' && msg!=null){
+        toastr.error(msg);
+    }
+</script>
+</body>
+</html>

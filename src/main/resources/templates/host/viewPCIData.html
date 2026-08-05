@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item active"></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title" ><span th:utext="${systemInfo.image}"></span><span style="margin-left:5px" th:text="${systemInfo.hostname}"></span>
+            <th:block th:if="${systemInfo.remark ne '' && systemInfo.remark ne null}">
+                (备注：<span th:text="${systemInfo.remark}"></span>)
+            </th:block><span class="btncopy" th:data-clipboard-text="${systemInfo.hostname}" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="复制" style="cursor:pointer;margin-left: 5px"><i class="fa fa-copy"></i></span>
+            </h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+        <label><span style="margin-left: 10px;margin-top:10px;color:#fff;background:#9267ff;display:inline-block;border-radius:3px;padding:4px 8px 4px;">主机PCI数据</span></label>
+        <div class="row">
+            <div class="col-12 table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th style="width: 60px">序号</th>
+                        <th>ID</th>
+                        <th>产品名称</th>
+                        <th>供应商名称</th>
+                        <th>采集时间</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <th:block th:each="item,iterStat : ${pciDataList}">
+                        <tr>
+                            <td th:text="${iterStat.index+1}">1</td>
+                            <td th:text="${item.deviceId}"></td>
+                            <td th:text="${item.productName}"></td>
+                            <td th:text="${item.vendorName}"></td>
+                            <td th:text="${#dates.format(item.createTime,'yyyy-MM-dd HH:mm:ss')}">Update software</td>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-12 card-footer clearfix">
+                <div class="float-left">共<span th:text="${cacheListSize}"></span>条</div>
+                <div class="float-right"><button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button></div>
+            </div>
+        </div>
+    </div>
+    <!-- /.card -->
+
+  </div>
+  <!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+<script th:inline="javascript">
+    var clipboard = new ClipboardJS('.btncopy');
+    clipboard.on('success', function (e) {
+        toastr.success("复制成功");
+    });
+</script>
+
+</body>
+</html>

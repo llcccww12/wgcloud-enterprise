@@ -1,0 +1,45 @@
+#==============================================================
+# AI 大模型接入（二开 - Layer 1）
+# 协议：OpenAI 兼容（/v1/chat/completions）
+# 支持任何兼容服务：DeepSeek/通义/Qwen/Ollama/vLLM/OpenAI/Azure 等
+#==============================================================
+ai:
+  #总开关，yes 开启 AI 助手，no 关闭（关闭后页面回退到旧版外部脚本模式）
+  enabled: yes
+  #API 基地址（不要带尾斜杠，路径自动拼接 /chat/completions）
+  baseUrl: http://192.168.157.200:82/v1
+  #API Key（OpenAI 兼容 Bearer Token）
+  apiKey: sk-qw3c0d3r-n3xt-9f8e7d6c5b4a3210
+  #模型名
+  model: DeepSeek-V4-Flash
+  #温度 0~2，越小越稳定，运维场景建议 0.2~0.4
+  temperature: 0.3
+  #最大输出 token 数，0 表示不限制
+  maxTokens: 2048
+  #单次请求超时（秒）
+  timeoutSeconds: 120
+  #系统提示词（决定 AI 的人设）
+  systemPrompt: '你是 cac 智能运维监控平台的助手，回答简洁、专业、用中文。涉及命令、指标时使用 Markdown 代码块或表格。'
+  #单次请求最大字符数（防止超长上下文撑爆 API），超出会截断
+  #Qwen3-Coder 支持 ~180K tokens 上下文，中文按 1 token ≈ 1.5 字符估算可放约 120K 字符
+  maxPromptChars: 120000
+  #------- 告警自动 AI 摘要（二开 Layer 2.3） -------
+  enrich:
+    #是否开启 AI 告警摘要回写。yes 开启，no 关闭
+    enabled: yes
+    #扫描定时任务间隔秒（最低 10）
+    scanIntervalSeconds: 30
+    #只处理"最近多少分钟内产生"的告警，超过此窗口就放弃 (避免历史告警挤压)
+    lookbackMinutes: 5
+    #单次扫描最多处理多少条
+    batchLimit: 30
+    #同一主机 + 同一摘要 hash，多少分钟内只生成一次 AI 摘要
+    dedupMinutes: 5
+    #每分钟最多调用 AI 多少次（全局限流）
+    perMinuteLimit: 20
+    #摘要 prompt（影响 AI 输出风格，建议简短）
+    summaryPrompt: '请用最多5行中文，简明分析这条运维告警：1)根本原因可能是什么；2)立即应执行的1个排查动作；3)风险等级(高/中/低)。仅输出要点，不要客套。'
+    #摘要在 INFO_CONTENT 中的起始锚点（用于去重判断，避免重复 enrich）
+    markerStart: '[AI摘要]'
+    #摘要末尾标记
+    markerEnd: '[/AI摘要]'

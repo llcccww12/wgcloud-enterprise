@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item active"></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-11">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">查看数据库配置</h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <form role="form" id="form1"  method="post"  th:action="@{'/dbInfo/save'}" onsubmit="onSubmit()">
+            <input type="hidden" name="id" th:value="${dbInfo.id}"/>
+            <div class="card-body">
+                <div class="form-group">
+                    <label><font color="red">*</font>数据库名称</label>
+                    <div  th:text="${dbInfo.aliasName}"></div>
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>数据库类型<span class="text-muted">（如果选择其他数据库，请使用server-backup监测）</span></label>
+                    <select class="validate[required] form-control col-md-8" name="dbType" id="dbType">
+                        <option value="mysql">MySQL</option>
+                        <option value="oracle">Oracle</option>
+                        <option value="postgresql">PostgreSQL</option>
+                        <option value="sqlserver">SQLServer</option>
+                        <option value="mariadb">MariaDB</option>
+                        <option value="redis">Redis</option>
+                        <option value="mongodb">MongoDB</option>
+                        <option value="db2">DB2</option>
+                        <option value="sqlite">SQLite</option>
+                        <option value="clickhouse">ClickHouse</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                <div class="form-group" id="driveClassNameDiv">
+                    <label><font color="red"></font>驱动名称</label>
+                    <div  th:text="${dbInfo.driverName}"></div>
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font><span id="dbUrlSpan">JDBC连接字符串</span><span class="text-muted">（请替换IP，端口，数据库名称）</span></label>
+                    <div  th:text="${dbInfo.dbUrl}"></div>
+                </div>
+                <div class="form-group" id="userNameDiv">
+                    <label><font color="red"></font><span id="userNameSpan">用户名</span></label>
+                    <div>******</div>
+                </div>
+                <div class="form-group" id="passwdDiv">
+                    <label><font color="red"></font>密码</label>
+                    <div>******</div>
+                </div>
+                <div class="form-group" id="testQuerySqlDiv">
+                    <label><font color="red">*</font>测试SQL</span><span class="text-muted">（一个简单的SQL，用来测试数据库是否能连接成功）</span></label>
+                    <div style="line-height:0.9;font-size:1rem" class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight">
+<code><span th:text="${dbInfo.testQuerySql}"></span></code></pre></div></div>
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>告警级别</label>
+                    <div th:replace="common/warnLevel.html"></div>
+                </div>
+                <div class="form-group clearfix">
+                    <label><font color="red">*</font>监控状态</label>
+                    <div th:replace="common/activeRadio.html"></div>
+                </div>
+                <div class="form-group"  th:if="${application.hostGroup == 'true'}">
+                    <label>标签</label>
+                    <div><span th:text="${dbInfo.groupId}"></span><span th:if="${dbInfo.groupId} == null or ${dbInfo.groupId} == ''">无</span></div>
+                </div>
+                <div class="form-group">
+                    <label>更新时间</label>
+                    <div  th:text="${#dates.format(dbInfo.createTime,'yyyy-MM-dd HH:mm:ss')}" ></div>
+                </div>
+                <div class="form-group">
+                    <label>连接用时</label>
+                    <div  th:text="${dbInfo.resTimesSecond}"></div>
+                </div>
+                <div class="form-group">
+                    <label>监控任务执行状态</label>
+                    <div><code class="highlighter-rouge" style="font-size:100%;font-weight:700" th:text="${dbInfoErrorMsg}"></code></div>
+                </div>
+            </div>
+            <!-- /.card-body -->
+
+            <div class="card-footer">
+                <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+            </div>
+
+        </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-10 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:src="@{'/static/js/dbinfo.js?v=3.5.8'}"></script>
+
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $("#dbType").val([[${dbInfo.dbType}]]);
+        if($("#dbType").val()=='redis'){
+            $("#driveClassNameDiv").hide();
+            $("#dbUrlSpan").html("Redis服务器IP");
+            $("#userNameSpan").html("Redis端口");
+            $("#testQuerySqlDiv").hide();
+        }
+        if($("#dbType").val()=='mongodb'){
+            $("#driveClassNameDiv").hide();
+            $("#userNameDiv").hide();
+            $("#passwdDiv").hide();
+            $("#dbUrlSpan").html("MongoDB URL");
+            $("#testQuerySqlDiv").hide();
+        }
+        var warnLevel = [[${dbInfo.warnLevel}]];
+        $("input[name='warnLevel'][value='"+warnLevel+"']").attr('checked','true');
+        var active = [[${dbInfo.active}]];
+        $("input[name='active'][value='"+active+"']").attr('checked','true');
+    });
+
+    var msg = [[${msg}]];
+    if(msg!='' && msg!=null){
+        toastr.error(msg);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<div class="row">
+    <!-- Left col -->
+    <section class="col-lg-7 connectedSortable">
+        <!-- Custom tabs (Charts with tabs)-->
+        <div class="row">
+        <section class="col-lg-6 connectedSortable"><div id="chartInfoByte"></div></section>
+        <section class="col-lg-6 connectedSortable"><div id="chartInfoLoad"></div></section>
+        </div>
+    </section>
+
+    <section class="col-lg-5 connectedSortable">
+        <!-- Custom tabs (Charts with tabs)-->
+        <div id="chartCpuMemPer"></div>
+        <!-- /.card -->
+    </section>
+</div>
+
+<!-- Main row -->
+<div class="row">
+    <!-- Left col -->
+    <section class="col-lg-3 connectedSortable">
+        <!-- Custom tabs (Charts with tabs)-->
+        <div id="chartInfoList1"></div>
+        <!-- /.card -->
+    </section>
+    <section class="col-lg-3 connectedSortable">
+        <!-- Custom tabs (Charts with tabs)-->
+        <div id="chartInfoHuantu"></div>
+        <!-- /.card -->
+    </section>
+    <section class="col-lg-3 connectedSortable">
+        <!-- Custom tabs (Charts with tabs)-->
+        <div id="chartInfoList2"></div>
+        <!-- /.card -->
+    </section>
+
+    <section class="col-lg-3 connectedSortable">
+        <!-- Custom tabs (Charts with tabs)-->
+        <div id="chartInfoList3"></div>
+    </section>
+
+</div>
+
+<!-- Main row -->
+<div class="row">
+    <!-- Info Boxes Style 2 -->
+    <div  class="col-lg-3">
+    <div  style="color:#fff;background-color:#6dd4b1!important;" class="info-box bg-arielle-smile">
+        <span class="info-box-icon"><i class="fa fa-memory"></i></span>
+        <div class="info-box-content">
+            <span class="info-box-text">内存总和</span>
+            <span class="info-box-number" style="font-weight:900"><span th:text="${memSum}">18</span>G</span>
+        </div>
+        <!-- /.info-box-content -->
+    </div>
+    </div>
+    <!-- /.info-box -->
+    <div  class="col-lg-3">
+    <div  style="color:#fff;background-color:#6dd4b1!important;" class="info-box bg-happy-itmeo">
+        <span class="info-box-icon"><i class="fa fa-microchip"></i></span>
+        <div class="info-box-content">
+            <span class="info-box-text">CPU核数总和</span>
+            <span class="info-box-number" style="font-weight:900" th:text="${cpuCoresSum}">92,050</span>
+        </div>
+        <!-- /.info-box-content -->
+    </div>
+    </div>
+    <!-- /.info-box -->
+    <div  class="col-lg-3">
+    <div  style="color:#fff;background-color:#6dd4b1!important;" class="info-box bg-happy-itmeo">
+        <span class="info-box-icon"><i class="fas fa-hard-drive"></i></span>
+        <div class="info-box-content" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="每小时统计一次">
+            <span class="info-box-text">磁盘容量总和</span>
+            <th:block th:if="${session.LOGIN_KEY == null || session.LOGIN_KEY.role != 'user'}"><span class="info-box-number" style="font-weight:900" th:text="${application.sumDiskSizeCache}">114,381</span></th:block>
+            <th:block th:if="${session.LOGIN_KEY != null && session.LOGIN_KEY.role == 'user'}"><span class="info-box-number" style="font-weight:900" th:text="${sumDiskSizeCache}">114,381</span></th:block>
+        </div>
+        <!-- /.info-box-content -->
+    </div>
+    </div>
+    <!-- /.info-box -->
+    <div  class="col-lg-3">
+    <div  style="color:#fff;background-color:#6dd4b1!important;" class="info-box bg-arielle-smile">
+        <span class="info-box-icon"><i class="fa fa-network-wired"></i></span>
+        <div class="info-box-content" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="所有主机最近5分钟传输总速率">
+            <span class="info-box-text">传输总速率(上行，下行)</span>
+            <span class="info-box-number" style="font-weight:900"><span th:text="${sumTxbyt}"></span>，<span th:text="${sumRxbyt}"></span></span>
+        </div>
+        <!-- /.info-box-content -->
+    </div>
+    </div>
+    <!-- /.info-box -->
+</div>
+
+<!-- Main row -->
+<div class="row" th:if="${not #lists.isEmpty(dbTableList)}">
+
+    <section class="col-lg-12 connectedSortable ui-sortable">
+        <div id="dbTableList"> </div>
+    </section>
+</div>

@@ -1,0 +1,47 @@
+
+<div class="btn-group">
+    <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">查看更多</button>
+    <ul class="dropdown-menu">
+        <li><button type="button"  th:onclick="viewIfconfig([[${item.id}]])"  style="margin-top:5px;margin-left:5px;"  class="btn btn-default bg-fuchsia btn-sm">
+            <th:block th:if="${#strings.indexOf(item.image,'windows') > -1 }">ipconfig</th:block>
+            <th:block th:unless="${#strings.indexOf(item.image,'windows') > -1 }">ifconfig</th:block></button>
+            <button type="button"  th:onclick="viewImage([[${item.id}]])"  style="color:#fff;margin-top:5px;margin-left:5px;"  class="btn btn-warning btn-sm">画 像</button></li>
+        <li><button type="button"  th:onclick="viewAllProcess([[${item.id}]])"  style="margin-top:5px;margin-left:5px;" class="btn btn-dark btn-sm">全量进程</button> </li>
+        <li><button type="button"  th:onclick="viewGpuInfo([[${item.id}]])"  style="margin-top:5px;margin-left:5px;" class="btn btn-dark bg-indigo btn-sm">扩展监控信息</button></li>
+        <li><button type="button"  th:onclick="viewAllPort([[${item.id}]])"  style="margin-top:5px;margin-left:5px;" class="btn btn-dark bg-indigo btn-sm">全量端口</button></li>
+        <th:block th:if="${session.LOGIN_KEY.role != 'guest'}">
+            <li>
+            <button type="button" class="btn btn-default btn-sm" data-toggle="modal" style="margin-top:5px;margin-left:5px;" th:onclick="setHostRemark([[${item.id}]],[[${item.remark}]])" data-target="#modal-default">备 注</button>
+            <button type="button"  th:onclick="del([[${item.id}]])"  style="margin-top:5px;margin-left:5px;" class="btn bg-danger btn-sm">删 除</button>
+            </li>
+            <li>
+            <th:block th:if="${application.webSsh == 'true'}">
+                <th:block th:if="${#strings.indexOf(item.image,'windows') > -1 }">
+                    <button type="button"  data-toggle="modal" th:onclick="setWinConsole([[${item.id}]],[[${item.winConsole}]])"  style="margin-top:5px;margin-left:5px;" class="btn btn-success btn-sm" data-target="#modal-default2">服 务</button>
+                </th:block>
+                <th:block th:unless="${#strings.indexOf(item.image,'windows') > -1 }">
+                    <button type="button"  th:onclick="viewWebSSH([[${item.hostname}]])" style="margin-top:5px;margin-left:5px;" class="btn btn-success btn-sm">SSH</button>
+                </th:block>
+            </th:block>
+            <th:block th:if="${item.active  ne '2'}">
+                <button type="button"  th:onclick="startOrStopMonitor([[${item.id}]],'2')"  style="margin-top:5px;margin-left:5px;" class="btn btn-default btn-sm">停止监控</button>
+            </th:block>
+            <th:block th:if="${item.active  == '2'}">
+                <button type="button"  th:onclick="startOrStopMonitor([[${item.id}]],'1')"  style="margin-top:5px;margin-left:5px;" class="btn btn-primary btn-sm">开始监控</button>
+            </th:block>
+            </li>
+            <li>
+            <th:block th:if="${item.countBlock  ne '2'}">
+                <button type="button"  th:onclick="setCountBlock([[${item.id}]],'2')"  style="margin-top:5px;margin-left:5px;" class="btn btn-default btn-sm">停止计算资源</button>
+            </th:block>
+            <th:block th:if="${item.countBlock  == '2'}">
+                <button type="button"  th:onclick="setCountBlock([[${item.id}]],'1')"  style="margin-top:5px;margin-left:5px;" class="btn btn-primary btn-sm">恢复计算资源</button>
+            </th:block>
+            </li>
+            <li><button type="button" data-toggle="modal" th:onclick="setHostOrderNum([[${item.id}]],[[${item.orderNum}]])"  style="margin-top:5px;margin-left:5px;" class="btn btn-primary btn-sm" data-target="#modal-default6">设置排序</button></li>
+        </th:block>
+
+    </ul>
+</div>
+<button type="button"  th:onclick="view([[${item.id}]])"  class="btn btn-primary btn-sm">系 统</button>
+<button type="button"  th:onclick="viewChart([[${item.id}]])"  class="btn btn-primary btn-sm">图 表</button>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="commonSqlUtil">
+
+	<sql id="createTimeQueryParams">
+		<if test="_databaseId == 'mysql' || _databaseId == 'SQLServer'">
+			<![CDATA[ AND CREATE_TIME >= #{startTime} and CREATE_TIME <=#{endTime}]]>
+		</if>
+		<if test="_databaseId == 'postgresql'">
+			<![CDATA[ AND CREATE_TIME >= cast(#{startTime} as timestamp) and CREATE_TIME <= cast(#{endTime} as timestamp)]]>
+		</if>
+		<if test="_databaseId == 'oracle'">
+			<![CDATA[ AND CREATE_TIME >= to_date(#{startTime},'yyyy-MM-dd hh24:mi:ss') and CREATE_TIME <= to_date(#{endTime},'yyyy-MM-dd hh24:mi:ss')]]>
+		</if>
+	</sql>
+
+	<sql id="createTimeDelParams">
+		<if test="_databaseId == 'mysql' || _databaseId == 'SQLServer'">
+			<![CDATA[  CREATE_TIME <=#{endTime}]]>
+		</if>
+		<if test="_databaseId == 'postgresql'">
+			<![CDATA[  CREATE_TIME <= cast(#{endTime} as timestamp)]]>
+		</if>
+		<if test="_databaseId == 'oracle'">
+			<![CDATA[  CREATE_TIME <=  to_date(#{endTime},'yyyy-MM-dd hh24:mi:ss')]]>
+		</if>
+	</sql>
+
+	<sql id="groupIdQueryParams">
+		<choose>
+			<when test="_databaseId == 'oracle'">
+				<![CDATA[ AND GROUP_ID LIKE  CONCAT(CONCAT('%',#{groupId}),'%') ]]>
+			</when>
+			<otherwise>
+				<![CDATA[ AND GROUP_ID LIKE  CONCAT('%',#{groupId},'%') ]]>
+			</otherwise>
+		</choose>
+	</sql>
+
+	<sql id="groupIdForHostNameQueryParams">
+		<choose>
+			<when test="_databaseId == 'oracle'">
+				<![CDATA[ AND HOST_NAME IN (SELECT c.HOST_NAME FROM SYSTEM_INFO c WHERE c.GROUP_ID LIKE  CONCAT(CONCAT('%',#{groupId}),'%')) ]]>
+			</when>
+			<otherwise>
+				<![CDATA[  AND HOST_NAME IN (SELECT c.HOST_NAME FROM SYSTEM_INFO c WHERE c.GROUP_ID LIKE  CONCAT('%',#{groupId},'%')) ]]>
+			</otherwise>
+		</choose>
+	</sql>
+
+	<sql id="hostChildAccountQueryParams">
+		<![CDATA[ AND HOST_NAME IN (SELECT c.HOST_NAME FROM SYSTEM_INFO c WHERE c.ACCOUNT= #{account}) ]]>
+	</sql>
+
+	<sql id="updateToTargetAccountQueryParams">
+		<if test="account != null">
+			<![CDATA[ ACCOUNT = #{account} ]]>
+		</if>
+		<if test="ids != null">
+			 ID IN
+			<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+	</sql>
+	
+</mapper>

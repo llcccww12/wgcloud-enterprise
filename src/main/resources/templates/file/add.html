@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}" style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item active"></li>
+                </ol>
+            </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-11">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">添加日志监控信息</h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <form role="form" id="form1" method="post" th:action="@{'/fileWarnInfo/save'}">
+            <input type="hidden" name="id" th:value="${fileWarnInfo.id}"/>
+            <div class="card-body">
+                <div class="form-group">
+                    <label><font color="red">*</font>监控主机</label>
+                    <div th:replace="common/singleSelectHost.html"></div>
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>日志文件或文件夹完整路径
+                        <span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="当监控文件夹时，系统每次会扫描文件夹下时间戳最新的日志文件。如果监控文件夹路径中包含动态日期，可以用{yyyy-MM-dd}或者{yyyyMMdd}代替，系统会自动处理为当前日期年月日"  style="cursor:pointer;margin-left: 10px"><i class="fa fa-comment-dots"></i></span>
+                    </label>
+                    <input type="text" autocomplete="off"  th:value="${fileWarnInfo.filePath}" class="validate[required,maxSize[200]] form-control" name="filePath" id="filePath"
+                           placeholder="如:/usr/lcoal/nginx/log/access.log，或/usr/lcoal/nginx/log/，当为文件夹时每次扫描文件夹下的最新log文件">
+                </div>
+                <div class="form-group">
+                    <label title="多个关键字用英文逗号隔开"><font color="red">*</font>告警关键字<span class="text-muted">（多个关键字用英文逗号隔开，不区分大小写）</span></label>
+                    <textarea class="validate[required,maxSize[500]] form-control"   name="warnChars" id="warnChars"
+                              th:text="${fileWarnInfo.warnChars}"  rows="3" placeholder="多个关键字用英文逗号隔开"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>日志文件名称需包含的关键字<span class="text-muted">（当监控日志文件夹时，此处才会生效，用来标识文件夹下的日志文件名称里需要包含的关键字，只能填写一个关键字）</span></label>
+                    <input type="text" autocomplete="off"  th:value="${fileWarnInfo.fileNamePrefix}" class="validate[maxSize[50]] form-control" name="fileNamePrefix" id="fileNamePrefix"
+                           placeholder="">
+                </div>
+                <div class="form-group">
+                    <label>日志文件类型<span class="text-muted">（当监控日志文件夹时，此处设置才会生效）</span></label>
+                    <div class="input-group">
+                        <div class="icheck-primary d-inline">
+                            <input type="radio" id="fileType1" name="fileType" value="1" checked>
+                            <label for="fileType1"><span style="opacity:.70">.log</span></label>
+                        </div>
+                        <div class="icheck-yellow d-inline" style="margin-left:35px;">
+                            <input type="radio" id="fileType2" name="fileType" value="2">
+                            <label for="fileType2"><span style="opacity:.70">.txt</span></label>
+                        </div>
+                        <div class="icheck-teal d-inline" style="margin-left:35px;">
+                            <input type="radio" id="fileType3" name="fileType" value="3">
+                            <label for="fileType3"><span style="opacity:.70">.out</span></label>
+                        </div>
+                        <div class="icheck-primary d-inline" style="margin-left:35px;">
+                            <input type="radio" id="fileType4" name="fileType" value="4">
+                            <label for="fileType4"><span style="opacity:.70">.json</span></label>
+                        </div>
+                        <div class="icheck-orange d-inline" style="margin-left:35px;">
+                            <input type="radio" id="fileType5" name="fileType" value="5">
+                            <label for="fileType5"><span style="opacity:.70">.xml</span></label>
+                        </div>
+                        <div class="icheck-pink d-inline" style="margin-left:35px;">
+                            <input type="radio" id="fileType6" name="fileType" value="6">
+                            <label for="fileType6"><span style="opacity:.70">无后缀</span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <input type="text" autocomplete="off"  th:value="${fileWarnInfo.remark}" class="validate[maxSize[200]] form-control" name="remark" id="remark" placeholder="">
+                </div>
+                <div class="form-group">
+                    <label>自动处理指令<span data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="当检测到日志告警关键字后触发，agent会自动执行下方输入的指令或脚本，如果不需要执行，删除指令即可，此功能需升级到专业版" class="text-muted">（多条指令请换行输入）</span><span class="text-muted" th:text="${blockStr}">敏感字符串过滤</span></label>
+                    <label><span style="color: #62d45e!important;">如果指令很多，比如超过10行或带有逻辑判断，建议将指令写入到一个脚本(存在被监控主机)，然后在这里执行脚本</span></label>
+                    <textarea class="validate[maxSize[500]] form-control"   name="customShell" id="customShell" th:text="${fileWarnInfo.customShell}"></textarea>
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>告警级别</label>
+                    <div th:replace="common/warnLevel.html"></div>
+                </div>
+                <div class="form-group clearfix">
+                    <label><font color="red">*</font>监控状态</label>
+                    <div th:replace="common/activeRadio.html"></div>
+                </div>
+
+            </div>
+            <!-- /.card-body -->
+
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-right:10px;"><i class="fas fa-save"></i> 保 存</button>
+                <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+            </div>
+
+        </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-10 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+</div>
+<!-- ./wrapper -->
+<div th:replace="common/codemirror.html"></div>
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $("#form1").validationEngine();
+        //Initialize Select2 Elements
+        $('.select2').select2()
+        //Initialize Select2 Elements
+        $('.select2bs4').select2({
+            theme: 'bootstrap4'
+        })
+
+        $("#hostname").val([[${fileWarnInfo.hostname}]]).select2();
+        var fileTypeVal = [[${fileWarnInfo.fileType}]];
+        $("input[name='fileType'][value='"+fileTypeVal+"']").attr('checked','true');
+        var warnLevel = [[${fileWarnInfo.warnLevel}]];
+        $("input[name='warnLevel'][value='"+warnLevel+"']").attr('checked','true');
+        var active = [[${fileWarnInfo.active}]];
+        $("input[name='active'][value='"+active+"']").attr('checked','true');
+        var editor = CodeMirror.fromTextArea(document.getElementById("customShell"), {
+            lineNumbers: true,
+            styleActiveLine: true,
+            matchBrackets: true,
+            mode: 'shell',
+        });
+        editor.setOption("theme", "dracula");
+        editor.setSize('auto','220px');
+    });
+
+    var msg = [[${msg}]];
+    if(msg!='' && msg!=null){
+        toastr.error(msg);
+    }
+</script>
+</body>
+</html>

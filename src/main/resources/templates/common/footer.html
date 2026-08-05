@@ -1,0 +1,89 @@
+<!-- /.content-wrapper -->
+<footer th:class="'main-footer '+${session.themeNameSign}">
+	<input type="hidden" id="serverInfoIdentify" th:value="${application.serverInfoId}"/>
+	<th:block th:if="${application.copyRight eq 'true'}">
+		<th:block th:if="${application.copyRightMainContent eq ''}">
+	<strong>Copyright &copy;2017-<span id="copyyear">now</span> <a target="_blank" href="http://www.wgstart.com">www.wgstart.com</a>.</strong> All Rights Reserved.
+		</th:block>
+		<th:block th:if="${application.copyRightMainContent ne ''}"><th:block th:utext="${application.copyRightMainContent}"></th:block></th:block>
+	</th:block>
+	<th:block th:if="${application.copyRight eq 'false'}">&nbsp;</th:block>
+	<div class="float-right d-none d-sm-inline-block">
+		<th:block th:if="${application.LICENSE_STATE eq '1'}">
+			<span id="newversion"></span><b id="nowversion" th:style="@{(${application.LICENSE_SHOW_VERSION eq 'false'} ? 'display:none' : '')}" data-trigger="hover"  data-container="body"
+											data-toggle="popover" data-placement="top" th:data-content="${application.footerLicenseInfo}">Version 3.6.8-Pro</b>
+		</th:block>
+		<th:block th:if="${application.LICENSE_STATE ne '1'}">
+			<span id="newversion"></span><b id="nowversion" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="个人版">Version 3.6.8</b>
+		</th:block>
+	</div>
+</footer>
+
+<audio id="notification">
+	<source th:src="${application.warnSoundName}" type="audio/mpeg">
+</audio>
+
+
+<!-- jQuery -->
+<script th:src="@{'/static/AdminLTE/plugins/jquery/jquery.min.js'}"></script>
+<!-- jQuery UI 1.11.4 -->
+<script th:src="@{'/static/AdminLTE/plugins/jquery-ui/jquery-ui.min.js'}"></script>
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+	$.widget.bridge('uibutton', $.ui.button)
+</script>
+<!-- Bootstrap 4 -->
+<script th:src="@{'/static/AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js'}"></script>
+<!-- Select2 -->
+<script  th:src="@{'/static/AdminLTE/plugins/select2/js/select2.full.min.js'}"></script>
+<!-- ChartJS -->
+<script th:src="@{'/static/AdminLTE/plugins/chart.js/Chart.min.js'}"></script>
+<!-- Sparkline -->
+<script th:src="@{'/static/AdminLTE/plugins/sparklines/sparkline.js'}"></script>
+<!-- JQVMap -->
+<script th:src="@{'/static/AdminLTE/plugins/jqvmap/jquery.vmap.min.js'}"></script>
+<script th:src="@{'/static/AdminLTE/plugins/jqvmap/maps/jquery.vmap.usa.js'}"></script>
+<!-- jQuery Knob Chart -->
+<script th:src="@{'/static/AdminLTE/plugins/jquery-knob/jquery.knob.min.js'}"></script>
+<!-- InputMask -->
+<script th:src="@{'/static/AdminLTE/plugins/moment/moment.min.js'}"></script>
+<script th:src="@{'/static/AdminLTE/plugins/inputmask/min/jquery.inputmask.bundle.min.js'}"></script>
+<!-- daterangepicker -->
+<script th:src="@{'/static/AdminLTE/plugins/daterangepicker/daterangepicker.js'}"></script>
+<!-- Tempusdominus Bootstrap 4 -->
+<script th:src="@{'/static/AdminLTE/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js'}"></script>
+<!-- Summernote -->
+<script th:src="@{'/static/AdminLTE/plugins/summernote/summernote-bs4.min.js'}"></script>
+<!-- overlayScrollbars -->
+<script th:src="@{'/static/AdminLTE/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js'}"></script>
+<!-- AdminLTE App -->
+<script th:src="@{'/static/AdminLTE/dist/js/adminlte.js'}"></script>
+<!-- SweetAlert2 -->
+<script th:src="@{'/static/AdminLTE/plugins/sweetalert2/sweetalert2.min.js'}"></script>
+<!-- Toastr -->
+<script th:src="@{'/static/AdminLTE/plugins/toastr/toastr.min.js'}"></script>
+<!-- Bootstrap4 Duallistbox -->
+<script th:src="@{'/static/AdminLTE/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js'}"></script>
+<!--jquery form是一个表单异步提交的插件-->
+<script th:src="@{'/static/js/jQuery/jquery.form.min.js'}" type="text/javascript" charset="utf-8"></script>
+<!-- AdminLTE for demo purposes
+<script th:src="@{'/static/AdminLTE/dist/js/demo.js'}"></script>
+ -->
+<!-- warn sound play -->
+<script th:src="@{'/static/js/warnSound.js?v=3.4.5'}"></script>
+<!-- form校验组件 -->
+<link rel="stylesheet" th:href="@{'/static/js/jQuery/validationEngine.jquery.css'}" type="text/css"/>
+<script th:src="@{'/static/js/jQuery/jquery.validationEngine-zh_CN.js'}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{'/static/js/jQuery/jquery.validationEngine.js'}" type="text/javascript" charset="utf-8"></script>
+<!-- clipboard.min.js -->
+<script th:src="@{'/static/common/clipboard.min.js?v=3.4.7'}"></script>
+<!-- footer.js -->
+<script th:src="@{'/static/js/footer.js?v=3.5.1'}"></script>
+<!-- switchTheme -->
+<script th:src="@{'/static/js/switchTheme.js?v=3.5.8'}"></script>
+<script type="text/javascript">
+//toastr提示框延时12s后消失
+toastr.options.timeOut = 12000;
+//启用弹出框popover
+$("[data-toggle='popover']").popover();
+</script>

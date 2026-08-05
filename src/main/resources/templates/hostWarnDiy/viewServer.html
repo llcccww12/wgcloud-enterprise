@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+
+<div class="wrapper">
+
+    <div th:replace="common/navbar.html"></div>
+
+    <div th:replace="common/aside.html"></div>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div th:class="'content-wrapper '+${session.themeNameSign}" style="font-size:0.90rem">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1></h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item active"></li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+
+                    <div class="col-md-12">
+                        <div th:class="'card card-primary '+${session.themeNameSign}">
+                            <div class="card-header">
+                                <h3 class="card-title" >server配置文件</h3>
+                                <div class=" float-sm-right">
+                                    <a href="javascript:history.back()">返回上级</a>
+                                </div>
+                            </div>
+                            <!-- /.card-header -->
+                            <!-- form start -->
+                            <form role="form">
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label>server/config/application.yml（只读）</label>
+                                        <div>
+                                            <textarea class="form-control" name="serverFileContent" id="serverFileContent" th:utext="${serverFileContent}"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.card-body -->
+                                <div class="card-footer">
+                                    <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+                                </div>
+                            </form>
+                            <!-- /.card-body -->
+
+
+                        </div>
+                        <!-- /.card -->
+
+
+                    </div><!-- /.col-md-12 -->
+
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </section><!-- /.content -->
+    </div><!-- /.content-wrapper -->
+
+
+    <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<div th:replace="common/codemirror.html"></div>
+
+<script th:inline="javascript">
+    var editor = CodeMirror.fromTextArea(document.getElementById("serverFileContent"), {
+        lineNumbers: true,
+        styleActiveLine: true,
+        mode: "yaml",
+        readOnly: true,
+        matchBrackets: true
+    });
+    editor.setOption("theme", "dracula");
+    editor.setSize('auto','auto');
+</script>
+
+</body>
+</html>

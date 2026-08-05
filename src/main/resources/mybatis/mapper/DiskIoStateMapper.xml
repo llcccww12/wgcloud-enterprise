@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wgcloud.mapper.DiskIoStateMapper">
+	<resultMap id="resultMap" type="com.wgcloud.entity.DiskIoState">
+		<id column="ID" property="id" jdbcType="CHAR" />
+		<result column="HOST_NAME" property="hostname" jdbcType="CHAR" />
+		<result column="READ_IO_AVG" property="readIoAvg" jdbcType="CHAR" />
+		<result column="WRITE_IO_AVG" property="writeIoAvg" jdbcType="CHAR" />
+		<result column="READ_IO_COUNT_AVG" property="readIoCountAvg" jdbcType="CHAR" />
+		<result column="WRITE_IO_COUNT_AVG" property="writeIoCountAvg" jdbcType="CHAR" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<sql id="tableColumnList">
+		ID,HOST_NAME, READ_IO_AVG,WRITE_IO_AVG,CREATE_TIME,READ_IO_COUNT_AVG,WRITE_IO_COUNT_AVG
+	</sql>
+	
+	<sql id="queryByParams">
+		<if test="hostname != null">
+			<![CDATA[ AND HOST_NAME = #{hostname} ]]>
+		</if>
+		<if test="readIoAvg != null">
+			<![CDATA[ AND READ_IO_AVG = #{readIoAvg} ]]>
+		</if>
+		<if test="writeIoAvg != null">
+			<![CDATA[ AND WRITE_IO_AVG = #{writeIoAvg} ]]>
+		</if>
+		<if test="startTime != null and endTime !=null and startTime !='' and endTime != '' ">
+			<include refid="commonSqlUtil.createTimeQueryParams" />
+		</if>
+		<if test="groupId != null">
+			<include refid="commonSqlUtil.groupIdForHostNameQueryParams" />
+		</if>
+	</sql>
+	
+	
+	<select id="selectById" resultMap="resultMap" parameterType="java.lang.String">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM DISK_IO_STATE
+		WHERE ID=#{id} 
+	</select>
+	
+	
+	<delete id="deleteByDate"  parameterType="map">
+		DELETE FROM DISK_IO_STATE
+		<where>
+			<include refid="commonSqlUtil.createTimeDelParams" />
+		</where>
+	</delete>
+	
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		DELETE FROM DISK_IO_STATE
+		WHERE ID = #{id}
+	</delete>
+	
+	<delete id="deleteById" parameterType="java.lang.String">
+		DELETE FROM
+		DISK_IO_STATE
+		WHERE ID IN
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<insert id="save" parameterType="com.wgcloud.entity.DiskIoState">
+		INSERT INTO DISK_IO_STATE
+    	<trim prefix="(" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >ID,</if>
+      		<if test="hostname != null" >HOST_NAME,</if>
+      		<if test="readIoAvg != null">READ_IO_AVG,</if>
+			<if test="writeIoAvg != null">WRITE_IO_AVG,</if>
+			<if test="readIoCountAvg != null">READ_IO_COUNT_AVG,</if>
+			<if test="writeIoCountAvg != null">WRITE_IO_COUNT_AVG,</if>
+      		<if test="createTime != null" >CREATE_TIME</if>
+    	</trim>
+    	<trim prefix="values (" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >#{id},</if>
+      		<if test="hostname != null" >#{hostname},</if>
+      		<if test="readIoAvg != null" >#{readIoAvg},</if>
+			<if test="writeIoAvg != null" >#{writeIoAvg},</if>
+			<if test="readIoCountAvg != null" >#{readIoCountAvg},</if>
+			<if test="writeIoCountAvg != null" >#{writeIoCountAvg},</if>
+      		<if test="createTime != null" >#{createTime}</if>
+    	</trim>
+	</insert>
+	
+	
+	<insert id="insertList" parameterType="java.util.List" >
+		<choose>
+			<when test="_databaseId == 'oracle'">
+				begin
+				<foreach collection="list" item="item" index="index">
+					INSERT INTO DISK_IO_STATE (ID,HOST_NAME,READ_IO_AVG,WRITE_IO_AVG,READ_IO_COUNT_AVG,WRITE_IO_COUNT_AVG,CREATE_TIME)  VALUES
+					(#{item.id},#{item.hostname},#{item.readIoAvg},#{item.writeIoAvg},#{item.readIoCountAvg},#{item.writeIoCountAvg},#{item.createTime});
+				</foreach>
+				end;
+			</when>
+			<otherwise>
+				INSERT INTO DISK_IO_STATE (ID,HOST_NAME,READ_IO_AVG,WRITE_IO_AVG,READ_IO_COUNT_AVG,WRITE_IO_COUNT_AVG,CREATE_TIME)  VALUES
+				<foreach collection="list" item="item" index="index" separator="," >
+					(#{item.id},#{item.hostname},#{item.readIoAvg},#{item.writeIoAvg},#{item.readIoCountAvg},#{item.writeIoCountAvg},#{item.createTime})
+				</foreach>
+			</otherwise>
+		</choose>
+	 </insert>
+
+	<select id="selectMaxByHostname" resultType="com.wgcloud.entity.DiskIoState" parameterType="map">
+		SELECT
+		<choose>
+			<when test="_databaseId == 'mysql'">
+				MAX(READ_IO_AVG + 0) as readIoAvg,MAX(WRITE_IO_AVG + 0) as writeIoAvg
+			</when>
+			<otherwise>
+				MAX(READ_IO_AVG) as readIoAvg,MAX(WRITE_IO_AVG) as writeIoAvg
+			</otherwise>
+		</choose>
+		FROM DISK_IO_STATE
+		<where>
+			<include refid="queryByParams" />
+		</where>
+	</select>
+
+	  <select id="selectAllByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM DISK_IO_STATE t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		 ORDER BY CREATE_TIME ASC
+	</select>
+	
+	<select id="selectByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM DISK_IO_STATE
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		 ORDER BY CREATE_TIME DESC
+	</select>
+	
+</mapper>

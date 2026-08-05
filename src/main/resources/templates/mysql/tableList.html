@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header" style="height:38px">
+      <div class="container-fluid">
+        <div class="row mb-2" style="margin-top: -7px;">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="正在监控中的资源"><a th:href="@{'/dbTable/list?active=1'}">监控中</a></li>
+              <li class="breadcrumb-item" data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="已停止监控的资源"><a th:href="@{'/dbTable/list?active=2'}">已停止</a></li>
+              <li class="breadcrumb-item"><a href="javascript:history.back()">返回上级</a></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-table nav-icon"></i>&nbsp;数据表监测列表</h3>
+        <div class=" float-sm-right">
+          <!-- SEARCH FORM -->
+          <form class="form-inline ml-3" th:action="@{'/dbTable/list'}">
+            <button type="button" onclick="searchByOnline('')" class="btn btn-primary btn-sm" style="margin-right:5px;">全部</button>
+            <button type="button" onclick="searchByOnline('1')" class="btn btn-success btn-sm" style="margin-right:5px;">在线</button>
+            <button type="button" onclick="searchByOnline('2')" class="btn bg-danger btn-sm" style="margin-right:5px;">异常</button>
+            <th:block th:if="${session.LOGIN_KEY.role != 'guest'}">
+              <button type="button" onclick="startMonitor('/dbTable/updateActive')" class="btn btn-primary btn-sm" style="margin-right:5px;">开始监控</button>
+              <button type="button" onclick="stopMonitor('/dbTable/updateActive')" class="btn btn-default btn-sm" style="margin-right:5px;">停止监控</button>
+              <button type="button" onclick="delChecks('/dbTable/del')"  class="btn bg-danger btn-sm" style="margin-right:5px;">删除</button>
+              <button type="button" onclick="add()" class="btn btn-primary btn-sm" style="margin-right:5px;">添加</button>
+            </th:block>
+            <div class="input-group input-group-sm">
+              <select style="width:150px;margin-right:5px;" th:class="'form-control '+${session.themeNameSign}"  name="dbInfoId" id="dbInfoId" onchange="searchByDb()">
+                <option value="">选择数据库</option>
+                <th:block th:each="item,iterStat : ${dbInfoList}">
+                  <option   th:value="${item.id}" th:text="${item.aliasName}">Alabama</option>
+                </th:block>
+              </select>
+
+            </div>
+            <div th:replace="common/accountSelect.html"></div>
+            <div class="input-group input-group-sm">
+              <input th:class="'form-control '+${session.themeNameSign}"  id="remark" name="remark" autocomplete="off" th:value="${dbTable.remark}" type="text" placeholder="数据表名称">
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="submit">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+
+            </div>
+          </form>
+
+        </div>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <table th:class="'table table-bordered '+${session.themeTableHoverSign}">
+          <thead>
+          <tr>
+            <th style="width: 20px"> <input type="checkbox" value="" name="checkall" id="checkall"></th>
+            <th style="width: 60px">序号</th>
+            <th>数据库</th>
+            <th>数据表名称</th>
+            <th:block th:if="${dbTable.orderBy  == 'TABLE_COUNT'}">
+              <th:block th:if="${dbTable.orderType  == 'ASC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('TABLE_COUNT','DESC')">监控结果<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-up" style="vertical-align:bottom;"></i>&nbsp;</small>
+              </th:block>
+              <th:block th:if="${dbTable.orderType  == 'DESC'}">
+                <th style="cursor:pointer" onclick="searchByOrder('TABLE_COUNT','ASC')">监控结果<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-down" style="color: #dc3545!important;vertical-align:bottom;"></i>&nbsp;</small>
+              </th:block>
+            </th:block>
+            <th:block th:if="${dbTable.orderBy  ne 'TABLE_COUNT'}">
+              <th style="cursor:pointer" onclick="searchByOrder('TABLE_COUNT','ASC')">监控结果<small  class="text-muted mr-1 float-right"><i class="fa-solid fa-up-down" style="vertical-align:bottom;"></i></small>
+            </th:block>
+            </th>
+            <th data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="表达式成立时候，就会发送告警通知">告警表达式</th>
+
+            <th:block th:if="${dbTable.orderBy  == 'RES_TIMES'}">
+              <th:block th:if="${dbTable.orderType  == 'ASC'}">
+                <th data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="执行SQL花费的时间" style="cursor:pointer" onclick="searchByOrder('RES_TIMES','DESC')">SQL执行用时<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-up" style="vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+              <th:block th:if="${dbTable.orderType  == 'DESC'}">
+                <th data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="执行SQL花费的时间" style="cursor:pointer" onclick="searchByOrder('RES_TIMES','ASC')">SQL执行用时<small    class="text-success mr-1 float-right"><i class="fas fa-arrow-down" style="color: #dc3545!important;vertical-align:bottom;"></i>&nbsp;</small></th>
+              </th:block>
+            </th:block>
+            <th:block th:if="${dbTable.orderBy  ne 'RES_TIMES'}">
+              <th data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="执行SQL花费的时间" style="cursor:pointer" onclick="searchByOrder('RES_TIMES','ASC')">SQL执行用时<small  class="text-muted mr-1 float-right"><i class="fa-solid fa-up-down" style="vertical-align:bottom;"></i></small></th>
+            </th:block>
+
+            <th>数据状态</th>
+            <th>监控状态</th>
+            <th>更新时间</th>
+            <th>告警级别</th>
+            <th th:if="${application.LICENSE_STATE eq '1' && application.userInfoManage == 'true' && session.LOGIN_KEY.role == 'admin'}">账号</th>
+              <th>操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <th:block th:each="item,iterStat : ${page.list}">
+            <tr>
+              <td><input type="checkbox" th:value="${item.id}" name="todo2" th:id="${item.id}+'_check'"/></td>
+              <td th:text="${iterStat.index+1}">1</td>
+              <td><image width="32" height="32" th:src="${item.image}"/>&nbsp;<span th:text="${item.tableName}"></span></td>
+              <td th:text="${item.remark}">Update software</td>
+              <td><span class="badge bg-primary" th:text="${item.tableCount}">监控中</span></td>
+              <td><code  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="${item.resultExp}" class="highlighter-rouge"  style="font-size:100%" th:text="${#strings.abbreviate(item.resultExp,50)}">result</code></td>
+              <td><span class="badge bg-teal" th:text="${item.resTimesSecond}"></span></td>
+              <td>
+                <th:block th:if="${item.state == '2'}">
+                  <span data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="sql执行失败或告警表达式成立" class="badge bg-danger">异常</span>
+                </th:block>
+                <th:block th:if="${item.state == '1'}">
+                  <span class="badge  bg-primary" >正常</span>
+                </th:block>
+              </td>
+              <td>
+                <th:block th:if="${item.active  == '1'}">
+                  <span class="badge bg-primary">监控中</span>
+                </th:block>
+                <th:block th:if="${item.active  == '2'}">
+                  <span style="background:#6c757d!important;" class="badge bg-danger">已停止</span>
+                </th:block>
+              </td>
+              <td th:text="${#dates.format(item.createTime,'yyyy-MM-dd HH:mm:ss')}">Update software</td>
+              <td>
+                <th:block th:if="${item.warnLevel  == 'ERROR'}">
+                  <span class="badge bg-primary">重要</span>
+                </th:block>
+                <th:block th:if="${item.warnLevel  == 'WARN'}">
+                  <span   style="color:#fff!important" class="badge bg-yellow">一般</span>
+                </th:block>
+                <th:block th:if="${item.warnLevel  == 'INFO'}">
+                  <span  class="badge bg-teal">信息</span>
+                </th:block>
+              </td>
+              <td th:text="${item.account}" th:if="${application.LICENSE_STATE eq '1' && application.userInfoManage == 'true' && session.LOGIN_KEY.role == 'admin'}"></td>
+              <td>
+                <th:block th:if="${session.LOGIN_KEY.role != 'guest'}">
+                  <button type="button"  th:onclick="testHeath([[${item.id}]],[[${item.remark}]])"  class="btn btn-primary btn-sm">测试</button>
+                  <button type="button"  th:onclick="view([[${item.id}]])"  class="btn btn-primary btn-sm">编辑</button>
+                  <button type="button"  th:onclick="del([[${item.id}]])"  class="btn bg-danger btn-sm">删除</button>
+                </th:block>
+                <button type="button"  th:onclick="viewChart([[${item.id}]])"  class="btn btn-primary btn-sm">图表</button>
+              </td>
+            </tr>
+          </th:block>
+
+          </tbody>
+        </table>
+      </div>
+      <!-- /.card-body -->
+      <div th:replace="common/page.html"></div>
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-12 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:src="@{'/static/js/dbtable.js?v=3.5.8'}"></script>
+
+<script th:inline="javascript">
+  var msg = [[${msg}]];
+  if(msg!='' && msg!=null){
+    toastr.info(msg);
+  }
+  $(document).ready(function(){
+    $("#dbInfoId").val([[${dbTable.dbInfoId}]]);
+    $("#account").val([[${dbTable.account}]]);
+  });
+</script>
+
+</body>
+</html>

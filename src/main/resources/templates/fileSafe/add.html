@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item active"></li>
+                </ol>
+            </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-11">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">添加文件监控（每10分钟扫描一次，若文件被篡改或删除，会告警通知）</h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <form role="form" id="form1" method="post" th:action="@{'/fileSafe/save'}">
+            <input type="hidden" name="id" th:value="${fileSafe.id}"/>
+            <div class="card-body">
+                <div class="form-group">
+                    <label><font color="red">*</font>监控主机</label>
+                    <div th:replace="common/singleSelectHost.html"></div>
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>监控文件类型
+                        <span  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="个人版可以监控文件，如果需要监控文件夹，请升级到专业版即可"  style="cursor:pointer;margin-left: 10px"><i class="fa fa-comment-dots"></i></span>
+                    </label>
+                    <div class="input-group">
+                        <div class="icheck-primary d-inline">
+                            <input type="radio" id="radioFileIsDir1" name="fileIsDir" value="1">
+                            <label for="radioFileIsDir1"><span style="opacity:.70">文件夹</span></label>
+                        </div>
+                        <div class="icheck-danger d-inline" style="margin-left:50px;">
+                            <input type="radio" id="radioFileIsDir2" name="fileIsDir" value="2"  checked>
+                            <label for="radioFileIsDir2"><span style="opacity:.70">文件</span></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>文件名称<span class="text-muted">（添加完成10分钟后，系统开始持续监控文件）</span></label>
+                    <input type="text" autocomplete="off"  th:value="${fileSafe.fileName}" class="validate[required,maxSize[50]] form-control" name="fileName" id="fileName" placeholder="请输入文件名称，如数据清洗程序包">
+                </div>
+                <div class="form-group">
+                    <label><font color="red">*</font>文件或文件夹完整路径</label>
+                    <input type="text" autocomplete="off"  th:value="${fileSafe.filePath}" class="validate[required,maxSize[200]] form-control" name="filePath" id="filePath" placeholder="如/usr/local/erp/erp-1.0.jar">
+                </div>
+                <div class="form-group">
+                    <label>文件的MD5字符串<span class="text-muted">（大小写均可，Linux可以用命令[md5sum 文件名称]获取。如果是监控文件夹类型，此处不用输入）</span></label>
+                    <input type="text" autocomplete="off"  th:value="${fileSafe.fileSign}" class="validate[maxSize[50]] form-control" name="fileSign" id="fileSign" placeholder="如DF93E4175D4FE7198D957C21D9AC760A，大小写都可以">
+                </div>
+                <div class="form-group">
+                    <label>自动恢复指令<span data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" data-content="当检测到文件或者文件夹被篡改后触发，agent会自动执行下方输入的指令或脚本，如果不需要执行，删除指令或停止监控即可，此功能需升级到专业版" class="text-muted">（多条指令请换行输入）</span><span class="text-muted" th:text="${blockStr}">敏感字符串过滤</span></label>
+                    <label><span style="color: #62d45e!important;">如果指令很多，比如超过10行或带有逻辑判断，建议将指令写入到一个脚本(存在被监控主机)，然后在这里执行脚本</span></label>
+                    <textarea class="validate[maxSize[500]] form-control"   name="customShell" id="customShell" th:text="${fileSafe.customShell}"></textarea>
+                </div>
+                <div id="dataFormList" class="form-group clearfix"></div>
+                <th:block th:if="${#strings.isEmpty(fileSafe.id)}" >
+                    <div class="form-group row">
+                        <div class="col-12"><button  type="button" onclick="addDataForm()" class="btn btn-primary btn-sm float-right"><i class="fa fa-plus-circle"></i> 添加一行</button>&nbsp;</div>
+                    </div>
+                    <input type="hidden" name="dataFromIndex"  id="dataFromIndex"/>
+                </th:block>
+                <div class="form-group">
+                    <label><font color="red">*</font>告警级别</label>
+                    <div th:replace="common/warnLevel.html"></div>
+                </div>
+                <div class="form-group clearfix">
+                    <label><font color="red">*</font>监控状态</label>
+                    <div th:replace="common/activeRadio.html"></div>
+                </div>
+
+            </div>
+            <!-- /.card-body -->
+
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-right:10px;"><i class="fas fa-save"></i> 保 存</button>
+                <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+            </div>
+
+        </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-10 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<!-- 动态添加一行数据 -->
+<div  id="dataHideContent" style="display: none">
+    <div id="dataFrom_{num}" class="card card-primary card-outline">
+        <div class="card-body">
+            <div class="form-group">
+                <label><font color="red">*</font>文件名称 </label>
+                <input type="text" autocomplete="off"   class="validate[required,maxSize[50]] form-control" name="fileName_{num}" id="fileName_{num}" placeholder="请输入文件名称，如数据清洗程序包">
+            </div>
+            <div class="form-group">
+                <label><font color="red">*</font>文件完整路径</label>
+                <input type="text" autocomplete="off"   class="validate[required,maxSize[200]] form-control" name="filePath_{num}" id="filePath_{num}" placeholder="如/usr/local/erp/erp-1.0.jar">
+            </div>
+            <div class="form-group">
+                <label>文件的MD5字符串<span class="text-muted">（大小写均可,Linux可以用命令[md5sum 文件名称]获取。如果是监控文件夹类型，此处不用输入）</span></label>
+                <input type="text" autocomplete="off"  class="validate[maxSize[50]] form-control" name="fileSign_{num}" id="fileSign_{num}" placeholder="如DF93E4175D4FE7198D957C21D9AC760A，大小写都可以">
+            </div>
+            <div class="form-group">
+                <div class="col-12"><button type="button" onclick="removeDiv('dataFrom_{num}')" class="btn bg-danger btn-sm float-right"><i class="far fa-trash-alt"></i> 删除</button></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{'/static/js/fileSafe.js?v=3.5.0'}"></script>
+<div th:replace="common/codemirror.html"></div>
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $("#form1").validationEngine();
+        //Initialize Select2 Elements
+        $('.select2').select2()
+        //Initialize Select2 Elements
+        $('.select2bs4').select2({
+            theme: 'bootstrap4'
+        })
+
+        $("#hostname").val([[${fileSafe.hostname}]]).select2();
+        var warnLevel = [[${fileSafe.warnLevel}]];
+        $("input[name='warnLevel'][value='"+warnLevel+"']").attr('checked','true');
+        var active = [[${fileSafe.active}]];
+        $("input[name='active'][value='"+active+"']").attr('checked','true');
+        var fileIsDir = [[${fileSafe.fileIsDir}]];
+        $("input[name='fileIsDir'][value='"+fileIsDir+"']").attr('checked','true');
+
+        var editor = CodeMirror.fromTextArea(document.getElementById("customShell"), {
+            lineNumbers: true,
+            styleActiveLine: true,
+            matchBrackets: true,
+            mode: 'shell',
+        });
+        editor.setOption("theme", "dracula");
+        editor.setSize('auto','220px');
+    });
+
+    var msg = [[${msg}]];
+    if(msg!='' && msg!=null){
+        toastr.error(msg);
+    }
+</script>
+</body>
+</html>

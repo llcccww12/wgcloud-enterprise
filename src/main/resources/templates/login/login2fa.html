@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+	<base href="./" th:href="'/'"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title th:text="${application.wgName}">cac监控系统</title>
+
+	<meta name="viewport" content="width=device-width,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<link type="text/css" rel="stylesheet" th:href="@{'/static/logincss/components.css'}" />
+<link type="text/css" rel="stylesheet" th:href="@{'/static/logincss/fix.css'}" />
+<link type="text/css" rel="stylesheet" th:href="@{'/static/logincss/suri-bootstrap.css'}" />
+<link type="text/css" rel="stylesheet" th:href="@{'/static/logincss/bootstrap.min.css'}" />
+<link type="text/css" rel="stylesheet" th:href="@{'/static/logincss/font-awesome.min.css'}" />
+<link type="text/css" rel="stylesheet" th:href="@{'/static/logincss/ionicons.min.css'}" />
+<link type="text/css" rel="stylesheet" th:href="@{'/static/logincss/atmosfero.css'}" />
+
+<link rel="shortcut icon" type="image/x-icon" th:href="${application.icoUrl}"/>
+		
+</head>
+<body class="login-page">
+
+<div class="login-box" style="margin-bottom: 3%">
+		<div class="login-box-content">
+			<div class="login-logo">
+				<a href="javascript:location.reload();" style="color: #fff;font-size: 16px;font-weight:bold"><img width="60" height="60"  th:src="${application.logoUrl}"><span  style="margin-left:5px;" th:text="${application.wgName}">cac</span></a>
+	  		</div>
+			<div class="login-box-body">
+			<p class="login-box-msg">验证码登录</p>
+
+		<form id="form1" th:action="@{'/login/loginByPhone'}"  method="post" class="form-horizontal">
+	
+          	<div class="form-group">
+				<div class="col-sm-12">
+              		<input id="accountPhone" name="accountPhone" th:value="${accountPhone}" disabled="true" maxlength="50" autocomplete="off" class="form-control" type="text">
+            	</div>
+          	</div>
+          	
+          	<div class="form-group">
+           	    <div class="col-sm-12">
+					<table><tr><td>
+              		<input placeholder='输入验证码' id="passwd" name="passwd" maxlength="10" class="validate[required] form-control" autocomplete="off" type="text">
+					</td><td><button type="button" id="sendCodeButton" style="width:160px;margin-right:1px;" class="btn btn-default btn-block" onclick="sendCodeFunc()">获取验证码</button></td></tr></table>
+            	</div>
+				<div class="col-sm-12">
+				</div>
+          	</div>
+
+        	<div class="form-group"  style="color:red;font-weight:bold;text-align: center;" th:text="${error}"></div>
+             	
+         	<div class="form-group">
+           	    <div class="col-sm-12">
+           		<input value="登录" class="btn btn-primary btn-block" type="submit">
+            	</div>
+          	</div>
+
+			<div class="form-group">
+				<div class="col-sm-5"><a th:href="@{'/login/toLogin'}">返 回</a></div>
+				<div class="col-sm-7"><input style="zoom:130%;-moz-transform:scale(1.3);vertical-align:middle; margin-top:0;" type="checkbox" name="sevenNoPhone" value="1"/> 7天内不再使用两步登录</div>
+			</div>
+             	
+          	<div class="form-group">
+          	</div>
+		</form>
+		</div>
+		</div>
+	</div>
+
+
+<th:block th:if="${application.copyRight eq 'true'}">
+	<center>
+		<div style="color:#2196f3">
+			<th:block th:if="${application.copyRightLoginContent eq ''}">
+				©2017-<span id="copyyear">now</span>  <a target="_blank" href='http://www.wgstart.com'> www.wgstart.com</a> . All Rights Reserved. Version 3.6.8
+			</th:block>
+			<th:block th:if="${application.copyRightLoginContent ne ''}"><th:block th:utext="${application.copyRightLoginContent}"></th:block></th:block>
+		</div>
+	</center>
+</th:block>
+    <link rel="stylesheet" th:href="@{'/static/js/jQuery/validationEngine.jquery.css'}" type="text/css"/>
+    <script th:src="@{'/static/js/jQuery/jquery-3.6.0.min.js'}"></script>
+    <script th:src="@{'/static/js/jQuery/jquery.validationEngine-zh_CN.js'}" type="text/javascript" charset="utf-8"></script>
+    <script th:src="@{'/static/js/jQuery/jquery.validationEngine.js'}" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" th:src="@{'/static/common/md5.js'}"></script>
+    <script th:inline="javascript">
+		var SERVER_SERVLET_CONTEXT_PATH = [[${application.SERVER_SERVLET_CONTEXT_PATH}]];
+		$(document).ready(function(){
+			$("#form1").validationEngine();
+			doHandleYear();
+		});
+		function doHandleYear() {
+			var myDate = new Date();
+			var tYear = myDate.getFullYear();
+			$("#copyyear").html(tYear);
+		}
+		//点击事件调用倒计时函数
+		function sendCodeFunc(){
+			setTime($('#sendCodeButton'), 60);
+			$.ajax({
+				url: SERVER_SERVLET_CONTEXT_PATH + "/login/sendPhoneCode",
+				type: "GET",
+				dataType: "json",
+				success: function(data) {
+				}
+			});
+		}
+
+		/**
+		 * 点击按钮开始倒计时
+		 * @param obj 倒计时操作的文档对象
+		 * @param countdown 倒计时时间
+		 */
+		function setTime(obj, countdown) {
+			if (countdown == 0) {
+				obj.removeAttr('disabled');
+				obj.html("获取验证码");
+				return;
+			} else {
+				obj.attr('disabled', 'disabled');
+				obj.html("重新发送(" + countdown + ")");
+				countdown--;
+			}
+			setTimeout(function(){setTime(obj, countdown)}, 1000);
+		}
+	</script>
+</body>
+</html>

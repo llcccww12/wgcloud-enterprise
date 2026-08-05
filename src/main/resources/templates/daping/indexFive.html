@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+  <title th:text="${application.wgName}">cac监控系统</title>
+  <base href="./" th:href="'/'"/>
+  <meta charset="utf-8">
+  <link rel="shortcut icon" type="image/x-icon" th:href="${application.icoUrl}"/>
+  <link rel="stylesheet" type="text/css" th:href="@{'/static/dapingFive/css/scanboard.css'}" />
+  <link rel="stylesheet" type="text/css" th:href="@{'/static/dapingFive/css/jquery.shCircleLoader.css'}" />
+  <script type="text/javascript" th:src="@{'/static/dapingFive/js/jquery.min.js'}"></script>
+  <script type="text/javascript" th:src="@{'/static/dapingFive/js/jquery.shCircleLoader-min.js'}"></script>
+  <!-- Toastr -->
+  <link rel="stylesheet" th:href="@{'/static/AdminLTE/plugins/toastr/toastr.min.css'}">
+  <!-- Toastr -->
+  <script th:src="@{'/static/AdminLTE/plugins/toastr/toastr.min.js'}"></script>
+</head>
+<body>
+<!--Top Start!-->
+<div class="scanboardWp animsition">
+
+  <!--Main Start!-->
+  <div id="main" class="wp clearfix">
+    <div class="left">
+
+    </div>
+
+    <div class="center">
+      <div class="centerWp">
+        <center><span style="color:#00deff;font-size:30px;font-weight: bold;" th:text="${application.wgName}">cac监控系统</span></center>
+        <div id="allDataContainer" style="margin-top:1%;"></div>
+        <div class="billChart" style="margin-top:2%;">
+          <div class="itemTit">
+            <span class="border-blue">主机运行时长分析</span>
+          </div>
+          <div id="myChart1"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right">
+    </div>
+    <!--Main End!-->
+  </div>
+
+</div>
+  <canvas id="canvas" style="position: absolute;top: 0;left: 0;"></canvas>
+</body>
+<script type="text/javascript" th:src="@{'/static/dapingFive/js/bg.js'}"></script>
+<script type="text/javascript" th:src="@{'/static/dapingFive/js/scanboard.js'}"></script>
+<script type="text/javascript" th:src="@{'/static/dapingFive/js/jquery.animsition.js'}"></script>
+<div th:replace="common/chart.html"></div>
+<script type="text/javascript" th:src="@{'/static/dapingFive/js/echarts.min.js'}"></script>
+<script th:inline="javascript">
+  const dapingRefreshTimes = [[${dapingRefreshTimes}]];
+  function reload() {
+    window.location.reload();
+  }
+  setTimeout(reload,dapingRefreshTimes);
+
+  const allDataChartJson = [[${allDataChartJson}]];
+  const colorTopMap = {
+    '已离线': '#dc3545',
+    '总数量': '#858FF8'
+  };
+  const chartTop = new G2.Chart({
+    container: 'allDataContainer',
+    forceFit: true,
+    padding: [30, 10, 85, 15]
+  });
+  chartTop.source(allDataChartJson);
+  chartTop.axis('name', {
+    label: {
+      textStyle: {
+        fill: '#fff'
+      }
+    }
+  });
+  chartTop.axis('value', false);
+  chartTop.interval().position('name*value').opacity(1)
+          .label('value', val => {
+            if (val <= 0) {
+              return false;
+            }
+            return {
+              textStyle: {
+                fill: '#00deff'
+              }
+            };
+          }).color('state', state => {
+    return colorTopMap[state];
+  }).adjust([{
+    type: 'dodge',
+    marginRatio: 1 / 32
+  }]);
+  chartTop.render();
+
+  const systemNameListJson = [[${systemNameListJson}]];
+  const dayValListJson = [[${dayValListJson}]];
+  var myChart1 = echarts.init(document.getElementById('myChart1'));
+  var option1 = {
+    tooltip: {
+      trigger: 'item',
+      formatter: function(params) {
+        var res = params.name+'运行天数：'+params.data;
+        return res;
+      }
+    },
+    grid: {
+      top: '5%',
+      left: '0%',
+      width: '100%',
+      height: '95%',
+      containLabel: true
+    },
+    xAxis: {
+      data: systemNameListJson,
+      axisLabel: {
+        show: true,
+        interval: 0,
+        rotate:30,
+        show: true,
+        textStyle: {
+          fontSize: '12px',
+          color: '#fff',
+        }
+      },
+      axisLine:{
+        lineStyle:{
+          color:'#fff',
+          width:1,
+        }
+      }
+    },
+    yAxis: {
+      axisLabel: {
+        show: true,
+        textStyle: {
+          fontSize: '12px',
+          color: '#fff',
+        }
+      },
+      axisLine:{
+        lineStyle:{
+          color:'#fff',
+          width:1,
+        }
+      },
+      splitLine:{
+        show:false,
+      }
+    },
+    series :{
+      name: '',
+      type: 'bar',
+      barWidth : 20,
+      data: dayValListJson,
+      itemStyle: {
+        normal: {
+          barBorderRadius:[5, 5, 5, 5],
+          color: new echarts.graphic.LinearGradient(
+                  0, 0, 0, 1,
+                  [
+                    {offset: 0, color: '#3876cd'},
+                    {offset: 0.5, color: '#45b4e7'},
+                    {offset: 1, color: '#54ffff'}
+                  ]
+          ),
+        },
+      },
+    },
+  }
+  myChart1.setOption(option1);
+  window.addEventListener("resize",function(){
+    myChart1.resize();
+  });
+
+  const tipInfoMsg = [[${tipInfoMsg}]];
+  if(tipInfoMsg!=''  && tipInfoMsg!=null){
+    //toastr提示框延时10s后消失
+    toastr.options.timeOut = 10000;
+    toastr.success("<span style='font-size:16px;color:#fff'>"+tipInfoMsg+"</span>");
+  }
+</script>
+</html>

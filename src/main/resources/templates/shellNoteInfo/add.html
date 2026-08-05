@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+  <link rel="stylesheet" th:href="@{'/static/common/quill/quill.snow.css'}" type="text/css"/>
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}" style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item active"></li>
+                </ol>
+            </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-11">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title">添加工作笔记</h3>
+          <div class=" float-sm-right">
+              <a href="javascript:history.back()">返回上级</a>
+          </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+        <form role="form" id="form1" method="post" th:action="@{'/shellNoteInfo/save'}" onsubmit="setTextArea()">
+            <input type="hidden" name="id" th:value="${shellNoteInfo.id}"/>
+            <div class="card-body">
+                <div class="form-group">
+                    <label><font color="red">*</font><span>标题</span></label>
+                    <input type="text" autocomplete="off"  th:value="${shellNoteInfo.shellTitle}" class="validate[required,maxSize[100]] form-control" name="shellTitle" id="shellTitle" placeholder="">
+                </div>
+                <div class="form-group">
+                    <label><font color="red"></font>正文<span class="text-muted">（支持粘贴/拖拽上传图片）</span></label>
+                    <!-- Create the editor container -->
+                    <div id="workContentEditor" style="height:500px;"></div>
+                    <textarea style="display:none"  name="shellContent" id="shellContent"></textarea>
+                </div>
+
+            </div>
+            <!-- /.card-body -->
+            <input id="opImg" style="display: none;" type="file" onchange="addImg(this)" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg">
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary btn-sm" style="margin-right:10px;"><i class="fas fa-save"></i> 保 存</button>
+                <button type="button"  th:onclick="goback()"  class="btn bg-danger btn-sm"><i class="fas fa-backward"></i> 返 回</button>
+            </div>
+
+        </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div><!-- /.col-md-10 -->
+
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section><!-- /.content -->
+  </div><!-- /.content-wrapper -->
+
+  <script th:src="@{'/static/common/quill/quill.js'}" type="text/javascript" charset="utf-8"></script>
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+
+<script th:src="@{'/static/js/shellNoteInfo.js?v=3.5.0'}"></script>
+<script th:inline="javascript">
+    $(document).ready(function(){
+        $("#form1").validationEngine();
+    });
+
+    var toolbarOptions = [
+        ['bold', 'italic', 'underline', 'strike'],        // 字体
+        ['blockquote', 'code-block'],
+
+        [{ 'header': 1 }, { 'header': 2 }],               // 样式标题
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        [{ 'script': 'sub'}, { 'script': 'super' }],      // 下标、上标
+        [{ 'indent': '-1'}, { 'indent': '+1' }],          // 缩进
+        [{ 'direction': 'rtl' }],
+
+        //[{ 'size': ['small', false, 'large', 'huge'] }],  // 字体
+        //[{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+
+        [{ 'color': [] }, { 'background': [] }],
+        //[{ 'font': [] }],
+        [{ 'align': [] }],
+        ['image'],
+        //["link", "image", "video"],
+        ["link"],
+        ['clean']                                         // 格式清除
+    ];
+
+    var quill = new Quill('#workContentEditor', {
+        modules: {
+            toolbar: {
+                container: toolbarOptions,
+                handlers: {
+                    image: imageHandler
+                }
+            }
+        },
+        theme: 'snow'
+    });
+
+    // 粘贴图片上传服务器
+    quill.root.addEventListener("paste", (e) => {
+        //console.log(e)
+        //console.log(this)
+        const clipboardData = e.clipboardData
+        // support cut by software & copy image file directly
+        const isImage = clipboardData.types.length && clipboardData.types.join('').includes('Files');
+        if (!isImage) {
+            return;
+        }
+        // only support single image paste
+        const file = clipboardData.files[0];
+        if (!file || !file.name || !(file.name.toLowerCase().indexOf(".png") !== -1 || file.name.toLowerCase().indexOf(".gif") !== -1
+            || file.name.toLowerCase().indexOf(".jpg") !== -1 || file.name.toLowerCase().indexOf(".jpeg") !== -1)) {
+            console.log('粘贴的不是图片')
+            return;
+        }
+        var formData = new FormData;
+        formData.append('file', file)
+        // 在此执行上传
+        $.ajax({
+            data: formData,
+            processData: false,//不做处理
+            contentType: false,//不做处理
+            sync: false,
+            url: SERVER_SERVLET_CONTEXT_PATH + '/shellNoteInfo/saveFileAjax',
+            type: 'post',
+            dataType: "json",
+            success(data) {
+                console.log(data)
+                if (data.code=="0"){
+                    const range = quill.getSelection(true);
+                    // 删除原图片
+                    quill.deleteText(quill.getSelection().index - 1, 1)
+                    quill.insertEmbed(range.index, 'image', data.data);
+                }
+
+            }
+        })
+    });
+
+    // 如果是拖拽图片处理
+    quill.root.addEventListener("drop", (e) => {
+        // 获取拖入的文件
+        const files = e.dataTransfer?.files;
+        if (!files || files.length === 0) return;
+        // only support single image paste
+        const file = files[0];
+        if (!file || !file.name || !(file.name.toLowerCase().indexOf(".png") !== -1 || file.name.toLowerCase().indexOf(".gif") !== -1
+            || file.name.toLowerCase().indexOf(".jpg") !== -1 || file.name.toLowerCase().indexOf(".jpeg") !== -1)) {
+            console.log('粘贴的不是图片')
+            return;
+        }
+        var formData = new FormData;
+        formData.append('file', file)
+        // 在此执行上传
+        $.ajax({
+            data: formData,
+            processData: false,//不做处理
+            contentType: false,//不做处理
+            sync: false,
+            url: SERVER_SERVLET_CONTEXT_PATH + '/shellNoteInfo/saveFileAjax',
+            type: 'post',
+            dataType: "json",
+            success(data) {
+                console.log(data)
+                if (data.code=="0"){
+                    const range = quill.getSelection(true);
+                    // 删除原图片
+                    quill.deleteText(quill.getSelection().index - 1, 1)
+                    quill.insertEmbed(range.index, 'image', data.data);
+                }
+            }
+        })
+        return;
+    });
+
+    function addImg(e) {
+        const upImg = e.files[0];
+        console.log(quill)
+        var formData = new FormData;
+        formData.append('file', upImg)
+        $.ajax({
+            data: formData,
+            processData: false,//不做处理
+            contentType: false,//不做处理
+            sync: false,
+            url: SERVER_SERVLET_CONTEXT_PATH + '/shellNoteInfo/saveFileAjax',
+            type: 'post',
+            dataType: "json",
+            success(data) {
+                console.log(data)
+                if (data.code == 0) {
+                    const range = quill.getSelection(true);
+                    quill.insertEmbed(range.index, 'image', data.data);
+                }
+            }
+        })
+    }
+    function imageHandler(e) {
+        // 在此执打开图片选择，行同步上传
+        document.getElementById('opImg').click()
+    }
+
+    function setTextArea(){
+        var delta = quill.root.innerHTML;
+        $("#shellContent").val(delta);
+        return true;
+    }
+
+    var shellContent = [[${shellNoteInfo.shellContent}]];
+    if(shellContent!=""){
+        quill.root.innerHTML =shellContent;
+    }
+</script>
+</body>
+</html>

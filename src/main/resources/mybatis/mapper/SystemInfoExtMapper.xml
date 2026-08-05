@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wgcloud.mapper.SystemInfoExtMapper">
+	<resultMap id="resultMap" type="com.wgcloud.entity.SystemInfoExt">
+		<id column="ID" property="id" jdbcType="CHAR" />
+		<result column="HOST_NAME" property="hostname" jdbcType="CHAR" />
+		<result column="PLATFORM" property="platForm" jdbcType="CHAR" />
+		<result column="PLATFORM_VERSION" property="platformVersion" jdbcType="CHAR" />
+		<result column="CPU_XH" property="cpuXh" jdbcType="CHAR" />
+		<result column="UPTIME" property="uptime" jdbcType="BIGINT" />
+		<result column="BOOT_TIME" property="bootTime" jdbcType="BIGINT" />
+		<result column="SUBMIT_SECONDS" property="submitSeconds" jdbcType="CHAR" />
+		<result column="AGENT_VER" property="agentVer" jdbcType="CHAR" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="BYTES_RECV" property="bytesRecv" jdbcType="CHAR" />
+		<result column="BYTES_SENT" property="bytesSent" jdbcType="CHAR" />
+		<result column="HOST_NAME_EXT" property="hostnameExt" jdbcType="CHAR" />
+		<result column="SWAP_MEM_PER" property="swapMemPer" jdbcType="CHAR" />
+		<result column="TOTAL_SWAP_MEM" property="totalSwapMem" jdbcType="CHAR" />
+		<result column="CPU_PHYSICALID" property="cpuPhysicalid" jdbcType="CHAR" />
+		<result column="CPU_FAMILY" property="cpuFamily" jdbcType="CHAR" />
+		<result column="CPU_MHZ" property="cpuMhz" jdbcType="CHAR" />
+		<result column="KERNEL_ARCH" property="kernelArch" jdbcType="CHAR" />
+		<result column="NET_INTERFACE_NAME" property="netInterfaceName" jdbcType="CHAR" />
+	</resultMap>
+
+	<sql id="tableColumnList">
+		ID,HOST_NAME,PLATFORM,PLATFORM_VERSION,CPU_XH,UPTIME,BOOT_TIME,SUBMIT_SECONDS,AGENT_VER,CREATE_TIME,BYTES_RECV,BYTES_SENT,HOST_NAME_EXT,SWAP_MEM_PER,TOTAL_SWAP_MEM,CPU_PHYSICALID,CPU_FAMILY,CPU_MHZ,KERNEL_ARCH,NET_INTERFACE_NAME
+	</sql>
+	
+	<sql id="queryByParams">
+		<if test="hostname != null">
+			<![CDATA[ AND HOST_NAME = #{hostname} ]]>
+		</if>
+		<if test="startTime != null and endTime !=null and startTime !='' and endTime != '' ">
+			<include refid="commonSqlUtil.createTimeQueryParams" />
+		</if>
+		<if test="countBlockNe != null">
+			<![CDATA[ AND HOST_NAME NOT IN (SELECT c.HOST_NAME FROM SYSTEM_INFO c WHERE c.COUNT_BLOCK = #{countBlockNe})  ]]>
+		</if>
+		<if test="account != null">
+			<include refid="commonSqlUtil.hostChildAccountQueryParams" />
+		</if>
+		<if test="groupId != null">
+			<include refid="commonSqlUtil.groupIdForHostNameQueryParams" />
+		</if>
+	</sql>
+	
+	
+	<select id="selectById" resultMap="resultMap" parameterType="java.lang.String">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM SYSTEM_INFO_EXT
+		WHERE ID=#{id} 
+	</select>
+
+
+	<delete id="deleteByDate"  parameterType="map">
+		DELETE FROM SYSTEM_INFO_EXT
+		<where>
+			<include refid="commonSqlUtil.createTimeDelParams" />
+		</where>
+	</delete>
+
+	<delete id="deleteByHostname"  parameterType="java.util.List">
+		DELETE FROM SYSTEM_INFO_EXT WHERE HOST_NAME IN
+		<foreach item="item" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		DELETE FROM SYSTEM_INFO_EXT
+		WHERE ID = #{id}
+	</delete>
+	
+	<delete id="deleteById" parameterType="java.lang.String">
+		DELETE FROM
+		SYSTEM_INFO_EXT
+		WHERE ID IN
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<insert id="insertList" parameterType="java.util.List" >
+		<choose>
+			<when test="_databaseId == 'oracle'">
+				begin
+				<foreach collection="list" item="item" index="index">
+					INSERT INTO SYSTEM_INFO_EXT (ID,HOST_NAME,PLATFORM,PLATFORM_VERSION,CPU_XH,UPTIME,BOOT_TIME,SUBMIT_SECONDS,AGENT_VER,CREATE_TIME,BYTES_RECV,BYTES_SENT,HOST_NAME_EXT,SWAP_MEM_PER,TOTAL_SWAP_MEM,CPU_PHYSICALID,CPU_FAMILY,CPU_MHZ,KERNEL_ARCH,NET_INTERFACE_NAME)  VALUES
+					(#{item.id},#{item.hostname},#{item.platForm},#{item.platformVersion},#{item.cpuXh},#{item.uptime},#{item.bootTime},#{item.submitSeconds},#{item.agentVer},#{item.createTime},#{item.bytesRecv},#{item.bytesSent},#{item.hostnameExt},#{item.swapMemPer},#{item.totalSwapMem},#{item.cpuPhysicalid},#{item.cpuFamily},#{item.cpuMhz},#{item.kernelArch},#{item.netInterfaceName});
+				</foreach>
+				end;
+			</when>
+			<otherwise>
+				INSERT INTO SYSTEM_INFO_EXT (ID,HOST_NAME,PLATFORM,PLATFORM_VERSION,CPU_XH,UPTIME,BOOT_TIME,SUBMIT_SECONDS,AGENT_VER,CREATE_TIME,BYTES_RECV,BYTES_SENT,HOST_NAME_EXT,SWAP_MEM_PER,TOTAL_SWAP_MEM,CPU_PHYSICALID,CPU_FAMILY,CPU_MHZ,KERNEL_ARCH,NET_INTERFACE_NAME)  VALUES
+				<foreach collection="list" item="item" index="index" separator="," >
+					(#{item.id},#{item.hostname},#{item.platForm},#{item.platformVersion},#{item.cpuXh},#{item.uptime},#{item.bootTime},#{item.submitSeconds},#{item.agentVer},#{item.createTime},#{item.bytesRecv},#{item.bytesSent},#{item.hostnameExt},#{item.swapMemPer},#{item.totalSwapMem},#{item.cpuPhysicalid},#{item.cpuFamily},#{item.cpuMhz},#{item.kernelArch},#{item.netInterfaceName})
+				</foreach>
+			</otherwise>
+		</choose>
+	 </insert>
+	
+	
+	  <select id="selectAllByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM SYSTEM_INFO_EXT t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		  <choose>
+			  <when test="orderBy !=null and orderBy != ''">
+				  <![CDATA[ ORDER BY ${orderBy} ${orderType}]]>
+			  </when>
+			  <otherwise>
+				  ORDER BY CREATE_TIME DESC
+			  </otherwise>
+		  </choose>
+	</select>
+	
+	<select id="selectByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM SYSTEM_INFO_EXT
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		<choose>
+			<when test="orderBy !=null and orderBy != ''">
+				<![CDATA[ ORDER BY ${orderBy} ${orderType}]]>
+			</when>
+			<otherwise>
+				ORDER BY CREATE_TIME DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+</mapper>

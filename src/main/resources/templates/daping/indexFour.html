@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title th:text="${application.wgName}">cac监控系统</title>
+  <base href="./" th:href="'/'"/>
+  <meta charset="utf-8">
+  <link rel="shortcut icon" type="image/x-icon" th:href="${application.icoUrl}"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link rel="stylesheet" th:href="@{'/static/dapingFour/css/public.css'}">
+  <link rel="stylesheet" th:href="@{'/static/dapingFour/css/icon.css'}">
+  <link rel="stylesheet" th:href="@{'/static/dapingFour/css/index.css'}">
+  <script type="text/javascript">
+    document.documentElement.style.fontSize = document.documentElement.clientWidth /768*100 + 'px';
+  </script>
+  <script  type="text/javascript"  th:src="@{'/static/daping/js/jquery.js'}"></script>
+  <script  type="text/javascript" th:src="@{'/static/dapingFour/js/echarts.min.js'}"></script>
+  <script  th:src="@{'/static/dapingFour/js/jquery.numscroll.js'}" type="text/javascript" charset="utf-8"></script>
+  <!-- Toastr -->
+  <link rel="stylesheet" th:href="@{'/static/AdminLTE/plugins/toastr/toastr.min.css'}">
+  <!-- Toastr -->
+  <script th:src="@{'/static/AdminLTE/plugins/toastr/toastr.min.js'}"></script>
+</head>
+<body>
+<div class="bg">
+  <div class="title" th:text="${application.wgName}"></div>
+  <div class="leftMain">
+    <div class="leftMain_top">
+      <div class="leftMain_topIn">
+        <ul>
+          <li>
+            <div class="liIn">
+              <h3>主机数量</h3>
+              <p class="shu"><span class="shu1" th:text="${hostAllSize}"></span><i></i></p>
+              <div class="zi"><span class="span1">所有监测主机</span><span></span></div>
+              <span class="border_bg_leftTop"></span>
+              <span class="border_bg_rightTop"></span>
+              <span class="border_bg_leftBottom"></span>
+              <span class="border_bg_rightBottom"></span>
+            </div>
+          </li>
+          <li>
+            <div class="liIn">
+              <h3>内存总和</h3>
+              <p class="shu"><span class="shu2" th:text="${memSum}"></span><i></i></p>
+              <div class="zi"><span class="span1">所有监测主机</span><span></span></div>
+              <span class="border_bg_leftTop"></span>
+              <span class="border_bg_rightTop"></span>
+              <span class="border_bg_leftBottom"></span>
+              <span class="border_bg_rightBottom"></span>
+            </div>
+          </li>
+          <li>
+            <div class="liIn">
+              <h3>CPU核数总和</h3>
+              <p class="shu"><span class="shu3" th:text="${cpuCoresSum}"></span><i></i></p>
+              <div class="zi"><span class="span1">所有监测主机</span><span></span></div>
+              <span class="border_bg_leftTop"></span>
+              <span class="border_bg_rightTop"></span>
+              <span class="border_bg_leftBottom"></span>
+              <span class="border_bg_rightBottom"></span>
+            </div>
+          </li>
+          <li>
+            <div class="liIn">
+              <h3>存储容量总和</h3>
+              <p class="shu"><span class="shu4" th:text="${sumDiskSizeCache}"></span><i></i></p>
+              <div class="zi"><span class="span1">所有监测主机</span><span></span></div>
+              <span class="border_bg_leftTop"></span>
+              <span class="border_bg_rightTop"></span>
+              <span class="border_bg_leftBottom"></span>
+              <span class="border_bg_rightBottom"></span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="leftMain_middle">
+      <div class="leftMain_middle_left">
+        <div class="leftMain_middle_leftIn">
+          <h3>主机进程数量波动图</h3>
+          <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+          <div class="biaoge" style="width:100%; height:25vh" id="chartmain"></div>
+          <script th:inline="javascript">
+            var resultListCpuTime =  eval([[${resultListCpuTime}]]);
+            var resultListProcsData =   eval([[${resultListProcsData}]]);
+            //window.onload = function () {
+            //指定图表的配置项和数据
+            var dataAxis = eval(resultListCpuTime);
+            var data = eval(resultListProcsData);
+            var yMax = 100;
+            var dataShadow = [];
+
+            for (var i = 0; i < data.length; i++) {
+              dataShadow.push(yMax);
+            }
+
+            option = {
+              title: {
+                text: '',
+                subtext: ''
+              },
+              grid:{
+                x:40,
+                y:40,
+                x2:20,
+                y2:20,
+                bottom:'20%',
+              },
+              xAxis: {
+                data: dataAxis,
+                axisLabel: {
+                  /*inside: true,*/
+                  interval:0,
+                  textStyle: {
+                    color: '#fff',
+                    fontSize: 12
+
+                  }
+                },
+                axisTick: {
+                  show: false,
+                },
+                axisLine: {
+                  show: true,
+                  symbol:['none', 'arrow'],
+                  symbolOffset: 12,
+                  lineStyle:{
+                    color: '#fff',
+                  }
+                },
+                axisLabel: {
+                  rotate:30
+                },
+                z: 10
+              },
+              yAxis: {
+                type: 'value',
+                name: '单位：个',
+                axisLine: {
+                  show: true,
+                  symbol: ['none', 'arrow'],
+                  symbolOffset: 12,
+                  lineStyle:{
+                    color: '#fff',
+                  }
+                },
+                axisTick: {
+                  show: false
+                },
+                axisLabel: {
+                  textStyle: {
+                    color: '#fff',
+                    fontSize: 12
+                  }
+                },
+                splitLine: {
+                  show: false
+                }
+              },
+
+              dataZoom: [
+                {
+                  type: 'inside'
+                }
+              ],
+              series: [
+                { // For shadow
+                  type: 'bar',
+                  itemStyle: {
+                    color: 'rgba(0,0,0,0.05)'
+                  },
+                  barGap: '-100%',
+                  barCategoryGap: '40%',
+                  data: dataShadow,
+                  animation: false
+                },
+                {
+                  type: 'bar',
+                  itemStyle: {
+                    color: new echarts.graphic.LinearGradient(
+                            0, 0, 0, 1,
+                            [
+                              {offset: 0, color: '#0efdff'},
+                              {offset: 0.5, color: '#188df0'},
+                              {offset: 1, color: '#188df0'}
+                            ]
+                    )
+                  },
+                  emphasis: {
+                    label: { show: true ,position:'top',color: '#fff'}
+                  },
+                  data: data
+                }
+              ]
+            };
+
+            // Enable data zoom when user click bar.
+            /*var zoomSize = 6;
+            myChart.on('click', function (params) {
+                console.log(dataAxis[Math.max(params.dataIndex - zoomSize / 2, 0)]);
+                myChart.dispatchAction({
+                    type: 'dataZoom',
+                    startValue: dataAxis[Math.max(params.dataIndex - zoomSize / 2, 0)],
+                    endValue: dataAxis[Math.min(params.dataIndex + zoomSize / 2, data.length - 1)]
+                });
+            });*/
+
+            //获取dom容器
+            var myChart = echarts.init(document.getElementById('chartmain'));
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+            //};
+          </script>
+          <span class="border_bg_leftTop"></span>
+          <span class="border_bg_rightTop"></span>
+          <span class="border_bg_leftBottom"></span>
+          <span class="border_bg_rightBottom"></span>
+        </div>
+      </div>
+      <div class="leftMain_middle_right">
+        <div class="leftMain_middle_rightIn">
+          <h3>磁盘使用率最高</h3>
+          <div class="biaoge biaoge_pai" style="width:100%; height:25vh">
+            <div class="biaoge_paiIn">
+              <ul>
+                <th:block th:each="item,iterStat : ${hostDiskPerList}">
+                  <li>
+                    <div th:class="${item.id}">
+                      <div class="liIn_left"><span class="bot"></span><span th:text="${item.hostname}" class="zi"></span></div>
+                      <div class="liIn_line"><div class="line_lineIn"  th:style="'width:' + ${item.diskPer}+'%;'"></div></div>
+                      <p class="num" th:text="${item.diskPer}+'%'">98.5%</p>
+                    </div>
+                  </li>
+                </th:block>
+              </ul>
+            </div>
+          </div>
+          <span class="border_bg_leftTop"></span>
+          <span class="border_bg_rightTop"></span>
+          <span class="border_bg_leftBottom"></span>
+          <span class="border_bg_rightBottom"></span>
+        </div>
+      </div>
+    </div>
+    <div class="leftMain_middle">
+      <div class="leftMain_middle_left">
+        <div class="leftMain_middle_leftIn">
+          <h3>主机内存使用率、CPU使用率波动图</h3>
+          <div class="biaoge" style="width:100%; height:25vh" id="chartmain_zhe"></div>
+          <script th:inline="javascript">
+            var resultListCpuTime =  eval([[${resultListCpuTime}]]);
+            var resultListMemData =   eval([[${resultListMemData}]]);
+            var resultListCpuData =   eval([[${resultListCpuData}]]);
+            option = {
+              title: {
+                text: ''
+              },
+              tooltip: {
+                trigger: 'axis'
+              },
+              legend: {
+                textStyle: {
+                  color: '#fff',
+                  fontSize: 12,
+                },
+                right:'10%',
+                data: ['内存使用率%','CPU使用率%']
+              },
+              grid:{
+                x:40,
+                y:40,
+                x2:20,
+                y2:20,
+                bottom:'20%',
+              },
+              toolbox: {
+                feature: {
+                  //saveAsImage: {}
+                }
+              },
+              xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                axisLabel: {
+                  /*inside: true,*/
+                  interval:0,
+                  textStyle: {
+                    color: '#fff',
+                    fontSize: 12
+
+                  }
+                },
+                axisTick: {
+                  show: false,
+                },
+                axisLine: {
+                  show: true,
+                  symbol:['none', 'arrow'],
+                  symbolOffset: 12,
+                  lineStyle:{
+                    color: '#fff',
+                  }
+                },
+                axisLabel: {
+                  rotate:30
+                },
+                data: eval(resultListCpuTime)
+              },
+              yAxis: {
+                type: 'value',
+                axisLine: {
+                  show: true,
+                  symbol: ['none', 'arrow'],
+                  symbolOffset: 12,
+                  lineStyle:{
+                    color: '#fff',
+                  }
+                },
+                axisTick: {
+                  show: false
+                },
+                axisLabel: {
+                  textStyle: {
+                    color: '#fff',
+                    fontSize: 12
+                  }
+                },
+                splitLine: {
+                  show: false
+                }
+              },
+              series: [
+                {
+                  name: '内存使用率%',
+                  type: 'line',
+                  data: eval(resultListMemData)
+                },
+                {
+                  name: 'CPU使用率%',
+                  type: 'line',
+                  itemStyle: {
+                    normal: {
+                      color: "#8ff9f8",//折线点的颜色
+                      lineStyle: {
+                        color: "#8ff9f8",//折线的颜色
+                        width:2,
+                      }
+                    },
+                  },
+                  data: eval(resultListCpuData)
+                }
+              ]
+            };
+            //获取dom容器
+            var myChart = echarts.init(document.getElementById('chartmain_zhe'));
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+            //};
+          </script>
+          <span class="border_bg_leftTop"></span>
+          <span class="border_bg_rightTop"></span>
+          <span class="border_bg_leftBottom"></span>
+          <span class="border_bg_rightBottom"></span>
+        </div>
+      </div>
+      <div class="leftMain_middle_right">
+        <div class="leftMain_middle_rightIn">
+          <h3>其他资源统计</h3>
+          <div class="biaoge biaoge_bi" style="width:100%; height:25vh">
+            <ul>
+              <li>
+                <div class="liIn">
+                  <p class="shu shu1" th:text="${heathSize}">23</p>
+                  <p class="zi">服务接口</p>
+                </div>
+              </li>
+              <li>
+                <div class="liIn">
+                  <p class="shu shu2" th:text="${dbInfoSize}">107</p>
+                  <p class="zi">数据库数量</p>
+                </div>
+              </li>
+              <li>
+                <div class="liIn">
+                  <p class="shu shu3" th:text="${dbTableSize}">107</p>
+                  <p class="zi">数据表数量</p>
+                </div>
+              </li>
+              <li>
+                <div class="liIn">
+                  <p class="shu shu4" th:text="${snmpSize}">23</p>
+                  <p class="zi">SNMP设备总数量</p>
+                </div>
+              </li>
+              <li>
+                <div class="liIn">
+                  <p class="shu shu5" th:text="${dceSize}">23</p>
+                  <p class="zi">PING设备总数量</p>
+                </div>
+              </li>
+              <li>
+                <div class="liIn">
+                  <p class="shu shu6" th:text="${equipmentSize}">23</p>
+                  <p class="zi">资产数量</p>
+                </div>
+              </li>
+            </ul>
+
+          </div>
+          <span class="border_bg_leftTop"></span>
+          <span class="border_bg_rightTop"></span>
+          <span class="border_bg_leftBottom"></span>
+          <span class="border_bg_rightBottom"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="rightMain">
+    <div class="rightMain_top">
+      <div class="rightMain_topIn">
+        <h3>运行时间最长的主机</h3>
+        <div class="biaoge" style="width:100%; height:30vh" id="chartmain_bing"></div>
+        <script  th:inline="javascript">
+          var hostUptimeList =  eval([[${hostUptimeList}]]);
+          var hostNameUptimeList =   eval([[${hostNameUptimeList}]]);
+          option = {
+            title: {
+              text: '运行情况统计',
+              subtext: '',
+              left: 'right',
+              textStyle: {
+                color: '#fff',
+                fontSize: 12
+              }
+            },
+            tooltip: {
+              trigger: 'item',
+              formatter: '{a} <br/>{b} : {c}天 ({d}%)'
+            },
+            legend: {
+              // orient: 'vertical',
+              // top: 'middle',
+              type: 'scroll',
+              orient: 'vertical',
+              right: 10,
+              top: 40,
+              bottom: 20,
+              left: 'right',
+              data: hostNameUptimeList,
+              textStyle: {
+                color: '#fff',
+                fontSize: 12
+              }
+
+            },
+            grid:{
+              x:'-10%',
+              y:40,
+              x2:20,
+              y2:20,
+            },
+            color : [ '#09d0fb', '#f88cfb', '#95f8fe', '#f9f390',  '#ecfeb7' ],
+            series: [
+              {
+                type: 'pie',
+                radius: '65%',
+                center: ['50%', '50%'],
+                selectedMode: 'single',
+                data: hostUptimeList,
+                emphasis: {
+                  itemStyle: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                  }
+                }
+              }
+            ]
+          };
+          //获取dom容器
+          var myChart = echarts.init(document.getElementById('chartmain_bing'));
+          // 使用刚指定的配置项和数据显示图表。
+          myChart.setOption(option);
+
+        </script>
+        <span class="border_bg_leftTop"></span>
+        <span class="border_bg_rightTop"></span>
+        <span class="border_bg_leftBottom"></span>
+        <span class="border_bg_rightBottom"></span>
+      </div>
+    </div>
+    <div class="rightMain_bottom">
+      <div class="rightMain_bottomIn">
+        <h3>系统日志</h3>
+        <div class="biaoge biaoge_list" style="width:100%; height:36vh">
+          <div class="biaoge_listIn">
+            <div class="ul_list">
+              <div class="ul_listIn">
+                <th:block th:each="item,iterStat : ${logList}">
+                  <ul class="ul_con">
+                    <li th:text="${item.hostname}"></li>
+                  </ul>
+                </th:block>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <span class="border_bg_leftTop"></span>
+        <span class="border_bg_rightTop"></span>
+        <span class="border_bg_leftBottom"></span>
+        <span class="border_bg_rightBottom"></span>
+      </div>
+    </div>
+  </div>
+  <div style="clear:both;"></div>
+</div>
+<!--大屏-->
+<!--数字增长累加动画-->
+
+<script  th:inline="javascript">
+  const dapingRefreshTimes = [[${dapingRefreshTimes}]];
+  function reload() {
+    window.location.reload();
+  }
+  setTimeout(reload,dapingRefreshTimes);
+
+  const tipInfoMsg = [[${tipInfoMsg}]];
+  if(tipInfoMsg!=''  && tipInfoMsg!=null){
+    //toastr提示框延时10s后消失
+    toastr.options.timeOut = 10000;
+    toastr.success("<span style='font-size:16px;color:#fff'>"+tipInfoMsg+"</span>");
+  }
+</script>
+<!--大屏-->
+</body>
+</html>

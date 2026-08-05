@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}" style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+          </div><!-- /.col -->
+          <!-- <div class="col-sm-6">
+             <ol class="breadcrumb float-sm-right">
+               <li class="breadcrumb-item"><a href="#">Home</a></li>
+               <li class="breadcrumb-item active">Dashboard v1</li>
+             </ol>
+           </div>--><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+
+          <div class="row"><span onclick="viewWindowsUrl('/daping/index?dashView=1')" style="margin-left:20px;margin-top:10px;color:#fff;background:#0dcaf0;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;">大屏可视化 v1版</span>
+          <span onclick="viewWindowsUrl('/dapingNew/index?dashView=1')" style="margin-left:20px;margin-top:10px;color:#fff;background:#508ff4;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;">大屏可视化 v2版</span>
+          <span onclick="viewWindowsUrl('/dapingThree/index?dashView=1')" style="margin-left:20px;margin-top:10px;color:#fff;background:#4be69d;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;">大屏可视化 v3版</span>
+          <span onclick="viewWindowsUrl('/dapingFour/index?dashView=1')" style="margin-left:20px;margin-top:10px;color:#fff;background:#508ff4;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;">大屏可视化 v4版</span>
+          <span onclick="viewWindowsUrl('/dapingFive/index?dashView=1')" style="margin-left:20px;margin-top:10px;color:#fff;background:#ffbf43;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;">大屏可视化 v5版</span>
+          <span onclick="viewWindowsUrl('/dapingSix/index?dashView=1')" style="margin-left:20px;margin-top:10px;color:#fff;background:#9267ff;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;">大屏可视化 v6版</span>
+          <span onclick="viewWindowsUrl('/dapingSeven/index?dashView=1')" style="margin-left:20px;margin-top:10px;color:#fff;background:#FF5370;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;">大屏可视化 v7版</span>
+          <span onclick="viewWindowsUrl('/dapingEight/index?dashView=1')" style="margin-left:20px;margin-top:10px;color:#fff;background:#fa71cd;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;">大屏可视化 v8版</span>
+          <span onclick="viewWindowsUrl('/dapingNine/index?dashView=1')" style="margin-left:20px;margin-top:10px;color:#fff;background:#ff4343;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;">大屏可视化 v9版</span>
+          <span onclick="viewWindowsUrl('/dapingTen/index?dashView=1')" style="margin-left:20px;margin-top:10px;color:#fff;background:#ff4343;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;">大屏可视化 v10版</span>
+          <span onclick="viewWindowsUrl('/dash/main?dashView=1')" style="margin-left:20px;margin-top:10px;color:#fff;background:#9267ff;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;">公众看板</span></div>
+          <div class="row">
+          <div class="col-sm-12" style="margin-left:10px;margin-top:10px;color: #495057;">提示：大屏可视化页面默认10分钟（可自定义），会自动刷新一次，不需要登录。也可以设置（在server配置文件中修改）需要登录才能查看大屏</div>
+          <div class="col-sm-12" style="margin-left:10px;margin-top:10px;color: #495057;">大屏页面默认展示所有监控资源的数据，如果只想展示当前登录用户的监控资源数据，请在大屏页面的url后面添加&viewDapingNowAccount=1</div>
+          </div>
+          <div class="row">
+              <th:block th:each="item,iterStat : ${dapingExtDiyList}">
+                  <th:block th:if="${iterStat.index == 0}">
+                  <span th:onclick="viewDapingExtUrl([[${item.hrefUrl}]])" style="margin-left:20px;margin-top:10px;color:#fff;background:#0dcaf0;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;" th:text="${item.name}">大屏可视化 v9版</span>
+                  </th:block>
+                  <th:block th:if="${iterStat.index == 1}">
+                      <span th:onclick="viewDapingExtUrl([[${item.hrefUrl}]])" style="margin-left:20px;margin-top:10px;color:#fff;background:#508ff4;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;" th:text="${item.name}">大屏可视化 v9版</span>
+                  </th:block>
+                  <th:block th:if="${iterStat.index == 2}">
+                      <span th:onclick="viewDapingExtUrl([[${item.hrefUrl}]])" style="margin-left:20px;margin-top:10px;color:#fff;background:#4be69d;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;" th:text="${item.name}">大屏可视化 v9版</span>
+                  </th:block>
+                  <th:block th:if="${iterStat.index == 3}">
+                      <span th:onclick="viewDapingExtUrl([[${item.hrefUrl}]])" style="margin-left:20px;margin-top:10px;color:#fff;background:#ffbf43;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;" th:text="${item.name}">大屏可视化 v9版</span>
+                  </th:block>
+                  <th:block th:if="${iterStat.index == 4}">
+                      <span th:onclick="viewDapingExtUrl([[${item.hrefUrl}]])" style="margin-left:20px;margin-top:10px;color:#fff;background:#9267ff;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;" th:text="${item.name}">大屏可视化 v9版</span>
+                  </th:block>
+                  <th:block th:if="${iterStat.index == 5}">
+                      <span th:onclick="viewDapingExtUrl([[${item.hrefUrl}]])" style="margin-left:20px;margin-top:10px;color:#fff;background:#FF5370;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;" th:text="${item.name}">大屏可视化 v9版</span>
+                  </th:block>
+                  <th:block th:if="${iterStat.index == 6}">
+                      <span th:onclick="viewDapingExtUrl([[${item.hrefUrl}]])" style="margin-left:20px;margin-top:10px;color:#fff;background:#fa71cd;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;" th:text="${item.name}">大屏可视化 v9版</span>
+                  </th:block>
+                  <th:block th:if="${iterStat.index == 7}">
+                      <span th:onclick="viewDapingExtUrl([[${item.hrefUrl}]])" style="margin-left:20px;margin-top:10px;color:#fff;background:#ff4343;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;" th:text="${item.name}">大屏可视化 v9版</span>
+                  </th:block>
+                  <th:block th:if="${iterStat.index > 7}">
+                      <span th:onclick="viewDapingExtUrl([[${item.hrefUrl}]])" style="margin-left:20px;margin-top:10px;color:#fff;background:#508ff4;display:inline-block;border-radius:3px;padding:4px 8px;cursor:pointer;" th:text="${item.name}">大屏可视化 v9版</span>
+                  </th:block>
+              </th:block>
+          </div>
+
+
+
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <div th:replace="common/footer.html"></div>
+</div>
+<!-- ./wrapper -->
+
+<script th:inline="javascript">
+  function viewWindowsUrl(url) {
+    window.open(SERVER_SERVLET_CONTEXT_PATH + url);
+  }
+  function viewDapingExtUrl(url) {
+      window.open(url);
+  }
+</script>
+
+</body>
+</html>

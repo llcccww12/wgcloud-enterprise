@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wgcloud.mapper.TaskJobInfoMapper">
+	<resultMap id="resultMap" type="com.wgcloud.entity.TaskJobInfo">
+		<id column="ID" property="id" jdbcType="CHAR" />
+		<result column="HOST_NAME" property="hostname" jdbcType="CHAR" />
+		<result column="CRON_VALUE" property="cronValue" jdbcType="CHAR" />
+		<result column="JOB_NAME" property="jobName" jdbcType="CHAR" />
+		<result column="JOB_REMARK" property="jobRemark" jdbcType="CHAR" />
+		<result column="ACTIVE" property="active" jdbcType="CHAR" />
+		<result column="ACCOUNT" property="account" jdbcType="CHAR" />
+		<result column="CALL_BACK_TIME" property="callBackTime" jdbcType="TIMESTAMP" />
+		<result column="CALL_BACK_STATE" property="callBackState" jdbcType="CHAR" />
+		<result column="GROUP_ID" property="groupId" jdbcType="CHAR" />
+		<result column="SHELL" property="shell" jdbcType="CHAR" />
+		<result column="CALL_BACK_RESULT" property="callBackResult" jdbcType="CHAR" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<sql id="tableColumnList">
+		ID,HOST_NAME, CRON_VALUE,JOB_NAME,JOB_REMARK,CREATE_TIME,ACCOUNT,ACTIVE,CALL_BACK_TIME,GROUP_ID,CALL_BACK_STATE,SHELL,CALL_BACK_RESULT
+	</sql>
+
+	<sql id="queryByParams">
+		<if test="hostname != null">
+			<choose>
+				<when test="_databaseId == 'oracle'">
+					<![CDATA[ AND ( HOST_NAME  = #{hostname} OR JOB_NAME LIKE  CONCAT(CONCAT('%',#{hostname}),'%') )]]>
+				</when>
+				<otherwise>
+					<![CDATA[ AND ( HOST_NAME  = #{hostname} OR JOB_NAME LIKE  CONCAT('%',#{hostname},'%') )]]>
+				</otherwise>
+			</choose>
+		</if>
+		<if test="hostnameForAgent != null">
+			<![CDATA[ AND HOST_NAME = #{hostnameForAgent} ]]>
+		</if>
+		<if test="active != null">
+			<![CDATA[ AND ACTIVE = #{active} ]]>
+		</if>
+		<if test="groupId != null">
+			<include refid="commonSqlUtil.groupIdQueryParams" />
+		</if>
+		<if test="account != null">
+			<include refid="commonSqlUtil.hostChildAccountQueryParams" />
+		</if>
+	</sql>
+	
+	
+	<select id="selectById" resultMap="resultMap" parameterType="java.lang.String">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM TASK_JOB_INFO 
+		WHERE ID=#{id} 
+	</select>
+	
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		DELETE FROM TASK_JOB_INFO 
+		WHERE ID = #{id}
+	</delete>
+
+
+	<delete id="deleteByHostName" parameterType="map">
+		DELETE FROM TASK_JOB_INFO WHERE <![CDATA[   HOST_NAME =#{hostname}]]>
+	</delete>
+	
+	<delete id="deleteById" parameterType="java.lang.String">
+		DELETE FROM
+		TASK_JOB_INFO 
+		WHERE ID IN
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<update id="updateToTargetAccount"  parameterType="map">
+		UPDATE  TASK_JOB_INFO SET ACCOUNT = #{accountTarget}
+		<where>
+			<include refid="commonSqlUtil.updateToTargetAccountQueryParams" />
+		</where>
+	</update>
+
+	<update id="updateActive"  parameterType="map">
+		UPDATE  TASK_JOB_INFO SET ACTIVE = #{active} WHERE ID IN
+		<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<update id="updateSendByIds"  parameterType="java.lang.String">
+		update TASK_JOB_INFO set CALL_BACK_STATE='Ready' WHERE ID IN
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<insert id="save" parameterType="com.wgcloud.entity.TaskJobInfo">
+		INSERT INTO TASK_JOB_INFO 
+    	<trim prefix="(" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >ID,</if>
+      		<if test="hostname != null" >HOST_NAME,</if>
+      		<if test="cronValue != null">CRON_VALUE,</if>
+      		<if test="jobName != null">JOB_NAME,</if>
+			<if test="jobRemark != null">JOB_REMARK,</if>
+			<if test="active != null">ACTIVE,</if>
+			<if test="account != null">ACCOUNT,</if>
+			<if test="groupId != null">GROUP_ID,</if>
+			<if test="callBackTime != null">CALL_BACK_TIME,</if>
+			<if test="callBackState != null">CALL_BACK_STATE,</if>
+			<if test="shell != null">SHELL,</if>
+			<if test="callBackResult != null">CALL_BACK_RESULT,</if>
+      		<if test="createTime != null" >CREATE_TIME</if>
+    	</trim>
+    	<trim prefix="values (" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >#{id},</if>
+      		<if test="hostname != null" >#{hostname},</if>
+      		<if test="cronValue != null" >#{cronValue},</if>
+      		<if test="jobName != null" >#{jobName},</if>
+			<if test="jobRemark != null" >#{jobRemark},</if>
+			<if test="active != null" >#{active},</if>
+			<if test="account != null" >#{account},</if>
+			<if test="groupId != null" >#{groupId},</if>
+			<if test="callBackTime != null" >#{callBackTime},</if>
+			<if test="callBackState != null" >#{callBackState},</if>
+			<if test="shell != null" >#{shell},</if>
+			<if test="callBackResult != null" >#{callBackResult},</if>
+      		<if test="createTime != null" >#{createTime}</if>
+    	</trim>
+	</insert>
+
+	
+	<update id="updateById" parameterType="com.wgcloud.entity.TaskJobInfo">
+		UPDATE TASK_JOB_INFO
+		<set>
+			<if test="hostname != null">
+				HOST_NAME = #{hostname},
+			</if>
+			<if test="cronValue != null">
+				CRON_VALUE = #{cronValue},
+			</if>
+			<if test="jobName != null">
+				JOB_NAME = #{jobName},
+			</if>
+			<if test="jobRemark != null">
+				JOB_REMARK = #{jobRemark},
+			</if>
+			<if test="active != null">
+				ACTIVE = #{active},
+			</if>
+			<if test="account != null">
+				ACCOUNT = #{account},
+			</if>
+			<if test="groupId != null">
+				GROUP_ID = #{groupId},
+			</if>
+			<if test="callBackTime != null">
+				CALL_BACK_TIME = #{callBackTime},
+			</if>
+			<if test="callBackState != null">
+				CALL_BACK_STATE = #{callBackState},
+			</if>
+			<if test="shell != null">
+				SHELL = #{shell},
+			</if>
+			<if test="callBackResult != null">
+				CALL_BACK_RESULT = #{callBackResult},
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime}
+			</if>
+		</set>
+		WHERE ID = #{id}
+	</update>
+
+	<select id="countByParams" parameterType="map" resultType="java.lang.Integer">
+		SELECT count(*)  FROM TASK_JOB_INFO t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+	</select>
+
+
+	<select id="selectAllByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM TASK_JOB_INFO t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		 ORDER BY ID DESC
+	</select>
+	
+	<select id="selectByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM TASK_JOB_INFO
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		<choose>
+			<when test="orderBy !=null and orderBy != ''">
+				<![CDATA[ ORDER BY ${orderBy} ${orderType}]]>
+			</when>
+			<otherwise>
+				ORDER BY ID DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,25 @@
+<div th:if="${not #lists.isEmpty(allNetworkList)}">
+<label><span style="margin-left: 10px;color:#fff;background:#FF5370;display:inline-block;border-radius:3px;padding:4px 8px;">网卡信息</span></label>
+<div class="row">
+    <div class="col-12 table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>网卡名称</th>
+                <th>总计发送流量</th>
+                <th>总计接收流量</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:each="item : ${allNetworkList}">
+                <tr>
+                    <td th:text="${item.name}"></td>
+                    <td th:text="${item.bytesSent}"></td>
+                    <td th:text="${item.bytesRecv}"></td>
+                </tr>
+            </th:block>
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>

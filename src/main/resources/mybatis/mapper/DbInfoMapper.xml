@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wgcloud.mapper.DbInfoMapper">
+	<resultMap id="resultMap" type="com.wgcloud.entity.DbInfo">
+		<id column="ID" property="id" jdbcType="CHAR" />
+		<result column="DBTYPE" property="dbType" jdbcType="CHAR" />
+		<result column="USER_NAME" property="userName" jdbcType="CHAR" />
+		<result column="PASSWD" property="passwd" jdbcType="CHAR" />
+		<result column="DBURL" property="dbUrl" jdbcType="CHAR" />
+		<result column="DB_STATE" property="dbState" jdbcType="CHAR" />
+		<result column="ALIAS_NAME" property="aliasName" jdbcType="CHAR" />
+		<result column="WARN_LEVEL" property="warnLevel" jdbcType="CHAR" />
+		<result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="ACCOUNT" property="account" jdbcType="CHAR" />
+		<result column="DRIVER_NAME" property="driverName" jdbcType="CHAR" />
+		<result column="TEST_QUERY_SQL" property="testQuerySql" jdbcType="CHAR" />
+		<result column="GROUP_ID" property="groupId" jdbcType="CHAR" />
+		<result column="ACTIVE" property="active" jdbcType="CHAR" />
+		<result column="RES_TIMES" property="resTimes" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<sql id="tableColumnList">
+		ID,DBTYPE,USER_NAME,PASSWD,CREATE_TIME,DBURL,DB_STATE,ALIAS_NAME,ACCOUNT,WARN_LEVEL,DRIVER_NAME,TEST_QUERY_SQL,ACTIVE,GROUP_ID,RES_TIMES
+	</sql>
+
+	<sql id="queryByParams">
+		<if test="aliasName != null">
+			<choose>
+				<when test="_databaseId == 'oracle'">
+					<![CDATA[ AND ALIAS_NAME LIKE  CONCAT(CONCAT('%',#{aliasName}),'%') ]]>
+				</when>
+				<otherwise>
+					<![CDATA[ AND ALIAS_NAME LIKE  CONCAT('%',#{aliasName},'%') ]]>
+				</otherwise>
+			</choose>
+		</if>
+		<if test="dbState != null">
+			<![CDATA[ AND DB_STATE = #{dbState} ]]>
+		</if>
+		<if test="account != null">
+			<![CDATA[ AND ACCOUNT = #{account} ]]>
+		</if>
+		<if test="dbInfoNames != null">
+			<![CDATA[ AND ALIAS_NAME IN ]]>
+			<foreach item="item" index="index" collection="dbInfoNames" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="active != null">
+			<![CDATA[ AND ACTIVE = #{active} ]]>
+		</if>
+		<if test="groupId != null">
+			<include refid="commonSqlUtil.groupIdQueryParams" />
+		</if>
+	</sql>
+	
+	<select id="selectByAccountId" resultMap="resultMap" parameterType="java.lang.String">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM DB_INFO 
+	</select>
+	
+	
+	<select id="selectById" resultMap="resultMap" parameterType="java.lang.String">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM DB_INFO 
+		WHERE ID=#{id} 
+	</select>
+	
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		DELETE FROM DB_INFO 
+		WHERE ID = #{id}
+	</delete>
+
+	<update id="updateToTargetAccount"  parameterType="map">
+		UPDATE  DB_INFO SET ACCOUNT = #{accountTarget}
+		<where>
+			<include refid="commonSqlUtil.updateToTargetAccountQueryParams" />
+		</where>
+	</update>
+
+	<update id="updateActive"  parameterType="map">
+		UPDATE  DB_INFO SET ACTIVE = #{active} WHERE ID IN
+		<foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<delete id="deleteById" parameterType="java.lang.String">
+		DELETE FROM
+		DB_INFO 
+		WHERE ID IN
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<insert id="save" parameterType="com.wgcloud.entity.DbInfo">
+		INSERT INTO DB_INFO 
+    	<trim prefix="(" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >ID,</if>
+      		<if test="dbType != null" >DBTYPE,</if>
+      		<if test="userName != null">USER_NAME,</if>
+      		<if test="passwd != null">PASSWD,</if>
+			<if test="dbUrl != null">DBURL,</if>
+			<if test="dbState != null">DB_STATE,</if>
+			<if test="aliasName != null">ALIAS_NAME,</if>
+			<if test="account != null">ACCOUNT,</if>
+			<if test="warnLevel != null">WARN_LEVEL,</if>
+			<if test="driverName != null">DRIVER_NAME,</if>
+			<if test="testQuerySql != null">TEST_QUERY_SQL,</if>
+			<if test="active != null">ACTIVE,</if>
+			<if test="groupId != null">GROUP_ID,</if>
+			<if test="resTimes != null">RES_TIMES,</if>
+      		<if test="createTime != null" >CREATE_TIME</if>
+    	</trim>
+    	<trim prefix="values (" suffix=")" suffixOverrides="," >
+      		<if test="id != null" >#{id},</if>
+      		<if test="dbType != null" >#{dbType},</if>
+      		<if test="userName != null" >#{userName},</if>
+      		<if test="passwd != null" >#{passwd},</if>
+			<if test="dbUrl != null" >#{dbUrl},</if>
+			<if test="dbState != null" >#{dbState},</if>
+			<if test="aliasName != null" >#{aliasName},</if>
+			<if test="account != null" >#{account},</if>
+			<if test="warnLevel != null" >#{warnLevel},</if>
+			<if test="driverName != null" >#{driverName},</if>
+			<if test="testQuerySql != null" >#{testQuerySql},</if>
+			<if test="active != null" >#{active},</if>
+			<if test="groupId != null" >#{groupId},</if>
+			<if test="resTimes != null" >#{resTimes},</if>
+      		<if test="createTime != null" >#{createTime}</if>
+    	</trim>
+	</insert>
+
+
+	<update id="updateById" parameterType="com.wgcloud.entity.DbInfo">
+		UPDATE DB_INFO
+		<set>
+			<if test="dbType != null">
+				DBTYPE = #{dbType},
+			</if>
+			<if test="userName != null">
+				USER_NAME = #{userName},
+			</if>
+			<if test="passwd != null">
+				PASSWD = #{passwd},
+			</if>
+			<if test="dbUrl != null">
+				DBURL = #{dbUrl},
+			</if>
+			<if test="dbState != null">
+				DB_STATE = #{dbState},
+			</if>
+			<if test="aliasName != null">
+				ALIAS_NAME = #{aliasName},
+			</if>
+			<if test="warnLevel != null">
+				WARN_LEVEL = #{warnLevel},
+			</if>
+			<if test="driverName != null">
+				DRIVER_NAME = #{driverName},
+			</if>
+			<if test="testQuerySql != null">
+				TEST_QUERY_SQL = #{testQuerySql},
+			</if>
+			<if test="active != null">
+				ACTIVE = #{active},
+			</if>
+			<if test="groupId != null">
+				GROUP_ID = #{groupId},
+			</if>
+			<if test="resTimes != null">
+				RES_TIMES = #{resTimes},
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime}
+			</if>
+		</set>
+		WHERE ID = #{id}
+	</update>
+
+	<select id="countByParams" parameterType="map" resultType="java.lang.Integer">
+		SELECT count(*)  FROM DB_INFO t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+	</select>
+
+
+	<select id="selectAllByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM DB_INFO t
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		 ORDER BY ID DESC
+	</select>
+	
+	<select id="selectByParams" parameterType="map" resultMap="resultMap">
+		SELECT
+		<include refid="tableColumnList" />
+		FROM DB_INFO
+		<where>
+			<include refid="queryByParams" />
+		</where>
+		<choose>
+			<when test="orderBy !=null and orderBy != ''">
+				<![CDATA[ ORDER BY ${orderBy} ${orderType}]]>
+			</when>
+			<otherwise>
+				ORDER BY ID DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+</mapper>

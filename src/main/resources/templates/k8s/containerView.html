@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+
+
+</head>
+<body th:class="${session.sidebarCollapse}">
+<div th:replace="common/chart.html"></div>
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}"  style="font-size:0.90rem">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1></h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item active"></li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+  <div class="col-md-12">
+    <div th:class="'card card-primary '+${session.themeNameSign}">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fa-brands fa-kubernetes nav-icon"></i>&nbsp;Container详细信息</h3>
+        <div class=" float-sm-right">
+          <a href="javascript:history.back()">返回上级</a>
+        </div>
+      </div>
+      <!-- /.card-header -->
+      <!-- form start -->
+      <form role="form">
+        <div class="card-body">
+          <div class="form-group">
+            <label>Container ID</label>
+            <div th:text="${containerInfo.containerId}"></div>
+          </div>
+          <div class="form-group">
+            <label>Container Name</label>
+            <div th:text="${containerInfo.containerName}"></div>
+          </div>
+          <div class="form-group">
+            <label>Ready</label>
+            <div th:text="${containerInfo.ready}"></div>
+          </div>
+          <div class="form-group">
+            <label>Image</label>
+            <div th:text="${containerInfo.image}"></div>
+          </div>
+          <div class="form-group">
+            <label>Restart Count</label>
+            <div th:text="${containerInfo.restartCount}"></div>
+          </div>
+          <div class="form-group">
+            <label>Started Time</label>
+            <th:block th:if="${containerInfo.startedTime  == 'Stopped'}">
+              <div><span class="badge bg-danger"  th:text="${containerInfo.startedTime}"></span></div>
+            </th:block>
+            <th:block th:if="${containerInfo.startedTime  != 'Stopped'}">
+              <div><span  th:text="${containerInfo.startedTime}"></span></div>
+            </th:block>
+          </div>
+          <div class="form-group">
+            <label>Limit CPU<span class="text-muted">（1000m = 1核CPU）</span></label>
+            <div><span class="badge bg-primary" th:text="${containerInfo.limitCpu}"></span><span th:if="${containerInfo.limitCpu} == ''">&nbsp;</span></div>
+          </div>
+          <div class="form-group">
+            <label>Limit Memory<span class="text-muted">（1Mi ≈ 1MB）</span></label>
+            <div><span class="badge bg-primary" th:text="${containerInfo.limitMemory}"></span><span th:if="${containerInfo.limitMemory} == ''">&nbsp;</span></div>
+          </div>
+          <div class="form-group">
+            <label>Request CPU</label>
+            <div><span class="badge bg-primary" th:text="${containerInfo.requestCpu}"></span><span th:if="${containerInfo.requestCpu} == ''">&nbsp;</span></div>
+          </div>
+          <div class="form-group">
+            <label>Request Memory</label>
+            <div><span class="badge bg-primary" th:text="${containerInfo.requestMemory}"></span><span th:if="${containerInfo.requestMemory} == ''">&nbsp;</span></div>
+          </div>
+          <div class="form-group">
+            <label>Ports</label>
+            <div><span th:text="${containerInfo.ports}"></span><span th:if="${containerInfo.ports} == ''">&nbsp;</span></div>
+          </div>
+          <div class="form-group">
+            <label>Namespace</label>
+            <div th:text="${containerInfo.namespace}"></div>
+          </div>
+          <div class="form-group">
+            <label>Pod Name</label>
+            <div th:text="${containerInfo.podName}"></div>
+          </div>
+          <div class="form-group">
+            <label>Node</label>
+            <div th:text="${containerInfo.nodeName}"></div>
+          </div>
+          <div class="form-group">
+            <label>集群名称</label>
+            <div th:text="${containerInfo.k8sName}"></div>
+          </div>
+          <div class="form-group">
+            <label>添加时间</label>
+            <div th:text="${#dates.format(containerInfo.createTime,'yyyy-MM-dd HH:mm:ss')}"></div>
+          </div>
+
+        </div>
+        <!-- /.card-body -->
+
+      </form>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+
+  </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+</body>
+</html>

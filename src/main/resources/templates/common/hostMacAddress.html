@@ -1,0 +1,14 @@
+<div th:if="${not #lists.isEmpty(hostMacInfoList)}">
+    <label style="margin-left: 10px;color:#fff;background:#508ff4;display:inline-block;border-radius:3px;padding:4px 8px;">MAC地址信息</label>
+    <div class="row">
+        <div class="col-12 table-responsive">
+            <div style="line-height:0.9;margin-left:10px;margin-right:10px;font-size:1rem" class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight">
+                <code>
+<th:block th:each="item : ${hostMacInfoList}">
+<span th:text="${item.macName}"></span>：<span class="nt" th:text="${item.macAddress}"></span>
+</th:block>
+                </code></pre></div></div>
+            <!-- /.col -->
+        </div>
+    </div>
+</div>

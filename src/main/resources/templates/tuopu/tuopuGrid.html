@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <div  th:replace="common/header.html"></div>
+</head>
+<body th:class="${session.sidebarCollapse}">
+
+<div class="wrapper">
+
+  <div th:replace="common/navbar.html"></div>
+
+  <div th:replace="common/aside.html"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div th:class="'content-wrapper '+${session.themeNameSign}">
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row  mb-2">
+          <div class="col-sm-12" style="font-weight: 500;margin-top:5px;font-size: 0.9rem;">
+            <form class="form-inline ml-3">
+             <th:block th:if="${pageFlag  == 'host'}">
+              <div class="input-group input-group-sm" th:if="${application.hostGroup == 'true'}"><select style="width:150px;margin-right:5px;" th:class="'form-control '+${session.themeNameSign}" onchange="searchByGroupId()" name="groupId" id="groupId">
+                <option value="">选择标签</option>
+                <th:block th:each="item,iterStat : ${hostGroupList}">
+                  <option  th:value="${item.id}"  th:text="${item.groupName}">Alabama</option>
+                </th:block>
+              </select></div>
+              <div th:replace="common/accountSelect.html"></div>
+              <button type="button" onclick="hrefTopUrl('/tuopu/tuopuListHostGrid')" class="btn btn-primary btn-sm" style="margin-left:10px;margin-right:5px;">全部</button>
+              <button type="button" onclick="hrefTopUrl('/tuopu/tuopuListHostGrid?state=1')" class="btn btn-success btn-sm" style="margin-right:5px;">在线</button>
+              <button type="button" onclick="hrefTopUrl('/tuopu/tuopuListHostGrid?state=2')" class="btn bg-danger btn-sm" style="margin-right:5px;">已离线</button>
+              <button type="button" onclick="hrefTopUrl('/tuopu/tuopuListHost')" class="btn btn-primary btn-sm" style="margin-right:5px;"><i class="fas fa-th"></i> 切换布局</button>
+            </th:block>
+
+            <th:block th:if="${pageFlag  == 'ping'}">
+              <div class="input-group input-group-sm" th:if="${application.hostGroup == 'true'}"><select style="width:150px;margin-right:5px;" th:class="'form-control '+${session.themeNameSign}" onchange="searchByGroupIdPing()" name="groupId" id="groupId">
+                <option value="">选择标签</option>
+                <th:block th:each="item,iterStat : ${hostGroupList}">
+                  <option  th:value="${item.id}"  th:text="${item.groupName}">Alabama</option>
+                </th:block>
+              </select></div>
+              <div class="input-group input-group-sm" th:if="${application.LICENSE_STATE eq '1' && application.userInfoManage == 'true' && session.LOGIN_KEY.role == 'admin'}"><select style="width:150px;margin-right:5px;margin-left:5px;" th:class="'form-control '+${session.themeNameSign}" onchange="searchByAccountPing()" name="account" id="account">
+                <option value="">选择账号</option>
+                <th:block th:each="item,iterStat : ${accountList}">
+                  <option  th:value="${item.account}"  th:text="${item.account}">Alabama</option>
+                </th:block>
+              </select></div>
+              <button type="button" onclick="hrefTopUrl('/tuopu/tuopuListStGrid')" class="btn btn-primary btn-sm" style="margin-left:10px;margin-right:5px;">全部</button>
+              <button type="button" onclick="hrefTopUrl('/tuopu/tuopuListStGrid?state=1')" class="btn btn-success btn-sm" style="margin-right:5px;">在线</button>
+              <button type="button" onclick="hrefTopUrl('/tuopu/tuopuListStGrid?state=2')" class="btn bg-danger btn-sm" style="margin-right:5px;">已离线</button>
+              <button type="button" onclick="hrefTopUrl('/tuopu/tuopuListSt')" class="btn btn-primary btn-sm" style="margin-right:5px;"><i class="fas fa-th"></i> 切换布局</button>
+            </th:block>
+
+            <th:block th:if="${pageFlag  == 'snmp'}">
+              <div class="input-group input-group-sm" th:if="${application.hostGroup == 'true'}"><select style="width:150px;margin-right:5px;" th:class="'form-control '+${session.themeNameSign}" onchange="searchByGroupIdSnmp()" name="groupId" id="groupId">
+                <option value="">选择标签</option>
+                <th:block th:each="item,iterStat : ${hostGroupList}">
+                  <option  th:value="${item.id}"  th:text="${item.groupName}">Alabama</option>
+                </th:block>
+              </select></div>
+              <div class="input-group input-group-sm" th:if="${application.LICENSE_STATE eq '1' && application.userInfoManage == 'true' && session.LOGIN_KEY.role == 'admin'}"><select style="width:150px;margin-right:5px;margin-left:5px;" th:class="'form-control '+${session.themeNameSign}" onchange="searchByAccountSnmp()" name="account" id="account">
+                <option value="">选择账号</option>
+                <th:block th:each="item,iterStat : ${accountList}">
+                  <option  th:value="${item.account}"  th:text="${item.account}">Alabama</option>
+                </th:block>
+              </select></div>
+              <button type="button" onclick="hrefTopUrl('/tuopu/tuopuListSnmpGrid')" class="btn btn-primary btn-sm" style="margin-left:10px;margin-right:5px;">全部</button>
+              <button type="button" onclick="hrefTopUrl('/tuopu/tuopuListSnmpGrid?state=1')" class="btn btn-success btn-sm" style="margin-right:5px;">在线</button>
+              <button type="button" onclick="hrefTopUrl('/tuopu/tuopuListSnmpGrid?state=2')" class="btn bg-danger btn-sm" style="margin-right:5px;">已离线</button>
+              <button type="button" onclick="hrefTopUrl('/tuopu/tuopuListSnmp')" class="btn btn-primary btn-sm" style="margin-right:5px;"><i class="fas fa-th"></i> 切换布局</button>
+            </th:block>
+
+            <th:block th:if="${pageFlag  == 'snmpDeep'}">
+              <div class="input-group input-group-sm" th:if="${application.hostGroup == 'true'}"><select style="width:150px;margin-right:5px;" th:class="'form-control '+${session.themeNameSign}" onchange="searchByGroupIdSnmpDeep()" name="groupId" id="groupId">
+                <option value="">选择标签</option>
+                <th:block th:each="item,iterStat : ${hostGroupList}">
+                  <option  th:value="${item.id}"  th:text="${item.groupName}">Alabama</option>
+                </th:block>
+              </select></div>
+              <div class="input-group input-group-sm" th:if="${application.LICENSE_STATE eq '1' && application.userInfoManage == 'true' && session.LOGIN_KEY.role == 'admin'}"><select style="width:150px;margin-right:5px;margin-left:5px;" th:class="'form-control '+${session.themeNameSign}" onchange="searchByAccountSnmpDeep()" name="account" id="account">
+                <option value="">选择账号</option>
+                <th:block th:each="item,iterStat : ${accountList}">
+                  <option  th:value="${item.account}"  th:text="${item.account}">Alabama</option>
+                </th:block>
+              </select></div>
+              <button type="button" onclick="hrefTopUrl('/tuopu/tuopuListSnmpDeepGrid')" class="btn btn-primary btn-sm" style="margin-left:10px;margin-right:5px;">全部</button>
+              <button type="button" onclick="hrefTopUrl('/tuopu/tuopuListSnmpDeepGrid?state=1')" class="btn btn-success btn-sm" style="margin-right:5px;">在线</button>
+              <button type="button" onclick="hrefTopUrl('/tuopu/tuopuListSnmpDeepGrid?state=2')" class="btn bg-danger btn-sm" style="margin-right:5px;">已离线</button>
+              <button type="button" onclick="hrefTopUrl('/tuopu/tuopuListSnmpDeep')" class="btn btn-primary btn-sm" style="margin-right:5px;"><i class="fas fa-th"></i> 切换布局</button>
+            </th:block>
+            <span style="margin-left:10px;vertical-align:bottom;vertical-align:bottom;" class="text-muted">数量：</span><span class="text-muted" style="margin-right:10px;vertical-align:bottom;vertical-align:bottom;font-weight: bold;" th:text="${nodeListSize}" ></span>
+            <span style="vertical-align:bottom;color:#3ac47d !important;vertical-align:bottom;" th:text="${licenseMsg}" ></span>
+            </form>
+          </div>
+        </div></div></section>
+    <div style="margin-left:20px;margin-top:20px">
+      <div class="btn-group">
+        <!--<button type="button" id="color-chooser-btn" class="btn btn-info btn-block dropdown-toggle" data-toggle="dropdown">Color <span class="caret"></span></button>-->
+        <ul class="fc-color-picker" id="color-chooser">
+          <th:block th:if="${pageFlag  == 'host'}">
+            <th:block th:each="item,iterStat : ${nodeList}">
+              <li  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="${item.label}+'，CPU使用率'+${item.cpuPer}+'，内存使用率'+${item.memPer}+'，上行速率'+${item.txbyt}+'，下行速率'+${item.rxbyt}+'，系统负载'+${item.fiveLoad}+'，运行进程数量'+${item.procs}+'，连接数量'+${item.netConnections}">
+              <th:block th:if="${item.active  == '2'}"><a class="text-muted" href="javascript:location.reload();"><i class="fas fa-square"></i></a></th:block>
+              <th:block th:if="${item.active  != '2'}">
+                <th:block th:if="${item.state  == '2'}"><a class="text-danger" href="javascript:location.reload();"><i class="fas fa-square"></i></a></th:block>
+                <th:block th:if="${item.state  != '2'}">
+                  <th:block th:if="${item.agentVer  == 'v3.6.8'}"><a class="text-success" href="javascript:location.reload();"><i class="fas fa-square"></i></a></th:block>
+                  <th:block th:if="${item.agentVer  != 'v3.6.8'}"><a class="text-warning" href="javascript:location.reload();"><i class="fas fa-square"></i></a></th:block>
+                </th:block>
+              </th:block>
+            </li>
+            </th:block>
+          </th:block>
+
+          <th:block th:if="${pageFlag  == 'ping'}">
+            <th:block th:each="item,iterStat : ${nodeList}">
+              <li  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="${item.label}+'，响应时间'+${item.cpuPer}">
+                <th:block th:if="${item.active  == '2'}"><a class="text-muted" href="javascript:location.reload();"><i class="fas fa-square"></i></a></th:block>
+                <th:block th:if="${item.active  != '2'}">
+                  <th:block th:if="${item.state  == '2'}"><a class="text-danger" href="javascript:location.reload();"><i class="fas fa-square"></i></a></th:block>
+                  <th:block th:if="${item.state  != '2'}"><a class="text-success" href="javascript:location.reload();"><i class="fas fa-square"></i></a></th:block>
+                </th:block>
+              </li>
+            </th:block>
+          </th:block>
+
+          <th:block th:if="${pageFlag  == 'snmp'}">
+            <th:block th:each="item,iterStat : ${nodeList}">
+              <li  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="${item.label}+'，上行流量'+${item.txbyt}+'，下行流量'+${item.rxbyt}">
+                <th:block th:if="${item.active  == '2'}"><a class="text-muted"><i class="fas fa-square"></i></a></th:block>
+                <th:block th:if="${item.active  != '2'}">
+                  <th:block th:if="${item.state  == '2'}"><a class="text-danger" href="javascript:location.reload();"><i class="fas fa-square"></i></a></th:block>
+                  <th:block th:if="${item.state  != '2'}"><a class="text-success" href="javascript:location.reload();"><i class="fas fa-square"></i></a></th:block>
+                </th:block>
+            </li>
+          </th:block>
+          </th:block>
+
+          <th:block th:if="${pageFlag  == 'snmpDeep'}">
+            <th:block th:each="item,iterStat : ${nodeList}">
+              <li  data-trigger="hover"  data-container="body" data-toggle="popover" data-placement="top" th:data-content="${item.label}">
+                <th:block th:if="${item.active  == '2'}"><a class="text-muted"><i class="fas fa-square"></i></a></th:block>
+                <th:block th:if="${item.active  != '2'}">
+                  <th:block th:if="${item.state  == '2'}"><a class="text-danger" href="javascript:location.reload();"><i class="fas fa-square"></i></a></th:block>
+                  <th:block th:if="${item.state  != '2'}"><a class="text-success" href="javascript:location.reload();"><i class="fas fa-square"></i></a></th:block>
+                </th:block>
+            </li>
+           </th:block>
+          </th:block>
+        </ul>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12 text-muted" style="margin-left:20px;margin-top:20px;font-size:0.9rem;">绿色代表正常监控中，红色代表已离线，<span th:if="${pageFlag  == 'host'}">黄色标识agent版本和当前server版本不一致，</span>灰色标识已停止监控</div>
+    </div>
+
+  </div>
+
+  <div th:replace="common/footer.html"></div>
+
+</div>
+<!-- ./wrapper -->
+
+<script th:inline="javascript">
+
+  $("#groupId").val([[${groupId}]]);
+  $("#account").val([[${account}]]);
+  function searchByGroupId() {
+    window.location.href = SERVER_SERVLET_CONTEXT_PATH + "/tuopu/tuopuListHostGrid?groupId="+$("#groupId").val();
+  }
+  function searchByAccount() {
+    window.location.href = SERVER_SERVLET_CONTEXT_PATH + "/tuopu/tuopuListHostGrid?account="+$("#account").val();
+  }
+  function searchByGroupIdPing() {
+    window.location.href = SERVER_SERVLET_CONTEXT_PATH + "/tuopu/tuopuListStGrid?groupId="+$("#groupId").val();
+  }
+  function searchByAccountPing() {
+    window.location.href = SERVER_SERVLET_CONTEXT_PATH + "/tuopu/tuopuListStGrid?account="+$("#account").val();
+  }
+  function searchByGroupIdSnmp() {
+    window.location.href = SERVER_SERVLET_CONTEXT_PATH + "/tuopu/tuopuListSnmpGrid?groupId="+$("#groupId").val();
+  }
+  function searchByAccountSnmp() {
+    window.location.href = SERVER_SERVLET_CONTEXT_PATH + "/tuopu/tuopuListSnmpGrid?account="+$("#account").val();
+  }
+
+  function searchByGroupIdSnmpDeep() {
+    window.location.href = SERVER_SERVLET_CONTEXT_PATH + "/tuopu/tuopuListSnmpDeepGrid?groupId="+$("#groupId").val();
+  }
+  function searchByAccountSnmpDeep() {
+    window.location.href = SERVER_SERVLET_CONTEXT_PATH + "/tuopu/tuopuListSnmpDeepGrid?account="+$("#account").val();
+  }
+
+</script>
+</body>
+</html>
