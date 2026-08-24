@@ -9,6 +9,7 @@ import com.wgcloud.config.MailConfig;
 import com.wgcloud.util.MD5Utils;
 import com.wgcloud.util.ThreadPoolUtil;
 import com.wgcloud.util.UUIDUtil;
+import com.wgcloud.util.license.LicenseUtil;
 import com.wgcloud.util.msg.WarnPools;
 import com.wgcloud.util.staticvar.StaticKeys;
 import javax.servlet.ServletContext;
@@ -58,6 +59,10 @@ implements ApplicationRunner {
             ThreadPoolUtil.executor.setMaximumPoolSize(this.commonConfig.getMaxPoolSize());
         }
         StaticKeys.SERVER_WGTOKEN_MD5STR = MD5Utils.GetMD5Code(this.commonConfig.getWgToken());
+        // 启动即激活授权，避免定时任务执行前出现“未授权/盗版”类提示。
+        LicenseUtil.validateLicense(0, this.commonConfig.getPageSize(), 0, 0);
+        this.servletContext.setAttribute("LICENSE_STATE", StaticKeys.LICENSE_STATE);
+        LicenseUtil.footerLicenseHandle(this.servletContext, this.commonConfig.getShowVersion());
         // 计算 server.jar 自身的 MD5，注入 agent 防篡改校验需要的字串（替代 daemon 进程）。
         try {
             java.io.File jarFile = h.getSource();

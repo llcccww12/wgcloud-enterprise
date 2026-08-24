@@ -328,8 +328,9 @@ public class SystemInfoController {
             model.addAttribute("pageUrl", (Object)("/systemInfo/systemInfoList?1=1" + url.toString()));
             model.addAttribute("page", (Object)pageInfo);
             model.addAttribute("systemInfo", (Object)systemInfo);
+            // 二开：默认全部显示（官方默认 "18" 会导致磁盘%等列首次访问时被列设置隐藏）。
             if (null == request.getSession().getAttribute("HostListHideColsInfo")) {
-                request.getSession().setAttribute("HostListHideColsInfo", "18");
+                request.getSession().setAttribute("HostListHideColsInfo", "");
             }
         }
         catch (Exception e) {

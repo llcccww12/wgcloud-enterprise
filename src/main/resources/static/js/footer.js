@@ -1,4 +1,7 @@
-//全选
+// 禁用官方远程 license 校验脚本（会向 wgstart.com 上报授权信息并弹出盗版提示）
+function licenseHandle() {}
+function checkVersion() {}
+function showFreeContent() {}
 $("#checkall").on("click",function(){
 	if($('#checkall').is(':checked')) {
 		$("input[name='todo2']:checkbox").each(function() {
