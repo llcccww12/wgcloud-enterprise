@@ -134,7 +134,7 @@ public class MailSetController {
                 mailSet.setFromPwd(DESUtil.decryptForServerDb(mailSet.getFromPwd()));
             }
             StaticKeys.mailSet = mailSet;
-            result = StaticKeys.LICENSE_STATE.equals("1") ? this.sendMail(mailSet.getToMail(), "\u6d4b\u8bd5\u90ae\u4ef6\u53d1\u9001", "\u6d4b\u8bd5\u90ae\u4ef6\u53d1\u9001") : this.sendMail(mailSet.getToMail(), "WGCLOUD\u6d4b\u8bd5\u90ae\u4ef6\u53d1\u9001", "WGCLOUD\u6d4b\u8bd5\u90ae\u4ef6\u53d1\u9001");
+            result = this.sendMail(mailSet.getToMail(), "\u6d4b\u8bd5\u90ae\u4ef6\u53d1\u9001", "\u6d4b\u8bd5\u90ae\u4ef6\u53d1\u9001");
         }
         catch (Exception e) {
             logger.error("\u6d4b\u8bd5\u90ae\u4ef6\u8bbe\u7f6e\u4fe1\u606f\u9519\u8bef", (Throwable)e);
@@ -193,8 +193,8 @@ public class MailSetController {
             return this.sendMailByJavax(mails, mailTitle, mailContent);
         }
         try {
-            String mailTitlePrefix = "[WGCLOUD] ";
-            String mailContentSuffix = "<p><p><p><a target='_blank' href='http://www.wgstart.com'>WGCLOUD</a>\u656c\u4e0a";
+            String mailTitlePrefix = "[\u667a\u7b97\u8fd0\u7ef4\u5e73\u53f0] ";
+            String mailContentSuffix = "<p><p><p>\u667a\u7b97\u8fd0\u7ef4\u5e73\u53f0\u656c\u4e0a";
             if (StaticKeys.LICENSE_STATE.equals("1")) {
                 mailTitlePrefix = this.commonConfig.getMailTitlePrefix();
                 mailContentSuffix = this.commonConfig.getMailContentSuffix();
@@ -230,8 +230,8 @@ public class MailSetController {
             mails = mails.substring(1);
         }
         try {
-            String mailTitlePrefix = "[WGCLOUD] ";
-            String mailContentSuffix = "<p><p><p><a target='_blank' href='http://www.wgstart.com'>WGCLOUD</a>\u656c\u4e0a";
+            String mailTitlePrefix = "[\u667a\u7b97\u8fd0\u7ef4\u5e73\u53f0] ";
+            String mailContentSuffix = "<p><p><p>\u667a\u7b97\u8fd0\u7ef4\u5e73\u53f0\u656c\u4e0a";
             if (StaticKeys.LICENSE_STATE.equals("1")) {
                 mailTitlePrefix = this.commonConfig.getMailTitlePrefix();
                 mailContentSuffix = this.commonConfig.getMailContentSuffix();

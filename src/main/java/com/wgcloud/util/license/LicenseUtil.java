@@ -89,7 +89,7 @@ public class LicenseUtil {
         try {
             Long days;
             if (StaticKeys.LICENSE_STATE.equals("1") && (days = LicenseUtil.getOutDays()) <= 7L) {
-                Runnable runnable = () -> WarnOtherUtil.sendUtil("WGCLOUD\u6388\u6743\u5373\u5c06\u5230\u671f\u63d0\u9192", "\u4f60\u597d\uff0cWGCLOUD\u6388\u6743\u5c06\u4e8e\u3010" + StaticKeys.LICENSE_DATE + "\u3011\u5230\u671f\uff0c\u8bf7\u8054\u7cfb\u6211\u4eec\u8fdb\u884c\u7eed\u8d39www.wgstart.com", "", "", false, "ERROR", "");
+                Runnable runnable = () -> WarnOtherUtil.sendUtil("\u667a\u7b97\u8fd0\u7ef4\u5e73\u53f0\u6388\u6743\u5373\u5c06\u5230\u671f\u63d0\u9192", "\u4f60\u597d\uff0c\u667a\u7b97\u8fd0\u7ef4\u5e73\u53f0\u6388\u6743\u5c06\u4e8e\u3010" + StaticKeys.LICENSE_DATE + "\u3011\u5230\u671f\uff0c\u8bf7\u53ca\u65f6\u7eed\u8d39", "", "", false, "ERROR", "");
                 ThreadPoolUtil.executor.execute(runnable);
             }
         }

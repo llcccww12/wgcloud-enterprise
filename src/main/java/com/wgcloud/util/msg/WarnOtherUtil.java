@@ -539,8 +539,8 @@ public class WarnOtherUtil {
             return WarnOtherUtil.sendMailByJavax(mails, mailTitle, mailContent);
         }
         try {
-            String mailTitlePrefix = "[WGCLOUD] ";
-            String mailContentSuffix = "<p><p><p><a target='_blank' href='http://www.wgstart.com'>WGCLOUD</a>\u656c\u4e0a";
+            String mailTitlePrefix = "[\u667a\u7b97\u8fd0\u7ef4\u5e73\u53f0] ";
+            String mailContentSuffix = "<p><p><p>\u667a\u7b97\u8fd0\u7ef4\u5e73\u53f0\u656c\u4e0a";
             if (StaticKeys.LICENSE_STATE.equals("1")) {
                 mailTitlePrefix = commonConfig.getMailTitlePrefix();
                 mailContentSuffix = commonConfig.getMailContentSuffix();
@@ -576,8 +576,8 @@ public class WarnOtherUtil {
             mails = mails.substring(1);
         }
         try {
-            String mailTitlePrefix = "[WGCLOUD] ";
-            String mailContentSuffix = "<p><p><p><a target='_blank' href='http://www.wgstart.com'>WGCLOUD</a>\u656c\u4e0a";
+            String mailTitlePrefix = "[\u667a\u7b97\u8fd0\u7ef4\u5e73\u53f0] ";
+            String mailContentSuffix = "<p><p><p>\u667a\u7b97\u8fd0\u7ef4\u5e73\u53f0\u656c\u4e0a";
             if (StaticKeys.LICENSE_STATE.equals("1")) {
                 mailTitlePrefix = commonConfig.getMailTitlePrefix();
                 mailContentSuffix = commonConfig.getMailContentSuffix();
