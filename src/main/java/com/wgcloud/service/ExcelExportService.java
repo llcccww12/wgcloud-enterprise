@@ -57,9 +57,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,6 +172,175 @@ public class ExcelExportService {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * 主机趋势图按自然日取均值导出：所选时间范围内每天一行。
+     */
+    public void exportExcelByDayAvg(Map<String, Object> params, HttpServletResponse response) {
+        try {
+            List<CpuState> cpuStateList = this.cpuStateService.selectAllByParams(params);
+            List<MemState> memStateList = this.memStateService.selectAllByParams(params);
+            List<SysLoadState> sysLoadStateList = this.sysLoadStateService.selectAllByParams(params);
+            List<NetIoState> netIoStateList = this.netIoStateService.selectAllByParams(params);
+
+            // getDateStr() 会截成 MM-dd HH:mm:ss（去年份），不能用于按日分组；必须用 createTime
+            TreeMap<String, DayAgg> dayMap = new TreeMap<>();
+            for (CpuState cpuState : cpuStateList) {
+                String day = toDayKey(cpuState.getCreateTime());
+                if (day == null) {
+                    continue;
+                }
+                DayAgg agg = dayMap.computeIfAbsent(day, k -> new DayAgg());
+                addDouble(agg.cpuPer, cpuState.getSys());
+                addInteger(agg.procsNum, cpuState.getProcsNum());
+            }
+            for (MemState memState : memStateList) {
+                String day = toDayKey(memState.getCreateTime());
+                if (day == null) {
+                    continue;
+                }
+                DayAgg agg = dayMap.computeIfAbsent(day, k -> new DayAgg());
+                addDouble(agg.memPer, memState.getUsePer());
+            }
+            for (SysLoadState sysLoadState : sysLoadStateList) {
+                String day = toDayKey(sysLoadState.getCreateTime());
+                if (day == null) {
+                    continue;
+                }
+                DayAgg agg = dayMap.computeIfAbsent(day, k -> new DayAgg());
+                addDouble(agg.oneLoad, sysLoadState.getOneLoad());
+                addDouble(agg.fiveLoad, sysLoadState.getFiveLoad());
+                addDouble(agg.fifteenLoad, sysLoadState.getFifteenLoad());
+            }
+            for (NetIoState netIoState : netIoStateList) {
+                String day = toDayKey(netIoState.getCreateTime());
+                if (day == null) {
+                    continue;
+                }
+                DayAgg agg = dayMap.computeIfAbsent(day, k -> new DayAgg());
+                addStringNum(agg.dropin, netIoState.getDropin());
+                addStringNum(agg.dropout, netIoState.getDropout());
+                addStringNum(agg.rxbyt, netIoState.getRxbyt());
+                addStringNum(agg.txbyt, netIoState.getTxbyt());
+                addStringNum(agg.rxpck, netIoState.getRxpck());
+                addStringNum(agg.txpck, netIoState.getTxpck());
+                addStringNum(agg.netConnections, netIoState.getNetConnections());
+            }
+
+            ArrayList<HostChartExcelDto> excelChartList = new ArrayList<>();
+            for (Map.Entry<String, DayAgg> entry : dayMap.entrySet()) {
+                DayAgg agg = entry.getValue();
+                HostChartExcelDto dto = new HostChartExcelDto();
+                dto.setDatetime(entry.getKey());
+                dto.setCpuPer(avgDouble(agg.cpuPer));
+                dto.setMemPer(avgDouble(agg.memPer));
+                dto.setOneLoad(avgDouble(agg.oneLoad));
+                dto.setFiveLoad(avgDouble(agg.fiveLoad));
+                dto.setFifteenLoad(avgDouble(agg.fifteenLoad));
+                dto.setProcsNum(avgInteger(agg.procsNum));
+                dto.setDropin(avgStringNum(agg.dropin));
+                dto.setDropout(avgStringNum(agg.dropout));
+                dto.setRxbyt(avgStringNum(agg.rxbyt));
+                dto.setTxbyt(avgStringNum(agg.txbyt));
+                dto.setRxpck(avgStringNum(agg.rxpck));
+                dto.setTxpck(avgStringNum(agg.txpck));
+                dto.setNetConnections(avgStringNum(agg.netConnections));
+                excelChartList.add(dto);
+            }
+
+            String hostname = params.get("hostname").toString();
+            String fileName = DateUtil.getCurrentDateTimeNoChar() + "_" + hostname + "\u8d8b\u52bf\u56fe_\u65e5\u5747\u503c.xlsx";
+            response.setContentType("application/vnd.ms-exce");
+            response.setCharacterEncoding("utf-8");
+            String encodedFileName = URLEncoder.encode(fileName, "UTF-8");
+            response.addHeader("Content-Disposition", "filename=" + encodedFileName);
+            EasyExcel.write((OutputStream)response.getOutputStream(), HostChartExcelDto.class).sheet("sheet").doWrite(excelChartList);
+        }
+        catch (Exception e) {
+            logger.error("\u4e3b\u673a\u8d8b\u52bf\u56fe\u65e5\u5747\u503c\u5bfc\u51faexcel\u9519\u8bef", (Throwable)e);
+        }
+    }
+
+    private static String toDayKey(Date createTime) {
+        if (createTime == null) {
+            return null;
+        }
+        return DateUtil.getDateString(createTime);
+    }
+
+    private static void addDouble(SumCount sc, Double value) {
+        if (value == null) {
+            return;
+        }
+        sc.sum += value;
+        sc.count++;
+    }
+
+    private static void addInteger(SumCount sc, Integer value) {
+        if (value == null) {
+            return;
+        }
+        sc.sum += value.doubleValue();
+        sc.count++;
+    }
+
+    private static void addStringNum(SumCount sc, String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return;
+        }
+        try {
+            sc.sum += Double.parseDouble(value.trim());
+            sc.count++;
+        }
+        catch (NumberFormatException ignored) {
+        }
+    }
+
+    private static Double avgDouble(SumCount sc) {
+        if (sc.count == 0) {
+            return null;
+        }
+        return Math.round(sc.sum / sc.count * 100.0) / 100.0;
+    }
+
+    private static Integer avgInteger(SumCount sc) {
+        if (sc.count == 0) {
+            return null;
+        }
+        return (int)Math.round(sc.sum / sc.count);
+    }
+
+    private static String avgStringNum(SumCount sc) {
+        if (sc.count == 0) {
+            return null;
+        }
+        double avg = sc.sum / sc.count;
+        if (Math.abs(avg - Math.rint(avg)) < 1.0E-9) {
+            return String.valueOf((long)Math.rint(avg));
+        }
+        return String.format("%.2f", avg);
+    }
+
+    private static class SumCount {
+        double sum;
+        int count;
+    }
+
+    private static class DayAgg {
+        final SumCount cpuPer = new SumCount();
+        final SumCount memPer = new SumCount();
+        final SumCount oneLoad = new SumCount();
+        final SumCount fiveLoad = new SumCount();
+        final SumCount fifteenLoad = new SumCount();
+        final SumCount procsNum = new SumCount();
+        final SumCount dropin = new SumCount();
+        final SumCount dropout = new SumCount();
+        final SumCount rxbyt = new SumCount();
+        final SumCount txbyt = new SumCount();
+        final SumCount rxpck = new SumCount();
+        final SumCount txpck = new SumCount();
+        final SumCount netConnections = new SumCount();
     }
 
     /*

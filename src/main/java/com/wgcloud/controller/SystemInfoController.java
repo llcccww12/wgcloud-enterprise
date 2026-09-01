@@ -655,6 +655,34 @@ public class SystemInfoController {
         }
     }
 
+    @RequestMapping(value={"chartExcelDayAvg"})
+    public void hostChartExcelDayAvg(Model model, HttpServletRequest request, HttpServletResponse response) {
+        String id = request.getParameter("id");
+        String startTime = request.getParameter("startTime");
+        String endTime = request.getParameter("endTime");
+        String am = request.getParameter("am");
+        if (StringUtils.isEmpty((CharSequence)id)) {
+            return;
+        }
+        try {
+            if (!StaticKeys.LICENSE_STATE.equals("1")) {
+                response.setContentType("text/html;charset=UTF-8");
+                response.getOutputStream().write("The module needs to professional version. Please contact us at www.wgstart.com".getBytes());
+                return;
+            }
+            SystemInfo systemInfo = this.systemInfoService.selectById(id);
+            model.addAttribute("systemInfo", (Object)systemInfo);
+            HashMap<String, Object> params = new HashMap<String, Object>();
+            params.put("hostname", systemInfo.getHostname());
+            this.dashboardService.setDateParam(am, startTime, endTime, params, model);
+            this.excelExportService.exportExcelByDayAvg(params, response);
+        }
+        catch (Exception e) {
+            logger.error("\u4e3b\u673a\u56fe\u5f62\u62a5\u8868\u65e5\u5747\u503c\u5bfc\u51faexcel\u9519\u8bef", (Throwable)e);
+            this.logInfoService.save("\u4e3b\u673a\u56fe\u5f62\u62a5\u8868\u65e5\u5747\u503c\u5bfc\u51faexcel\u9519\u8bef", e.toString(), "2");
+        }
+    }
+
     @RequestMapping(value={"hostListExcel"})
     public void hostListExcel(SystemInfo systemInfo, Model model, HttpServletRequest request, HttpServletResponse response) {
         try {

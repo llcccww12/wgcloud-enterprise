@@ -96,6 +96,12 @@ function excelExport(id,searchTime){
 	window.open(SERVER_SERVLET_CONTEXT_PATH + "/systemInfo/chartExcel?id="+id+"&startTime="+startTime+"&endTime="+endTime+"&am="+searchTime);
 }
 
+function excelExportDayAvg(id,searchTime){
+	var startTime = $("#startTime").val();
+	var endTime = $("#endTime").val();
+	window.open(SERVER_SERVLET_CONTEXT_PATH + "/systemInfo/chartExcelDayAvg?id="+id+"&startTime="+startTime+"&endTime="+endTime+"&am="+searchTime);
+}
+
 function excelExportHostList(){
 	var urlParams = window.location.search;
 	var chk_value =[];

@@ -78,7 +78,10 @@
                         </form>
                     </td>
 
-                    <td width="2%" style="vertical-align:bottom;text-align: right"><button type="button" th:onclick="excelExport([[${systemInfo.id}]],[[${am}]])" class="btn btn-primary btn-sm">导出Excel</button></td>
+                    <td width="2%" style="vertical-align:bottom;text-align: right;white-space:nowrap;">
+                        <button type="button" th:onclick="excelExport([[${systemInfo.id}]],[[${am}]])" class="btn btn-primary btn-sm" style="margin-right:5px;">导出Excel</button>
+                        <button type="button" th:onclick="excelExportDayAvg([[${systemInfo.id}]],[[${am}]])" class="btn btn-outline-primary btn-sm" title="按天取平均值，半个月约15行">导出日均值Excel</button>
+                    </td>
                     </tr></tbody></table>
             </div>
             <!-- /.col -->
@@ -175,7 +178,7 @@
 </div>
 <!-- ./wrapper -->
 
-<script th:src="@{'/static/js/host.js?v=3.5.0'}"></script>
+<script th:src="@{'/static/js/host.js?v=3.6.8-dayavg'}"></script>
 
 
 <script th:inline="javascript">
