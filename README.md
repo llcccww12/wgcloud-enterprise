@@ -25,6 +25,20 @@
 - **官方 jar 里这是数据截断错误**：
   `Data too long for column 'FROM_PWD' at row 1`
 
+## 数据库初始化（必须）
+
+**必须使用 `sql/wgcloud-schema-full.sql` 初始化数据库**（约 45+ 张表，含 `DCE_INFO` 等全功能表）。
+
+- 不要使用 `sql/wgcloud-MySQL.sql`：那是 2021 年旧版导出，**只有 17 张表**，缺 `DCE_INFO` 等表，会导致登录页品牌名、PING/SNMP 等功能异常。
+- `wgcloud-schema-full.sql` 使用 `CREATE TABLE IF NOT EXISTS`，可重复执行。
+
+```bash
+mysql -uroot -p -e "CREATE DATABASE IF NOT EXISTS wgcloud DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -uroot -p wgcloud < sql/wgcloud-schema-full.sql
+# 可选：邮件密码字段加长补丁
+mysql -uroot -p wgcloud < sql/patches/01-mail-set-from-pwd-100.sql
+```
+
 ## 构建
 
 ```bash
@@ -34,17 +48,15 @@ mvn -DskipTests clean package
 
 ## 部署
 
-1. 把打出来的 `wgcloud-server-release.jar` 放到 `server/` 目录
-2. 把 `agent-linux-amd64-v3.6.8.tar.gz` 解压放到 `agent/wgcloud-agent-pack/`
-3. 应用 schema 补丁:
-   ```sql
-   mysql -uroot -p wgcloud < sql/patches/01-mail-set-from-pwd-100.sql
-   ```
-4. 修改 `agent/wgcloud-agent-pack/config/application.properties`：
+1. **先按上一节用 `sql/wgcloud-schema-full.sql` 初始化数据库**（不要用 `wgcloud-MySQL.sql`）
+2. 把打出来的 `wgcloud-server-release.jar` 放到 `server/` 目录
+3. 配置 `server/config/application.yml`（可参考 `src/main/resources/application.yml.example`）
+4. 把 `agent-linux-amd64-v3.6.8.tar.gz` 解压放到 `agent/wgcloud-agent-pack/`
+5. 修改 `agent/wgcloud-agent-pack/config/application.properties`：
    - `serverUrl=http://<server-ip>:9999`
    - `bindIp=<本机 ip>`（防被自动识别成 docker0 网卡 IP）
    - `wgToken=<与 server 一致>`
-5. 启动:
+6. 启动:
    ```bash
    nohup java -Xms512m -Xmx1024m -jar server/wgcloud-server-release.jar \
      --spring.config.location=server/config/application.yml &
